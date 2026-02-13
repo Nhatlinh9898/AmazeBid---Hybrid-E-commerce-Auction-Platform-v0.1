@@ -124,7 +124,7 @@ export interface Product {
   stepPrice?: number;
   platformName?: string;
   commissionRate?: number;
-  condition?: 'NEW' | 'LIKE_NEW' | 'USED'; // New field
+  condition?: 'NEW' | 'LIKE_NEW' | 'USED'; 
 }
 
 export interface LiveStream {
@@ -157,7 +157,7 @@ export interface ContentPost {
   status: 'DRAFT' | 'PUBLISHED';
   platform: 'BLOG' | 'FACEBOOK' | 'INSTAGRAM' | 'TIKTOK';
   createdAt: string;
-  comments?: Comment[]; // Added comments
+  comments?: Comment[];
   likes?: number;
 }
 
@@ -205,4 +205,30 @@ export interface AvatarCustomization {
   language: string;
   voiceSpeed: number;
   voicePitch: number;
+}
+
+export interface AppNotification {
+  id: string;
+  type: 'ORDER' | 'BID' | 'PROMO' | 'SYSTEM';
+  title: string;
+  message: string;
+  time: string;
+  read: boolean;
+  image?: string;
+}
+
+export interface ChatConversation {
+  id: string;
+  partnerId: string;
+  partnerName: string;
+  partnerAvatar: string;
+  lastMessage: string;
+  lastTime: string;
+  unread: number;
+  messages: {
+    id: string;
+    senderId: string;
+    text: string;
+    timestamp: string;
+  }[];
 }

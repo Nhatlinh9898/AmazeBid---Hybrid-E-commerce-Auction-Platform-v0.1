@@ -1,14 +1,16 @@
 
-import React, { useState, useEffect } from 'react';
-import { Search, ShoppingCart, User as UserIcon, MapPin, Gavel, LayoutGrid, PlusCircle, Package, Video, Sparkles, Zap, BarChart3, Shield, Bot, BrainCircuit, Newspaper, Home, Crown, Camera, Mic, MicOff, Heart } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, ShoppingCart, User as UserIcon, MapPin, Gavel, LayoutGrid, PlusCircle, Package, Video, Sparkles, Zap, BarChart3, Shield, Bot, BrainCircuit, Newspaper, Home, Crown, Camera, Mic, MicOff, Heart, Bell } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import NotificationDropdown from './NotificationDropdown';
+import { AppNotification } from '../types';
 
 interface NavbarProps {
   cartCount: number;
-  wishlistCount: number; // Added prop
+  wishlistCount: number; 
   onSearch: (term: string) => void;
   openCart: () => void;
-  openWishlist: () => void; // Added prop
+  openWishlist: () => void; 
   openSellModal: () => void;
   openOrders: () => void;
   onOpenLiveStudio: () => void;
@@ -39,6 +41,35 @@ const Navbar: React.FC<NavbarProps> = ({
   const { user } = useAuth();
   const [isListening, setIsListening] = useState(false);
   const [voiceText, setVoiceText] = useState('');
+  
+  // Notification State
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState<AppNotification[]>([
+      { id: 'n1', type: 'ORDER', title: 'Đơn hàng đang giao', message: 'Shipper đang trên đường giao iPhone 15 Pro Max đến bạn.', time: '5 phút trước', read: false },
+      { id: 'n2', type: 'BID', title: 'Đã bị trả giá cao hơn!', message: 'Có người vừa trả $5,100 cho Rolex Datejust. Hãy trả giá lại ngay!', time: '1 giờ trước', read: false },
+      { id: 'n3', type: 'PROMO', title: 'Flash Sale sắp bắt đầu', message: 'Săn deal giảm 50% lúc 12:00 hôm nay.', time: '2 giờ trước', read: true }
+  ]);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setShowNotifications(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [notifRef]);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const handleMarkRead = (id: string) => {
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  };
+
+  const handleClearAll = () => {
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
 
   // Voice Search Logic
   const handleVoiceSearch = () => {
@@ -154,6 +185,21 @@ const Navbar: React.FC<NavbarProps> = ({
                   <span className="text-xs font-bold text-[#febd69]">{user.points?.toLocaleString() || 0}</span>
               </div>
           )}
+
+          {/* Notifications */}
+          <div className="relative" ref={notifRef}>
+              <div onClick={() => setShowNotifications(!showNotifications)} className="p-1 cursor-pointer hover:text-[#febd69] relative">
+                  {unreadCount > 0 && <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1 rounded-full animate-pulse">{unreadCount}</span>}
+                  <Bell size={22} />
+              </div>
+              {showNotifications && (
+                  <NotificationDropdown 
+                    notifications={notifications} 
+                    onMarkRead={handleMarkRead}
+                    onClearAll={handleClearAll}
+                  />
+              )}
+          </div>
 
           <div onClick={user ? onOpenProfile : onOpenAuth} className="p-1 cursor-pointer hover:text-[#febd69]">
             <UserIcon size={22} />

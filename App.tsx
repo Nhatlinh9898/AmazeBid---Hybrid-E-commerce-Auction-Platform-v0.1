@@ -24,7 +24,8 @@ import ProductDetailModal from './components/ProductDetailModal';
 import CompareBar from './components/CompareBar'; 
 import CompareModal from './components/CompareModal'; 
 import CartDrawer from './components/CartDrawer'; 
-import FilterPanel from './components/FilterPanel'; // Import FilterPanel
+import FilterPanel from './components/FilterPanel';
+import ChatWidget from './components/ChatWidget'; // Import ChatWidget
 
 import { AuthProvider, useAuth } from './context/AuthContext'; 
 
@@ -511,6 +512,8 @@ const InnerApp: React.FC = () => {
         </div>
       )}
 
+      {/* Global Widgets */}
+      <ChatWidget />
       <GeminiAssistant products={products} />
     </div>
   );
