@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { Product, KOLProfile } from "../types";
 
@@ -96,34 +95,6 @@ export const generateProductImage = async (prompt: string) => {
   } catch (e) { return null; }
 };
 
-export const generateProductVideo = async (prompt: string) => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  try {
-    let operation = await ai.models.generateVideos({
-      model: 'veo-3.1-fast-generate-preview',
-      prompt: prompt,
-      config: {
-        numberOfVideos: 1,
-        resolution: '720p',
-        aspectRatio: '16:9'
-      }
-    });
-    while (!operation.done) {
-      await new Promise(resolve => setTimeout(resolve, 10000));
-      operation = await ai.operations.getVideosOperation({operation: operation});
-    }
-
-    const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
-    if (downloadLink) {
-        return `${downloadLink}&key=${process.env.API_KEY}`;
-    }
-    return null;
-  } catch (error) {
-    console.error("Video Generation Error:", error);
-    return null;
-  }
-};
-
 export const analyzeProductImage = async (base64Image: string): Promise<{ query: string, category: string } | null> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
@@ -145,45 +116,6 @@ export const analyzeProductImage = async (base64Image: string): Promise<{ query:
     console.error("Visual Search Error:", e);
     return { query: "Sản phẩm", category: "Electronics" };
   }
-};
-
-export interface ProductAnalysis {
-    score: number;
-    verdict: "EXCELLENT_DEAL" | "GOOD_PRICE" | "FAIR" | "OVERPRICED";
-    pros: string[];
-    cons: string[];
-    priceAnalysis: string;
-}
-
-export const analyzeProductDeal = async (product: Product): Promise<ProductAnalysis | null> => {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    const prompt = `Phân tích xem sản phẩm này có đáng mua không dựa trên giá và tên gọi:
-    Sản phẩm: ${product.title}
-    Giá hiện tại: $${product.price}
-    ${product.originalPrice ? `Giá gốc: $${product.originalPrice}` : ''}
-    Mô tả: ${product.description}
-
-    Hãy đóng vai một chuyên gia thẩm định giá.
-    Trả về JSON với cấu trúc:
-    {
-        "score": number (1-10),
-        "verdict": "EXCELLENT_DEAL" | "GOOD_PRICE" | "FAIR" | "OVERPRICED",
-        "pros": ["Điểm mạnh 1", "Điểm mạnh 2"],
-        "cons": ["Điểm yếu 1", "Điểm yếu 2"],
-        "priceAnalysis": "Nhận xét ngắn gọn về giá (tiếng Việt)"
-    }`;
-
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
-            contents: prompt,
-            config: { responseMimeType: "application/json" }
-        });
-        return JSON.parse(response.text) as ProductAnalysis;
-    } catch (e) {
-        console.error("Deal Analysis Error:", e);
-        return null;
-    }
 };
 
 export interface ComparisonResult {
@@ -223,75 +155,127 @@ export const compareProducts = async (p1: Product, p2: Product): Promise<Compari
     }
 };
 
-export interface NegotiationResult {
-    status: 'ACCEPTED' | 'REJECTED' | 'COUNTER_OFFER';
-    sellerResponse: string; 
-    finalPrice?: number;
-}
+// --- Added Missing Functions ---
 
-export const negotiateWithAI = async (
-    product: Product, 
-    userOffer: number, 
-    userMessage: string, 
-    chatHistory: {role: string, text: string}[]
-): Promise<NegotiationResult | null> => {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+export const generateProductVideo = async (prompt: string): Promise<string | null> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  try {
+    let operation = await ai.models.generateVideos({
+      model: 'veo-3.1-fast-generate-preview',
+      prompt: prompt,
+      config: {
+        numberOfVideos: 1,
+        resolution: '720p',
+        aspectRatio: '16:9'
+      }
+    });
     
-    const floorPrice = product.price * 0.85;
-    const historyText = chatHistory.map(m => `${m.role}: ${m.text}`).join('\n');
-
-    const prompt = `Bạn là chủ cửa hàng AmazeBid (AI Shopkeeper). Bạn đang bán sản phẩm "${product.title}" với giá niêm yết $${product.price}.
-    Giá sàn thấp nhất bạn có thể bán là $${floorPrice} (TUYỆT ĐỐI KHÔNG TIẾT LỘ GIÁ SÀN CHO KHÁCH).
-    
-    Khách hàng vừa trả giá: $${userOffer}.
-    Lời nhắn của khách: "${userMessage}".
-
-    Lịch sử chat:
-    ${historyText}
-
-    Nhiệm vụ của bạn:
-    1. Nếu giá khách trả >= Giá sàn: Chấp nhận (ACCEPTED).
-    2. Nếu giá khách trả < Giá sàn nhưng gần (khoảng 80-84%): Đưa ra giá Counter Offer (COUNTER_OFFER) cao hơn giá sàn một chút.
-    3. Nếu giá quá thấp: Từ chối khéo léo hoặc Counter Offer về mức giá niêm yết giảm nhẹ.
-    
-    Hãy trả lời ngắn gọn, hài hước, đôi khi "chảnh" một chút hoặc than nghèo kể khổ để giữ giá.
-
-    Trả về JSON:
-    {
-        "status": "ACCEPTED" | "REJECTED" | "COUNTER_OFFER",
-        "sellerResponse": "Câu trả lời của bạn (Tiếng Việt)",
-        "finalPrice": con số (nếu accept thì là giá khách, nếu counter thì là giá bạn muốn, nếu reject thì null)
-    }`;
-
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
-            contents: prompt,
-            config: { responseMimeType: "application/json" }
-        });
-        return JSON.parse(response.text) as NegotiationResult;
-    } catch (e) {
-        console.error("Negotiation Error:", e);
-        return null;
+    while (!operation.done) {
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      operation = await ai.operations.getVideosOperation({operation: operation});
     }
+
+    if (operation.response?.generatedVideos?.[0]?.video?.uri) {
+       // Return URI with API key appended for access
+       return `${operation.response.generatedVideos[0].video.uri}&key=${process.env.API_KEY}`;
+    }
+    return null;
+  } catch (e) {
+    console.error("Video Generation Error:", e);
+    return null;
+  }
 };
 
-/** New Function: AI Viral Copywriter for Group Buying */
-export const generateRecruitmentMessage = async (productName: string, teamPrice: number, style: 'FUNNY' | 'URGENT' | 'EMOTIONAL'): Promise<string> => {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    const prompt = `Viết một tin nhắn ngắn (dưới 30 từ) để rủ bạn bè mua chung sản phẩm "${productName}" với giá siêu rẻ $${teamPrice} trên AmazeBid.
-    Phong cách: ${style} (Hài hước / Gấp gáp / Tình cảm).
-    Có dùng Emoji.
-    Mục tiêu: Khiến người nhận bấm vào link ngay lập tức.
-    Chỉ trả về nội dung tin nhắn.`;
+export interface ProductAnalysis {
+  verdict: 'EXCELLENT_DEAL' | 'GOOD_PRICE' | 'OVERPRICED';
+  score: number;
+  priceAnalysis: string;
+  pros: string[];
+  cons: string[];
+}
 
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
-            contents: prompt,
-        });
-        return response.text || `Mua chung ${productName} giá ${teamPrice} với mình đi! 🔥`;
-    } catch (e) {
-        return `Mua chung ${productName} giá ${teamPrice} với mình đi! 🔥`;
-    }
+export const analyzeProductDeal = async (product: Product): Promise<ProductAnalysis | null> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const prompt = `Analyze this product deal:
+  Title: ${product.title}
+  Price: ${product.price}
+  Description: ${product.description}
+  Category: ${product.category}
+  
+  Return JSON with fields:
+  verdict (enum: EXCELLENT_DEAL, GOOD_PRICE, OVERPRICED),
+  score (number 1-10),
+  priceAnalysis (string),
+  pros (string array),
+  cons (string array).`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+      config: { responseMimeType: "application/json" }
+    });
+    return JSON.parse(response.text) as ProductAnalysis;
+  } catch (e) {
+    console.error("Product Analysis Error:", e);
+    return null;
+  }
+};
+
+export interface NegotiationResult {
+  sellerResponse: string;
+  status: 'PENDING' | 'ACCEPTED' | 'COUNTER_OFFER' | 'REJECTED';
+  finalPrice?: number;
+}
+
+export const negotiateWithAI = async (product: Product, userOffer: number, userNote: string, history: {role: string, text: string}[]): Promise<NegotiationResult | null> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const systemInstruction = `You are a seller negotiating the price of "${product.title}". 
+  Listed Price: ${product.price}.
+  Minimum Acceptable Price: ${product.price * 0.85}.
+  
+  Behavior:
+  - Be polite but professional.
+  - If offer is too low (< min price), reject or counter offer.
+  - If acceptable (>= min price), accept.
+  - User note: "${userNote}".
+  
+  Output JSON:
+  {
+    "sellerResponse": "string",
+    "status": "PENDING" | "ACCEPTED" | "COUNTER_OFFER" | "REJECTED",
+    "finalPrice": number (optional)
+  }`;
+
+  const conversation = history.map(m => `${m.role.toUpperCase()}: ${m.text}`).join('\n');
+  const prompt = `Conversation history:\n${conversation}\n\nUser just offered: ${userOffer}. Provide response.`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+      config: { 
+        responseMimeType: "application/json",
+        systemInstruction: systemInstruction 
+      }
+    });
+    return JSON.parse(response.text) as NegotiationResult;
+  } catch (e) {
+    console.error("Negotiation Error:", e);
+    return null;
+  }
+};
+
+export const generateRecruitmentMessage = async (productName: string, price: number, style: 'FUNNY' | 'URGENT' | 'EMOTIONAL'): Promise<string> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const prompt = `Write a short, catchy invitation message for a group buy of "${productName}" at price $${price}. Style: ${style}. Max 150 characters.`;
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: prompt,
+    });
+    return response.text.trim();
+  } catch (e) {
+    return `Mua chung ${productName} giá cực sốc $${price} cùng mình nhé!`;
+  }
 };
