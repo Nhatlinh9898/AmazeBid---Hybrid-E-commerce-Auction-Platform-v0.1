@@ -47,10 +47,14 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
       setIsCheckoutModalOpen(true);
   };
 
+  // Updated: Only update data, let CheckoutModal handle closing UI after printing
   const handleFinalCheckout = (info: ShippingInfo) => {
-      onCheckout(info);
+      onCheckout(info); 
+  };
+
+  const handleCloseCheckout = () => {
       setIsCheckoutModalOpen(false);
-      onClose(); // Close cart drawer
+      onClose(); // Close cart drawer after full process
   };
 
   return (
@@ -186,7 +190,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
 
       <CheckoutModal 
         isOpen={isCheckoutModalOpen}
-        onClose={() => setIsCheckoutModalOpen(false)}
+        onClose={handleCloseCheckout}
         cartItems={cartItems}
         totalAmount={total}
         onSubmitOrder={handleFinalCheckout}

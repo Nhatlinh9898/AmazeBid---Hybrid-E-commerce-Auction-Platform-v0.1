@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { X, MapPin, Phone, User, CreditCard, Truck, CheckCircle2, ArrowRight } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { X, MapPin, Phone, User, CreditCard, Truck, CheckCircle2, ArrowRight, Printer, Package, Download } from 'lucide-react';
 import { ShippingInfo, CartItem } from '../types';
 import { useAuth } from '../context/AuthContext';
 
@@ -22,8 +22,56 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, cartItem
     note: ''
   });
   const [paymentMethod, setPaymentMethod] = useState('COD');
+  
+  // Success & Print States
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [orderId, setOrderId] = useState('');
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const labelRef = useRef<HTMLDivElement>(null);
 
   if (!isOpen) return null;
+
+  const handlePrintLabel = () => {
+      setIsPrinting(true);
+      
+      const printContent = document.getElementById('shipping-label-area');
+      if (printContent) {
+          const win = window.open('', '', 'height=800,width=600');
+          if (win) {
+              win.document.write(`
+                  <html>
+                      <head>
+                          <title>Phiếu Gửi Hàng - ${orderId}</title>
+                          <style>
+                              body { font-family: 'Arial', sans-serif; padding: 20px; }
+                              .label-container { border: 2px solid #000; padding: 20px; max-width: 500px; margin: 0 auto; }
+                              .header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+                              .logo { font-weight: 900; font-size: 24px; font-style: italic; }
+                              .barcode { text-align: center; margin: 20px 0; }
+                              .barcode-img { height: 60px; width: 80%; background: repeating-linear-gradient(90deg, #000 0, #000 2px, #fff 2px, #fff 4px); display: inline-block; }
+                              .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+                              .section { border: 1px solid #ccc; padding: 10px; }
+                              .label { font-size: 10px; font-weight: bold; text-transform: uppercase; color: #555; }
+                              .value { font-size: 14px; font-weight: bold; margin-top: 4px; }
+                              .items { margin-top: 20px; border-top: 1px dashed #000; pt-2; }
+                              .item-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+                              .footer { text-align: center; font-size: 10px; margin-top: 30px; border-top: 1px solid #ccc; padding-top: 10px; }
+                          </style>
+                      </head>
+                      <body>
+                          ${printContent.innerHTML}
+                          <script>
+                              window.onload = function() { window.print(); window.close(); }
+                          </script>
+                      </body>
+                  </html>
+              `);
+              win.document.close();
+          }
+      }
+      setIsPrinting(false);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,9 +79,116 @@ const CheckoutModal: React.FC<CheckoutModalProps> = ({ isOpen, onClose, cartItem
         alert("Vui lòng điền đầy đủ thông tin giao hàng");
         return;
     }
+    
+    // 1. Generate Order ID
+    const newOrderId = `AMZ-${Date.now().toString().slice(-8)}-VN`;
+    setOrderId(newOrderId);
+
+    // 2. Submit Order to App State
     onSubmitOrder(formData);
+
+    // 3. Switch to Success View
+    setIsSuccess(true);
+
+    // 4. Auto Trigger Print after a short delay (for UX)
+    setTimeout(() => {
+        handlePrintLabel();
+    }, 800);
   };
 
+  // --- Render Success View ---
+  if (isSuccess) {
+      return (
+        <div className="fixed inset-0 z-[500] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+            <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl p-8 flex flex-col items-center text-center animate-in zoom-in">
+                
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-green-500/20">
+                    <CheckCircle2 size={40} className="text-green-600" />
+                </div>
+                
+                <h2 className="text-2xl font-black text-gray-900 mb-2">Đặt hàng thành công!</h2>
+                <p className="text-gray-500 text-sm mb-6">Mã đơn hàng: <span className="font-mono font-bold text-[#131921]">{orderId}</span></p>
+
+                <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 w-full mb-6 text-left">
+                    <div className="flex items-center gap-3 mb-2">
+                        <Printer size={20} className="text-blue-600"/>
+                        <p className="font-bold text-sm text-gray-800">Đang in phiếu gửi hàng...</p>
+                    </div>
+                    <p className="text-xs text-gray-500 ml-8">Vui lòng dán phiếu này lên kiện hàng nếu bạn cần trả lại hoặc lưu làm bằng chứng.</p>
+                </div>
+
+                <div className="flex gap-3 w-full">
+                    <button 
+                        onClick={onClose}
+                        className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition-all"
+                    >
+                        Đóng
+                    </button>
+                    <button 
+                        onClick={handlePrintLabel}
+                        className="flex-1 py-3 bg-[#131921] text-white font-bold rounded-xl hover:bg-black transition-all flex items-center justify-center gap-2"
+                    >
+                        <Printer size={18}/> In lại
+                    </button>
+                </div>
+
+                {/* HIDDEN SHIPPING LABEL TEMPLATE (FOR PRINTING) */}
+                <div id="shipping-label-area" className="hidden">
+                    <div className="label-container">
+                        <div className="header">
+                            <div className="logo">AMAZE<span style={{color: '#febd69'}}>BID</span></div>
+                            <div className="label">EXPRESS DELIVERY</div>
+                        </div>
+                        
+                        <div className="barcode">
+                            <div className="barcode-img"></div>
+                            <div style={{letterSpacing: '4px', fontWeight: 'bold', marginTop: '5px'}}>{orderId}</div>
+                        </div>
+
+                        <div className="grid">
+                            <div className="section">
+                                <div className="label">FROM (NGƯỜI GỬI)</div>
+                                <div className="value">AMAZEBID WAREHOUSE</div>
+                                <div style={{fontSize: '12px', marginTop: '2px'}}>Quan 1, TP. Ho Chi Minh</div>
+                                <div style={{fontSize: '12px'}}>Hotline: 1900 1234</div>
+                            </div>
+                            <div className="section">
+                                <div className="label">TO (NGƯỜI NHẬN)</div>
+                                <div className="value" style={{fontSize: '16px'}}>{formData.fullName.toUpperCase()}</div>
+                                <div style={{fontSize: '12px', marginTop: '2px'}}>{formData.phone}</div>
+                                <div style={{fontSize: '12px'}}>{formData.address}, {formData.city}</div>
+                            </div>
+                        </div>
+
+                        <div className="section">
+                            <div className="label">ORDER DETAILS</div>
+                            <div style={{marginTop: '10px'}}>
+                                {cartItems.map((item, i) => (
+                                    <div key={i} className="item-row">
+                                        <span>{item.quantity}x {item.title}</span>
+                                        <span style={{fontWeight: 'bold'}}>${(item.price * item.quantity).toLocaleString()}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div style={{borderTop: '1px solid #eee', marginTop: '10px', paddingTop: '5px', display: 'flex', justifyContent: 'space-between', fontWeight: 'bold'}}>
+                                <span>TOTAL (COD)</span>
+                                <span>${totalAmount.toLocaleString()}</span>
+                            </div>
+                        </div>
+
+                        <div className="footer">
+                            Powered by AmazeBid Logistics - Thank you for shopping!
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+      );
+  }
+
+  // --- Normal Checkout Form ---
   return (
     <div className="fixed inset-0 z-[500] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm animate-in fade-in" onClick={onClose} />
