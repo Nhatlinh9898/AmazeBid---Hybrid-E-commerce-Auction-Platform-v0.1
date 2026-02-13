@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Upload, Gavel, DollarSign, Tag, Info, PlusCircle, CreditCard, Landmark, Wallet, CheckCircle2, Sparkles, Search, Link2, Globe, Download } from 'lucide-react';
+import { X, Upload, Gavel, DollarSign, Tag, Info, PlusCircle, CreditCard, Landmark, Wallet, CheckCircle2, Sparkles, Search, Link2, Globe, Download, Calculator, ArrowRight, PieChart, AlertTriangle } from 'lucide-react';
 import { Product, ItemType, OrderStatus } from '../types';
 import { PRODUCT_TEMPLATES, AFFILIATE_NETWORK_ITEMS } from '../data';
 
@@ -15,6 +15,25 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
   const [suggestions, setSuggestions] = useState<typeof PRODUCT_TEMPLATES>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   
+  // --- Smart Pricing State ---
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [calcData, setCalcData] = useState({
+      costPrice: 0,
+      totalQuantity: 100,
+      breakEvenCount: 20, // Mặc định thu hồi vốn sau 20 sản phẩm
+      platformFeePercent: 5 // Phí sàn 5%
+  });
+
+  // Derived Pricing Data
+  const totalCapital = calcData.costPrice * calcData.totalQuantity;
+  const suggestedPrice = calcData.breakEvenCount > 0 ? Math.ceil(totalCapital / calcData.breakEvenCount) : 0;
+  const systemFee = suggestedPrice * (calcData.platformFeePercent / 100);
+  const netRevenuePerUnit = suggestedPrice - systemFee;
+  const netProfitPerUnit = netRevenuePerUnit - calcData.costPrice;
+  
+  // Phase 2: Sau khi bán hết 20 cái, 80 cái còn lại là lãi ròng (trừ phí sàn)
+  const profitPhase2 = suggestedPrice - systemFee; 
+
   // Affiliate Link Input (Manual)
   const [manualAffiliateLink, setManualAffiliateLink] = useState('');
 
@@ -71,6 +90,11 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
       type: ItemType.FIXED_PRICE 
     });
     setShowSuggestions(false);
+  };
+
+  const applySmartPrice = () => {
+      setFormData({ ...formData, price: suggestedPrice.toString() });
+      setShowCalculator(false);
   };
 
   // Add item from Affiliate Network
@@ -310,7 +334,7 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
                 </div>
 
                 <div className="space-y-6">
-                    <div className="bg-gray-50 p-6 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center group hover:border-[#febd69] transition-all cursor-pointer relative overflow-hidden">
+                    <div className="bg-gray-50 p-6 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center group hover:border-[#febd69] transition-all cursor-pointer relative overflow-hidden h-[150px]">
                     {/* Preview Image if Auto-filled */}
                     {formData.image.includes('picsum') ? (
                         <>
@@ -330,47 +354,57 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
                     </div>
 
                     <div className="bg-gray-50 p-4 rounded-xl space-y-4">
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider">Hình thức giao dịch</label>
-                    <div className="flex p-1 bg-white rounded-lg border border-gray-200">
-                        <button 
-                        type="button"
-                        onClick={() => setFormData({...formData, type: ItemType.FIXED_PRICE})}
-                        className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 text-xs font-bold transition-all ${formData.type === ItemType.FIXED_PRICE ? 'bg-[#131921] text-white shadow-md' : 'text-gray-400 hover:bg-gray-50'}`}
-                        >
-                        <DollarSign size={14} /> MUA NGAY
-                        </button>
-                        <button 
-                        type="button"
-                        onClick={() => setFormData({...formData, type: ItemType.AUCTION})}
-                        className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 text-xs font-bold transition-all ${formData.type === ItemType.AUCTION ? 'bg-[#febd69] text-black shadow-md' : 'text-gray-400 hover:bg-gray-50'}`}
-                        >
-                        <Gavel size={14} /> ĐẤU GIÁ
-                        </button>
-                    </div>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider">Hình thức giao dịch</label>
+                        <div className="flex p-1 bg-white rounded-lg border border-gray-200">
+                            <button 
+                            type="button"
+                            onClick={() => setFormData({...formData, type: ItemType.FIXED_PRICE})}
+                            className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 text-xs font-bold transition-all ${formData.type === ItemType.FIXED_PRICE ? 'bg-[#131921] text-white shadow-md' : 'text-gray-400 hover:bg-gray-50'}`}
+                            >
+                            <DollarSign size={14} /> MUA NGAY
+                            </button>
+                            <button 
+                            type="button"
+                            onClick={() => setFormData({...formData, type: ItemType.AUCTION})}
+                            className={`flex-1 py-2 rounded-md flex items-center justify-center gap-2 text-xs font-bold transition-all ${formData.type === ItemType.AUCTION ? 'bg-[#febd69] text-black shadow-md' : 'text-gray-400 hover:bg-gray-50'}`}
+                            >
+                            <Gavel size={14} /> ĐẤU GIÁ
+                            </button>
+                        </div>
                     </div>
 
                     <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-wider">
-                        {formData.type === ItemType.FIXED_PRICE ? 'Giá bán (Dự kiến)' : 'Giá khởi điểm'}
-                    </label>
-                    <div className="relative">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</div>
-                        <input 
-                        required
-                        type="number"
-                        className="w-full border-2 border-gray-100 p-3 pl-8 rounded-xl focus:border-[#febd69] outline-none transition-all font-bold text-xl text-[#131921]"
-                        placeholder="0.00"
-                        value={formData.price}
-                        onChange={e => setFormData({...formData, price: e.target.value})}
-                        />
-                    </div>
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider">
+                                {formData.type === ItemType.FIXED_PRICE ? 'Giá bán' : 'Giá khởi điểm'}
+                            </label>
+                            <button 
+                                type="button"
+                                onClick={() => setShowCalculator(!showCalculator)}
+                                className="text-[10px] font-bold text-blue-600 flex items-center gap-1 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100"
+                            >
+                                <Calculator size={12}/> Tính giá thông minh
+                            </button>
+                        </div>
+                        
+                        <div className="relative">
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">$</div>
+                            <input 
+                            required
+                            type="number"
+                            className="w-full border-2 border-gray-100 p-3 pl-8 rounded-xl focus:border-[#febd69] outline-none transition-all font-bold text-xl text-[#131921]"
+                            placeholder="0.00"
+                            value={formData.price}
+                            onChange={e => setFormData({...formData, price: e.target.value})}
+                            />
+                        </div>
                     </div>
                 </div>
                 </div>
             ) : (
                 <div className="space-y-6 animate-in slide-in-from-right">
                 {/* Step 2: Payment & Payout Info */}
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3">
                     <Info className="text-blue-600 shrink-0" size={20} />
                     <div className="text-sm text-blue-800">
                     <p className="font-bold mb-1">Cơ chế Bảo vệ AmazeBid SafePay</p>
@@ -422,6 +456,118 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
                 </div>
             )}
             </form>
+        )}
+
+        {/* Smart Pricing Calculator Modal Layer */}
+        {showCalculator && (
+            <div className="absolute inset-0 bg-white z-50 flex flex-col animate-in slide-in-from-bottom">
+                <div className="bg-[#131921] p-4 text-white flex justify-between items-center">
+                    <h3 className="font-bold flex items-center gap-2"><Calculator size={20} className="text-[#febd69]"/> AmazeCalc: Định Giá Thông Minh</h3>
+                    <button onClick={() => setShowCalculator(false)} className="hover:bg-white/20 p-1 rounded-full"><X size={20}/></button>
+                </div>
+                
+                <div className="flex-1 p-6 overflow-y-auto custom-scrollbar bg-gray-50">
+                    <div className="mb-6 bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
+                        <h4 className="font-bold text-blue-800 mb-2 flex items-center gap-2"><PieChart size={16}/> Chiến lược hòa vốn (Break-even Strategy)</h4>
+                        <p className="text-xs text-gray-600 leading-relaxed">
+                            Hệ thống sẽ tính giá bán sao cho bạn thu hồi toàn bộ vốn sau khi bán hết một lượng hàng nhỏ (ví dụ 20%). Số lượng còn lại sẽ là lợi nhuận ròng để chạy khuyến mãi.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Giá vốn 1 SP ($)</label>
+                            <input 
+                                type="number" 
+                                className="w-full border border-gray-300 p-2 rounded-lg font-bold" 
+                                value={calcData.costPrice}
+                                onChange={e => setCalcData({...calcData, costPrice: parseFloat(e.target.value) || 0})}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Tổng số lượng nhập</label>
+                            <input 
+                                type="number" 
+                                className="w-full border border-gray-300 p-2 rounded-lg font-bold" 
+                                value={calcData.totalQuantity}
+                                onChange={e => setCalcData({...calcData, totalQuantity: parseFloat(e.target.value) || 100})}
+                            />
+                        </div>
+                        <div className="col-span-2">
+                            <label className="block text-[10px] font-bold text-gray-500 uppercase mb-1">Muốn hòa vốn sau khi bán (Số lượng)</label>
+                            <div className="flex gap-2 items-center">
+                                <input 
+                                    type="range" min="1" max={calcData.totalQuantity} 
+                                    value={calcData.breakEvenCount}
+                                    onChange={e => setCalcData({...calcData, breakEvenCount: parseInt(e.target.value)})}
+                                    className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#febd69]"
+                                />
+                                <span className="text-sm font-bold w-12 text-center">{calcData.breakEvenCount}</span>
+                            </div>
+                            <p className="text-[10px] text-gray-400 mt-1 text-right">({Math.round((calcData.breakEvenCount/calcData.totalQuantity)*100)}% tổng kho)</p>
+                        </div>
+                    </div>
+
+                    <div className="space-y-3 border-t border-gray-200 pt-4">
+                        <div className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600">Tổng vốn đầu tư:</span>
+                            <span className="font-bold text-gray-900">${totalCapital.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between items-center bg-yellow-50 p-2 rounded-lg border border-yellow-200">
+                            <span className="text-sm font-bold text-yellow-800">Giá bán đề xuất:</span>
+                            <span className="font-black text-xl text-[#b12704]">${suggestedPrice.toLocaleString()}</span>
+                        </div>
+                        
+                        {suggestedPrice > calcData.costPrice * 3 && (
+                            <div className="flex items-center gap-2 text-xs text-orange-600 bg-orange-100 p-2 rounded-lg">
+                                <AlertTriangle size={14}/>
+                                <span>Giá này gấp {Math.round(suggestedPrice/calcData.costPrice)}x giá vốn. Cân nhắc tăng số lượng hòa vốn để giảm giá bán.</span>
+                            </div>
+                        )}
+
+                        <div className="bg-gray-100 p-3 rounded-lg text-xs space-y-2 mt-2">
+                            <p className="font-bold text-gray-700 border-b pb-1 mb-1">Cơ cấu lợi nhuận (Trên 1 sản phẩm)</p>
+                            <div className="flex justify-between">
+                                <span>Giá bán:</span>
+                                <span>${suggestedPrice.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between text-red-500">
+                                <span>Phí sàn ({calcData.platformFeePercent}%):</span>
+                                <span>-${systemFee.toFixed(2)} (Trích nộp hệ thống)</span>
+                            </div>
+                            <div className="flex justify-between text-gray-500">
+                                <span>Giá vốn:</span>
+                                <span>-${calcData.costPrice.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between font-bold text-green-600 pt-1 border-t border-gray-300">
+                                <span>Lợi nhuận ròng (Giai đoạn 1):</span>
+                                <span>${netProfitPerUnit.toFixed(2)}</span>
+                            </div>
+                        </div>
+
+                        <div className="bg-green-50 p-3 rounded-lg border border-green-200 mt-2">
+                            <p className="text-xs font-bold text-green-800 mb-1 flex items-center gap-1">
+                                <Sparkles size={12}/> Giai đoạn 2 (Sau {calcData.breakEvenCount} sản phẩm):
+                            </p>
+                            <p className="text-[10px] text-green-700">
+                                Bạn đã hòa vốn! {calcData.totalQuantity - calcData.breakEvenCount} sản phẩm còn lại là lãi ròng.
+                                <br/>Lợi nhuận mỗi đơn sau đó: <strong>${profitPhase2.toFixed(2)}</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-4 bg-white border-t border-gray-200 flex gap-3">
+                    <button onClick={() => setShowCalculator(false)} className="flex-1 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl">Hủy</button>
+                    <button 
+                        onClick={applySmartPrice}
+                        disabled={suggestedPrice <= 0}
+                        className="flex-1 py-3 bg-[#131921] text-white font-bold rounded-xl hover:bg-black transition-all flex items-center justify-center gap-2"
+                    >
+                        Áp dụng giá này <ArrowRight size={16}/>
+                    </button>
+                </div>
+            </div>
         )}
 
         {/* Footer */}
