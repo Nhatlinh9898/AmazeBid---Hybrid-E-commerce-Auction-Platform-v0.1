@@ -13,6 +13,25 @@ export enum OrderStatus {
   RETURNED = 'RETURNED'
 }
 
+export interface Review {
+  id: string;
+  userId: string;
+  userName: string;
+  userAvatar: string;
+  rating: number;
+  content: string;
+  date: string;
+  images?: string[];
+}
+
+export interface Comment {
+  id: string;
+  user: string;
+  avatar: string;
+  text: string;
+  timestamp: string;
+}
+
 export interface Bid {
   id: string;
   userId: string;
@@ -95,6 +114,7 @@ export interface Product {
   affiliateLink?: string;
   rating: number;
   reviewCount: number;
+  reviews?: Review[]; // Added reviews array
   originalPrice?: number;
   currentBid?: number;
   bidCount?: number;
@@ -136,6 +156,8 @@ export interface ContentPost {
   status: 'DRAFT' | 'PUBLISHED';
   platform: 'BLOG' | 'FACEBOOK' | 'INSTAGRAM' | 'TIKTOK';
   createdAt: string;
+  comments?: Comment[]; // Added comments
+  likes?: number;
 }
 
 export interface Transaction {

@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingCart, User as UserIcon, MapPin, Gavel, LayoutGrid, PlusCircle, Package, Video, Sparkles, Zap, BarChart3, Shield, Bot, BrainCircuit, Newspaper, Home, Crown, Camera, Mic, MicOff } from 'lucide-react';
+import { Search, ShoppingCart, User as UserIcon, MapPin, Gavel, LayoutGrid, PlusCircle, Package, Video, Sparkles, Zap, BarChart3, Shield, Bot, BrainCircuit, Newspaper, Home, Crown, Camera, Mic, MicOff, Heart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface NavbarProps {
   cartCount: number;
+  wishlistCount: number; // Added prop
   onSearch: (term: string) => void;
   openCart: () => void;
+  openWishlist: () => void; // Added prop
   openSellModal: () => void;
   openOrders: () => void;
   onOpenLiveStudio: () => void;
@@ -28,7 +30,7 @@ interface NavbarProps {
 }
 
 const Navbar: React.FC<NavbarProps> = ({ 
-  cartCount, onSearch, openCart, openSellModal, openOrders, 
+  cartCount, wishlistCount, onSearch, openCart, openWishlist, openSellModal, openOrders, 
   onOpenLiveStudio, onViewLiveStreams, onOpenAuth, onOpenProfile, onOpenCustomerService, 
   onOpenContentStudio, onOpenSuperDeals, onOpenSellerDashboard, onOpenAdminDashboard, 
   onOpenAvatarStudio, onOpenKOLStudio, onOpenRewards, onOpenVisualSearch,
@@ -155,6 +157,14 @@ const Navbar: React.FC<NavbarProps> = ({
 
           <div onClick={user ? onOpenProfile : onOpenAuth} className="p-1 cursor-pointer hover:text-[#febd69]">
             <UserIcon size={22} />
+          </div>
+
+          {/* Wishlist */}
+          <div onClick={openWishlist} className="hidden sm:flex items-center p-1 cursor-pointer hover:text-[#febd69] relative">
+             {wishlistCount > 0 && (
+                 <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold px-1 rounded-full">{wishlistCount}</span>
+             )}
+             <Heart size={22} />
           </div>
 
           {/* Cart */}

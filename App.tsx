@@ -28,7 +28,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 
 import { MOCK_PRODUCTS, MOCK_STREAMS } from './data';
 import { Product, CartItem, ItemType, OrderStatus, LiveStream, Bid, ContentPost } from './types';
-import { Filter, PackageSearch, Sparkles, User } from 'lucide-react';
+import { Filter, PackageSearch, Sparkles, User, Heart } from 'lucide-react';
 
 const InnerApp: React.FC = () => {
   const { user } = useAuth();
@@ -44,6 +44,7 @@ const InnerApp: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [filterType, setFilterType] = useState<'ALL' | ItemType>('ALL');
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [wishlist, setWishlist] = useState<string[]>([]); // Array of Product IDs
   
   // Modals
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -71,6 +72,7 @@ const InnerApp: React.FC = () => {
   const [activeStream, setActiveStream] = useState<LiveStream | null>(null);
   const [isHostMode, setIsHostMode] = useState(false); 
   const [showLiveList, setShowLiveList] = useState(false);
+  const [showWishlistOnly, setShowWishlistOnly] = useState(false); // Filter for Wishlist view
   const [notification, setNotification] = useState<string | null>(null);
 
   const categories = ['Tất cả', 'Điện tử', 'Thời trang', 'Đồ cổ', 'Máy tính', 'Nhà cửa', 'Làm đẹp', 'Music'];
@@ -78,12 +80,16 @@ const InnerApp: React.FC = () => {
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
       if (p.status !== OrderStatus.AVAILABLE) return false;
+      
+      // Wishlist Filter
+      if (showWishlistOnly && !wishlist.includes(p.id)) return false;
+
       const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'Tất cả' || p.category === selectedCategory || (selectedCategory === 'Điện tử' && p.category === 'Electronics');
       const matchesType = filterType === 'ALL' || p.type === filterType;
       return matchesSearch && matchesCategory && matchesType;
     });
-  }, [searchTerm, products, selectedCategory, filterType]);
+  }, [searchTerm, products, selectedCategory, filterType, showWishlistOnly, wishlist]);
 
   const showNotification = (msg: string) => {
     setNotification(msg);
@@ -103,6 +109,19 @@ const InnerApp: React.FC = () => {
               }
               showNotification(`Đã thêm ${product.title} vào so sánh`);
               return [...prev, product];
+          }
+      });
+  };
+
+  // --- Wishlist Logic ---
+  const handleToggleWishlist = (product: Product) => {
+      setWishlist(prev => {
+          if (prev.includes(product.id)) {
+              showNotification(`Đã bỏ thích ${product.title}`);
+              return prev.filter(id => id !== product.id);
+          } else {
+              showNotification(`Đã thêm ${product.title} vào yêu thích`);
+              return [...prev, product.id];
           }
       });
   };
@@ -193,8 +212,10 @@ const InnerApp: React.FC = () => {
     <div className="min-h-screen bg-[#f3f4f6] pb-20">
       <Navbar 
         cartCount={cart.reduce((s, i) => s + i.quantity, 0)} 
+        wishlistCount={wishlist.length}
         onSearch={setSearchTerm}
         openCart={() => setIsCartOpen(true)}
+        openWishlist={() => { setShowWishlistOnly(!showWishlistOnly); setCurrentView('MARKET'); }}
         openSellModal={() => setIsSellModalOpen(true)}
         openOrders={() => setIsOrderDashboardOpen(true)}
         onOpenLiveStudio={() => user ? setIsCreateStreamModalOpen(true) : setIsAuthModalOpen(true)}
@@ -218,6 +239,17 @@ const InnerApp: React.FC = () => {
       {/* Main Content Area based on View */}
       {currentView === 'MARKET' ? (
           <main className="max-w-[1500px] mx-auto px-4 py-6 animate-in fade-in">
+            {showWishlistOnly && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex justify-between items-center animate-in slide-in-from-top-2">
+                    <div className="flex items-center gap-2 text-red-600 font-bold">
+                        <Heart fill="currentColor"/> Danh sách yêu thích ({wishlist.length})
+                    </div>
+                    <button onClick={() => setShowWishlistOnly(false)} className="text-sm underline text-gray-500 hover:text-black">
+                        Xem tất cả sản phẩm
+                    </button>
+                </div>
+            )}
+
             {showLiveList && (
                 <div className="mb-10 animate-in slide-in-from-top-4 fade-in">
                     <div className="flex items-center gap-2 mb-4">
@@ -241,7 +273,7 @@ const InnerApp: React.FC = () => {
                 </div>
             )}
 
-            {!showLiveList && (
+            {!showLiveList && !showWishlistOnly && (
                 <div className="relative h-[250px] md:h-[350px] mb-8 overflow-hidden rounded-xl shadow-lg group">
                     <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&q=80&w=1500" alt="Banner" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
                     <div className="absolute inset-0 bg-black/40 flex flex-col justify-center p-8 md:p-12 text-white">
@@ -251,17 +283,19 @@ const InnerApp: React.FC = () => {
                 </div>
             )}
 
-            <div className="bg-white p-2 rounded-xl shadow-sm mb-8 flex items-center overflow-x-auto no-scrollbar gap-2 sticky top-[108px] z-40 border border-gray-100">
-              <div className="flex items-center gap-2 px-4 border-r border-gray-200 mr-2 shrink-0">
-                <Filter size={18} className="text-gray-400" />
-                <span className="text-xs font-bold text-gray-500 uppercase">Danh mục</span>
-              </div>
-              {categories.map(cat => (
-                <button key={cat} onClick={() => setSelectedCategory(cat)} className={`px-6 py-2 rounded-full text-sm font-medium transition-all shrink-0 ${selectedCategory === cat ? 'bg-[#131921] text-white' : 'hover:bg-gray-100 text-gray-600'}`}>
-                  {cat}
-                </button>
-              ))}
-            </div>
+            {!showWishlistOnly && (
+                <div className="bg-white p-2 rounded-xl shadow-sm mb-8 flex items-center overflow-x-auto no-scrollbar gap-2 sticky top-[108px] z-40 border border-gray-100">
+                <div className="flex items-center gap-2 px-4 border-r border-gray-200 mr-2 shrink-0">
+                    <Filter size={18} className="text-gray-400" />
+                    <span className="text-xs font-bold text-gray-500 uppercase">Danh mục</span>
+                </div>
+                {categories.map(cat => (
+                    <button key={cat} onClick={() => setSelectedCategory(cat)} className={`px-6 py-2 rounded-full text-sm font-medium transition-all shrink-0 ${selectedCategory === cat ? 'bg-[#131921] text-white' : 'hover:bg-gray-100 text-gray-600'}`}>
+                    {cat}
+                    </button>
+                ))}
+                </div>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {filteredProducts.map(product => (
@@ -273,12 +307,15 @@ const InnerApp: React.FC = () => {
                     onOpenDetail={setSelectedDetailProduct}
                     onToggleCompare={handleToggleCompare} 
                     isCompared={compareList.some(p => p.id === product.id)}
+                    isWishlisted={wishlist.includes(product.id)}
+                    onToggleWishlist={handleToggleWishlist}
                 />
               ))}
               {filteredProducts.length === 0 && (
                 <div className="col-span-full bg-white rounded-2xl p-20 text-center shadow-sm">
                     <PackageSearch size={40} className="text-gray-300 mx-auto mb-6" />
                     <h3 className="text-xl font-bold text-gray-800">Không tìm thấy sản phẩm</h3>
+                    {showWishlistOnly && <p className="text-gray-500 mt-2">Bạn chưa yêu thích sản phẩm nào.</p>}
                 </div>
               )}
             </div>

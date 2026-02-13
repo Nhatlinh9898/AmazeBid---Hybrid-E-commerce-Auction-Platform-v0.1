@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Star, Clock, Gavel, ShoppingCart, ExternalLink, Link2, Eye, ArrowRightLeft } from 'lucide-react';
+import { Star, Clock, Gavel, ShoppingCart, ExternalLink, Link2, Eye, ArrowRightLeft, Heart } from 'lucide-react';
 import { Product, ItemType } from '../types';
 
 interface ProductCardProps {
@@ -8,11 +8,15 @@ interface ProductCardProps {
   onAddToCart: (p: Product) => void;
   onPlaceBid: (p: Product) => void;
   onOpenDetail?: (p: Product) => void;
-  onToggleCompare?: (p: Product) => void; // New prop
-  isCompared?: boolean; // New prop
+  onToggleCompare?: (p: Product) => void;
+  isCompared?: boolean;
+  isWishlisted?: boolean; // New prop
+  onToggleWishlist?: (p: Product) => void; // New prop
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlaceBid, onOpenDetail, onToggleCompare, isCompared }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ 
+    product, onAddToCart, onPlaceBid, onOpenDetail, onToggleCompare, isCompared, isWishlisted, onToggleWishlist 
+}) => {
   const [timeLeft, setTimeLeft] = useState<string>('');
 
   useEffect(() => {
@@ -52,6 +56,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlace
       if (onToggleCompare) onToggleCompare(product);
   };
 
+  const handleWishlistClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (onToggleWishlist) onToggleWishlist(product);
+  };
+
   const handleClickCard = () => {
       if (onOpenDetail) {
           onOpenDetail(product);
@@ -77,17 +86,30 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlace
             </span>
         </div>
 
-        {/* Compare Button (Overlay Top Right) */}
+        {/* Wishlist Button (Top Right) */}
+        <button 
+            onClick={handleWishlistClick}
+            className={`absolute top-2 right-2 p-1.5 rounded-full z-20 shadow-md transition-colors ${
+                isWishlisted 
+                ? 'bg-white text-red-500' 
+                : 'bg-white text-gray-400 hover:text-red-500'
+            }`}
+            title="Yêu thích"
+        >
+            <Heart size={16} fill={isWishlisted ? "currentColor" : "none"} />
+        </button>
+
+        {/* Compare Button (Below Wishlist) */}
         <button 
             onClick={handleCompareClick}
-            className={`absolute top-2 right-2 p-1.5 rounded-full z-20 shadow-md transition-colors ${
+            className={`absolute top-10 right-2 p-1.5 rounded-full z-20 shadow-md transition-colors ${
                 isCompared 
                 ? 'bg-[#febd69] text-black' 
                 : 'bg-white text-gray-400 hover:text-black opacity-0 group-hover:opacity-100'
             }`}
             title="So sánh"
         >
-            <ArrowRightLeft size={14} />
+            <ArrowRightLeft size={16} />
         </button>
 
         {product.type === ItemType.AUCTION && (

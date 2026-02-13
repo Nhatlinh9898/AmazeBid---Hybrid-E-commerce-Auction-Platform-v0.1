@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, ShoppingCart, Gavel, Heart, Share2, Star, ShieldCheck, Truck, RotateCcw, BrainCircuit, BarChart3, AlertCircle, CheckCircle2, ChevronRight, Clock, MessageSquare, Users, Mail, Send, Shirt } from 'lucide-react';
-import { Product, ItemType } from '../types';
+import { X, ShoppingCart, Gavel, Heart, Share2, Star, ShieldCheck, Truck, RotateCcw, BrainCircuit, BarChart3, AlertCircle, CheckCircle2, ChevronRight, Clock, MessageSquare, Users, Mail, Send, Shirt, ThumbsUp, PenTool } from 'lucide-react';
+import { Product, ItemType, Review } from '../types';
 import { analyzeProductDeal, ProductAnalysis } from '../services/geminiService';
 import { emailService } from '../services/emailService';
 import NegotiationModal from './NegotiationModal';
 import TeamBuyModal from './TeamBuyModal';
+import { useAuth } from '../context/AuthContext';
 
 interface ProductDetailModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface ProductDetailModalProps {
 }
 
 const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose, product, onAddToCart, onPlaceBid, onAddToCartWithPrice }) => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'AI_INSIGHTS' | 'REVIEWS' | 'TRY_ON'>('OVERVIEW');
   const [analysis, setAnalysis] = useState<ProductAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -31,11 +33,28 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
   const [emailNote, setEmailNote] = useState('');
   const [isSendingEmail, setIsSendingEmail] = useState(false);
 
+  // Review State
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [newReviewText, setNewReviewText] = useState('');
+  const [newReviewRating, setNewReviewRating] = useState(5);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+
   useEffect(() => {
     if (isOpen && product) {
         setActiveTab('OVERVIEW');
         setAnalysis(null);
         setShowEmailShare(false);
+        // Load existing reviews or mock
+        setReviews(product.reviews || [
+            {
+                id: 'r1', userId: 'u1', userName: 'Minh Tuấn', userAvatar: 'https://ui-avatars.com/api/?name=Minh+Tuan',
+                rating: 5, content: 'Sản phẩm tuyệt vời, giao hàng nhanh trong 2h!', date: '2024-03-10'
+            },
+            {
+                id: 'r2', userId: 'u2', userName: 'Lan Anh', userAvatar: 'https://ui-avatars.com/api/?name=Lan+Anh',
+                rating: 4, content: 'Đóng gói cẩn thận, nhưng màu thực tế hơi tối hơn ảnh một chút.', date: '2024-03-09'
+            }
+        ]);
     }
   }, [isOpen, product]);
 
@@ -64,6 +83,25 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
       setEmailInput('');
       setEmailNote('');
       alert("Đã gửi thông tin sản phẩm qua email thành công!");
+  };
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!newReviewText.trim()) return;
+
+      const newReview: Review = {
+          id: `rev_${Date.now()}`,
+          userId: user?.id || 'guest',
+          userName: user?.fullName || 'Khách',
+          userAvatar: user?.avatar || 'https://ui-avatars.com/api/?name=Guest',
+          rating: newReviewRating,
+          content: newReviewText,
+          date: new Date().toISOString().split('T')[0]
+      };
+
+      setReviews([newReview, ...reviews]);
+      setNewReviewText('');
+      setShowReviewForm(false);
   };
 
   if (!isOpen || !product) return null;
@@ -129,10 +167,16 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
                     <BrainCircuit size={16} className={activeTab === 'AI_INSIGHTS' ? "text-[#febd69]" : ""} /> Phân tích AI
                 </button>
                 <button 
+                    onClick={() => setActiveTab('REVIEWS')}
+                    className={`px-6 py-4 text-sm font-bold text-center border-b-2 transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'REVIEWS' ? 'border-[#131921] text-[#131921]' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                >
+                    Đánh giá ({reviews.length})
+                </button>
+                <button 
                     onClick={() => setActiveTab('TRY_ON')}
                     className={`px-6 py-4 text-sm font-bold text-center border-b-2 transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'TRY_ON' ? 'border-purple-600 text-purple-700 bg-purple-50' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                 >
-                    <Shirt size={16} /> Phòng thử đồ
+                    <Shirt size={16} /> Thử đồ
                 </button>
             </div>
 
@@ -147,7 +191,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
                             
                             <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
                                 <span className="flex items-center gap-1 text-[#febd69]">
-                                    <Star size={16} fill="currentColor" /> 4.9 (124 reviews)
+                                    <Star size={16} fill="currentColor" /> {product.rating} ({product.reviewCount} reviews)
                                 </span>
                                 <span>•</span>
                                 <span className="text-blue-600 font-medium hover:underline cursor-pointer">
@@ -319,10 +363,75 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
                 )}
 
                 {activeTab === 'REVIEWS' && (
-                    <div className="animate-in slide-in-from-right-4 flex flex-col items-center justify-center h-full text-gray-400">
-                        <Star size={48} className="mb-4 opacity-20" />
-                        <p className="font-bold">Tính năng Đánh giá chi tiết đang cập nhật.</p>
-                        <p className="text-xs mt-2">Dữ liệu review sẽ được tổng hợp từ lịch sử mua hàng.</p>
+                    <div className="animate-in slide-in-from-right-4 space-y-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="text-4xl font-black text-[#131921]">{product.rating}</div>
+                                <div>
+                                    <div className="flex text-[#febd69] mb-1">
+                                        {[...Array(5)].map((_,i) => <Star key={i} size={14} fill={i < Math.floor(product.rating) ? 'currentColor' : 'none'}/>)}
+                                    </div>
+                                    <p className="text-xs text-gray-500">{reviews.length} đánh giá</p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => setShowReviewForm(!showReviewForm)}
+                                className="px-4 py-2 bg-[#131921] text-white rounded-lg text-sm font-bold hover:bg-black flex items-center gap-2"
+                            >
+                                <PenTool size={14}/> Viết đánh giá
+                            </button>
+                        </div>
+
+                        {showReviewForm && (
+                            <form onSubmit={handleSubmitReview} className="bg-gray-50 p-4 rounded-xl border border-gray-200 animate-in fade-in">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span className="text-sm font-bold">Bạn chấm mấy sao?</span>
+                                    <div className="flex text-[#febd69] cursor-pointer">
+                                        {[1,2,3,4,5].map(star => (
+                                            <Star key={star} size={20} fill={star <= newReviewRating ? 'currentColor' : 'none'} onClick={() => setNewReviewRating(star)}/>
+                                        ))}
+                                    </div>
+                                </div>
+                                <textarea 
+                                    className="w-full p-3 rounded-lg border border-gray-300 focus:border-[#febd69] outline-none text-sm resize-none"
+                                    rows={3}
+                                    placeholder="Chia sẻ trải nghiệm của bạn..."
+                                    value={newReviewText}
+                                    onChange={e => setNewReviewText(e.target.value)}
+                                />
+                                <div className="flex justify-end gap-2 mt-3">
+                                    <button type="button" onClick={() => setShowReviewForm(false)} className="px-3 py-1.5 text-xs font-bold text-gray-500 hover:bg-gray-200 rounded">Hủy</button>
+                                    <button type="submit" className="px-4 py-1.5 text-xs font-bold bg-[#febd69] text-black rounded hover:bg-[#f3a847]">Gửi đánh giá</button>
+                                </div>
+                            </form>
+                        )}
+
+                        <div className="space-y-4">
+                            {reviews.length === 0 ? (
+                                <p className="text-center text-gray-400 text-sm py-8">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
+                            ) : (
+                                reviews.map(rev => (
+                                    <div key={rev.id} className="border-b border-gray-100 pb-4 last:border-0">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <img src={rev.userAvatar} className="w-8 h-8 rounded-full"/>
+                                                <div>
+                                                    <p className="text-sm font-bold text-gray-900">{rev.userName}</p>
+                                                    <div className="flex text-[#febd69]">
+                                                        {[...Array(5)].map((_,i) => <Star key={i} size={10} fill={i < rev.rating ? 'currentColor' : 'none'}/>)}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span className="text-xs text-gray-400">{rev.date}</span>
+                                        </div>
+                                        <p className="text-sm text-gray-600 leading-relaxed">{rev.content}</p>
+                                        <div className="flex items-center gap-4 mt-2">
+                                            <button className="text-xs text-gray-400 flex items-center gap-1 hover:text-blue-600"><ThumbsUp size={12}/> Hữu ích?</button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
                 )}
 

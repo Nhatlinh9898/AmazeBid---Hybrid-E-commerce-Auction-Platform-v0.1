@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
-import { Heart, MessageCircle, Share2, ShoppingBag, MoreHorizontal, Sparkles, CheckCircle2, TrendingUp, Gavel } from 'lucide-react';
-import { ContentPost, Product, ItemType } from '../types';
+import { Heart, MessageCircle, Share2, ShoppingBag, MoreHorizontal, Sparkles, CheckCircle2, TrendingUp, Gavel, Send } from 'lucide-react';
+import { ContentPost, Product, ItemType, Comment } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 interface SocialFeedProps {
   posts: ContentPost[];
@@ -11,6 +12,8 @@ interface SocialFeedProps {
 }
 
 const SocialFeed: React.FC<SocialFeedProps> = ({ posts, products, onAddToCart, onPlaceBid }) => {
+  const { user } = useAuth();
+  
   // Mock data nếu chưa có bài đăng nào
   const [localPosts, setLocalPosts] = useState<ContentPost[]>(posts.length > 0 ? posts : [
     {
@@ -21,7 +24,10 @@ const SocialFeed: React.FC<SocialFeedProps> = ({ posts, products, onAddToCart, o
       generatedImages: ['https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&q=80&w=800'],
       status: 'PUBLISHED',
       platform: 'TIKTOK',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      comments: [
+          { id: 'c1', user: 'TechLover', avatar: 'https://ui-avatars.com/api/?name=Tech', text: 'Đồng ý, camera quá đỉnh!', timestamp: '10m trước' }
+      ]
     },
     {
       id: 'mock_2',
@@ -36,9 +42,37 @@ const SocialFeed: React.FC<SocialFeedProps> = ({ posts, products, onAddToCart, o
   ]);
 
   const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
+  const [openComments, setOpenComments] = useState<Record<string, boolean>>({});
+  const [commentInputs, setCommentInputs] = useState<Record<string, string>>({});
 
   const toggleLike = (id: string) => {
     setLikedPosts(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const toggleComments = (id: string) => {
+      setOpenComments(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleCommentSubmit = (postId: string) => {
+      const text = commentInputs[postId];
+      if (!text?.trim()) return;
+
+      const newComment: Comment = {
+          id: `c_${Date.now()}`,
+          user: user?.fullName || 'Guest',
+          avatar: user?.avatar || 'https://ui-avatars.com/api/?name=Guest',
+          text: text,
+          timestamp: 'Vừa xong'
+      };
+
+      setLocalPosts(prev => prev.map(p => {
+          if (p.id === postId) {
+              return { ...p, comments: [...(p.comments || []), newComment] };
+          }
+          return p;
+      }));
+
+      setCommentInputs(prev => ({ ...prev, [postId]: '' }));
   };
 
   // Hàm tìm sản phẩm liên quan (Giả lập logic matching theo tên)
@@ -65,6 +99,7 @@ const SocialFeed: React.FC<SocialFeedProps> = ({ posts, products, onAddToCart, o
       {localPosts.map((post) => {
         const relatedProduct = getRelatedProduct(post.title);
         const isLiked = likedPosts[post.id];
+        const isCommentOpen = openComments[post.id];
 
         return (
           <div key={post.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden animate-in slide-in-from-bottom-4">
@@ -135,7 +170,7 @@ const SocialFeed: React.FC<SocialFeedProps> = ({ posts, products, onAddToCart, o
             </div>
 
             {/* Actions */}
-            <div className="p-4 flex items-center justify-between">
+            <div className="p-4 flex items-center justify-between border-b border-gray-100">
                <div className="flex gap-4">
                   <button 
                     onClick={() => toggleLike(post.id)}
@@ -144,9 +179,12 @@ const SocialFeed: React.FC<SocialFeedProps> = ({ posts, products, onAddToCart, o
                      <Heart size={22} fill={isLiked ? "currentColor" : "none"} />
                      <span>{isLiked ? '1.2k' : '1.2k'}</span>
                   </button>
-                  <button className="flex items-center gap-1 text-sm font-bold text-gray-600 hover:text-blue-500">
+                  <button 
+                    onClick={() => toggleComments(post.id)}
+                    className={`flex items-center gap-1 text-sm font-bold hover:text-blue-500 ${isCommentOpen ? 'text-blue-500' : 'text-gray-600'}`}
+                  >
                      <MessageCircle size={22} />
-                     <span>48</span>
+                     <span>{post.comments?.length || 0}</span>
                   </button>
                   <button className="flex items-center gap-1 text-sm font-bold text-gray-600 hover:text-green-500">
                      <Share2 size={22} />
@@ -157,9 +195,45 @@ const SocialFeed: React.FC<SocialFeedProps> = ({ posts, products, onAddToCart, o
                </div>
             </div>
             
-            <div className="px-4 pb-4">
-               <p className="text-xs text-gray-500 cursor-pointer hover:underline">Xem tất cả 48 bình luận...</p>
-            </div>
+            {/* Comment Section */}
+            {isCommentOpen && (
+                <div className="bg-gray-50 p-4 animate-in slide-in-from-top-2">
+                    <div className="space-y-3 mb-4 max-h-48 overflow-y-auto custom-scrollbar">
+                        {post.comments && post.comments.length > 0 ? (
+                            post.comments.map(comment => (
+                                <div key={comment.id} className="flex gap-2 text-sm">
+                                    <img src={comment.avatar} className="w-6 h-6 rounded-full shrink-0 mt-1"/>
+                                    <div className="bg-white p-2 rounded-lg border border-gray-200 shadow-sm flex-1">
+                                        <div className="flex justify-between items-baseline mb-1">
+                                            <span className="font-bold text-xs">{comment.user}</span>
+                                            <span className="text-[10px] text-gray-400">{comment.timestamp}</span>
+                                        </div>
+                                        <p className="text-gray-700">{comment.text}</p>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-xs text-gray-400 text-center italic">Chưa có bình luận nào.</p>
+                        )}
+                    </div>
+                    
+                    <div className="flex gap-2">
+                        <input 
+                            value={commentInputs[post.id] || ''}
+                            onChange={(e) => setCommentInputs(prev => ({...prev, [post.id]: e.target.value}))}
+                            placeholder="Viết bình luận..."
+                            className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm outline-none focus:border-[#febd69]"
+                            onKeyPress={(e) => e.key === 'Enter' && handleCommentSubmit(post.id)}
+                        />
+                        <button 
+                            onClick={() => handleCommentSubmit(post.id)}
+                            className="bg-[#131921] text-white p-2 rounded-full hover:bg-black"
+                        >
+                            <Send size={16}/>
+                        </button>
+                    </div>
+                </div>
+            )}
           </div>
         );
       })}
