@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { X, Trophy, Crown, Star, Gift, ChevronRight, Zap, Gem, CheckCircle2, Ticket } from 'lucide-react';
+import { X, Trophy, Crown, Star, Gift, ChevronRight, Zap, Gem, CheckCircle2, Ticket, Sparkles, RefreshCw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { MOCK_REWARDS } from '../data';
 import { Reward } from '../types';
@@ -12,7 +12,8 @@ interface RewardsHubProps {
 
 const RewardsHub: React.FC<RewardsHubProps> = ({ isOpen, onClose }) => {
   const { user, updateProfile } = useAuth();
-  const [activeTab, setActiveTab] = useState<'REDEEM' | 'EARN' | 'HISTORY'>('REDEEM');
+  const [activeTab, setActiveTab] = useState<'REDEEM' | 'EARN' | 'HISTORY' | 'LUCKY_SPIN'>('REDEEM');
+  const [isSpinning, setIsSpinning] = useState(false);
 
   if (!isOpen || !user) return null;
 
@@ -40,6 +41,27 @@ const RewardsHub: React.FC<RewardsHubProps> = ({ isOpen, onClose }) => {
         updateProfile({ points: currentPoints - reward.cost });
         alert(`Đổi quà thành công! Mã của bạn là: ${reward.code || 'GIFT-' + Date.now()}`);
     }
+  };
+
+  const handleSpin = () => {
+      if (currentPoints < 50) {
+          alert("Bạn cần 50 điểm cho mỗi lượt quay!");
+          return;
+      }
+      setIsSpinning(true);
+      // Deduct points
+      updateProfile({ points: currentPoints - 50 });
+
+      // Simulate Spin
+      setTimeout(() => {
+          setIsSpinning(false);
+          const prize = Math.random() > 0.5 ? 100 : 10;
+          const isJackpot = Math.random() > 0.9;
+          const finalPrize = isJackpot ? 1000 : prize;
+          
+          alert(isJackpot ? `JACKPOT! BẠN NHẬN ĐƯỢC ${finalPrize} ĐIỂM!` : `Chúc mừng! Bạn nhận được ${finalPrize} điểm.`);
+          updateProfile({ points: (currentPoints - 50) + finalPrize });
+      }, 2000);
   };
 
   const renderTierBadge = () => {
@@ -125,22 +147,28 @@ const RewardsHub: React.FC<RewardsHubProps> = ({ isOpen, onClose }) => {
         <div className="flex-1 flex flex-col bg-gray-50">
             {/* Header Tabs */}
             <div className="bg-white p-4 border-b border-gray-200 flex justify-between items-center shrink-0">
-                <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
+                <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto no-scrollbar">
                     <button 
                         onClick={() => setActiveTab('REDEEM')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'REDEEM' ? 'bg-white shadow text-[#131921]' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'REDEEM' ? 'bg-white shadow text-[#131921]' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                         Đổi quà
                     </button>
                     <button 
+                        onClick={() => setActiveTab('LUCKY_SPIN')}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap flex items-center gap-1 ${activeTab === 'LUCKY_SPIN' ? 'bg-[#febd69] text-black shadow' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                        <Sparkles size={14}/> Vòng quay
+                    </button>
+                    <button 
                         onClick={() => setActiveTab('EARN')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'EARN' ? 'bg-white shadow text-[#131921]' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'EARN' ? 'bg-white shadow text-[#131921]' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                         Nhiệm vụ
                     </button>
                     <button 
                         onClick={() => setActiveTab('HISTORY')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'HISTORY' ? 'bg-white shadow text-[#131921]' : 'text-gray-500 hover:text-gray-700'}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all whitespace-nowrap ${activeTab === 'HISTORY' ? 'bg-white shadow text-[#131921]' : 'text-gray-500 hover:text-gray-700'}`}
                     >
                         Lịch sử
                     </button>
@@ -189,6 +217,43 @@ const RewardsHub: React.FC<RewardsHubProps> = ({ isOpen, onClose }) => {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                )}
+
+                {/* LUCKY SPIN TAB */}
+                {activeTab === 'LUCKY_SPIN' && (
+                    <div className="animate-in zoom-in h-full flex flex-col items-center justify-center">
+                        <div className="text-center mb-8">
+                            <h3 className="text-2xl font-black text-[#131921]">VÒNG QUAY MAY MẮN</h3>
+                            <p className="text-gray-500 text-sm">Thử vận may - Nhận ngay Jackpot</p>
+                        </div>
+
+                        <div className="relative mb-8">
+                            {/* Simple Wheel Representation */}
+                            <div className={`w-64 h-64 rounded-full border-8 border-[#febd69] bg-white shadow-2xl relative overflow-hidden transition-transform duration-[2000ms] cubic-bezier(0.2, 0.8, 0.2, 1) ${isSpinning ? 'rotate-[1080deg]' : 'rotate-0'}`}>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
+                                        <div className="bg-red-100 flex items-center justify-center p-4"><span className="font-black text-red-600 -rotate-45">10 pts</span></div>
+                                        <div className="bg-blue-100 flex items-center justify-center p-4"><span className="font-black text-blue-600 rotate-45">50 pts</span></div>
+                                        <div className="bg-yellow-100 flex items-center justify-center p-4"><span className="font-black text-yellow-600 -rotate-[135deg]">100 pts</span></div>
+                                        <div className="bg-purple-100 flex items-center justify-center p-4"><span className="font-black text-purple-600 rotate-[135deg]">JACKPOT</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Pointer */}
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-red-600 drop-shadow-md">
+                                <div className="w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-t-[30px] border-t-red-600"></div>
+                            </div>
+                        </div>
+
+                        <button 
+                            onClick={handleSpin}
+                            disabled={isSpinning || currentPoints < 50}
+                            className="bg-gradient-to-r from-red-600 to-orange-500 text-white px-12 py-4 rounded-full font-black text-lg shadow-xl hover:scale-105 transition-transform disabled:opacity-50 disabled:scale-100 flex items-center gap-2"
+                        >
+                            {isSpinning ? <RefreshCw className="animate-spin"/> : <Sparkles className="animate-pulse"/>}
+                            QUAY NGAY (-50 Pts)
+                        </button>
                     </div>
                 )}
 

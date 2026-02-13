@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, ShoppingCart, Gavel, Heart, Share2, Star, ShieldCheck, Truck, RotateCcw, BrainCircuit, BarChart3, AlertCircle, CheckCircle2, ChevronRight, Clock, MessageSquare, Users, Mail, Send } from 'lucide-react';
+import { X, ShoppingCart, Gavel, Heart, Share2, Star, ShieldCheck, Truck, RotateCcw, BrainCircuit, BarChart3, AlertCircle, CheckCircle2, ChevronRight, Clock, MessageSquare, Users, Mail, Send, Shirt } from 'lucide-react';
 import { Product, ItemType } from '../types';
 import { analyzeProductDeal, ProductAnalysis } from '../services/geminiService';
 import { emailService } from '../services/emailService';
@@ -17,7 +17,7 @@ interface ProductDetailModalProps {
 }
 
 const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose, product, onAddToCart, onPlaceBid, onAddToCartWithPrice }) => {
-  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'AI_INSIGHTS' | 'REVIEWS'>('OVERVIEW');
+  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'AI_INSIGHTS' | 'REVIEWS' | 'TRY_ON'>('OVERVIEW');
   const [analysis, setAnalysis] = useState<ProductAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   
@@ -115,24 +115,24 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
         <div className="w-full md:w-1/2 flex flex-col bg-white overflow-y-auto custom-scrollbar">
             
             {/* Tabs Header */}
-            <div className="flex border-b border-gray-200 sticky top-0 bg-white z-10">
+            <div className="flex border-b border-gray-200 sticky top-0 bg-white z-10 overflow-x-auto no-scrollbar">
                 <button 
                     onClick={() => setActiveTab('OVERVIEW')}
-                    className={`flex-1 py-4 text-sm font-bold text-center border-b-2 transition-all ${activeTab === 'OVERVIEW' ? 'border-[#131921] text-[#131921]' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                    className={`px-6 py-4 text-sm font-bold text-center border-b-2 transition-all whitespace-nowrap ${activeTab === 'OVERVIEW' ? 'border-[#131921] text-[#131921]' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                 >
                     Tổng quan
                 </button>
                 <button 
                     onClick={() => { setActiveTab('AI_INSIGHTS'); if(!analysis) handleAnalyze(); }}
-                    className={`flex-1 py-4 text-sm font-bold text-center border-b-2 transition-all flex items-center justify-center gap-2 ${activeTab === 'AI_INSIGHTS' ? 'border-[#febd69] text-black bg-orange-50/50' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                    className={`px-6 py-4 text-sm font-bold text-center border-b-2 transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'AI_INSIGHTS' ? 'border-[#febd69] text-black bg-orange-50/50' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                 >
                     <BrainCircuit size={16} className={activeTab === 'AI_INSIGHTS' ? "text-[#febd69]" : ""} /> Phân tích AI
                 </button>
                 <button 
-                    onClick={() => setActiveTab('REVIEWS')}
-                    className={`flex-1 py-4 text-sm font-bold text-center border-b-2 transition-all ${activeTab === 'REVIEWS' ? 'border-[#131921] text-[#131921]' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                    onClick={() => setActiveTab('TRY_ON')}
+                    className={`px-6 py-4 text-sm font-bold text-center border-b-2 transition-all flex items-center justify-center gap-2 whitespace-nowrap ${activeTab === 'TRY_ON' ? 'border-purple-600 text-purple-700 bg-purple-50' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                 >
-                    Đánh giá
+                    <Shirt size={16} /> Phòng thử đồ
                 </button>
             </div>
 
@@ -277,6 +277,44 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
                                 <p className="text-[10px] text-gray-400 text-center italic">Phân tích được tạo tự động bởi Gemini AI. Chỉ mang tính chất tham khảo.</p>
                             </div>
                         )}
+                    </div>
+                )}
+
+                {activeTab === 'TRY_ON' && (
+                    <div className="animate-in slide-in-from-right-4 h-full flex flex-col">
+                        <div className="bg-purple-50 p-4 rounded-xl border border-purple-100 mb-4">
+                            <h3 className="font-bold text-purple-800 flex items-center gap-2">
+                                <Shirt size={18}/> Phòng Thử Đồ Ảo
+                            </h3>
+                            <p className="text-sm text-purple-700 mt-1">
+                                Xem trước sản phẩm khi mặc lên người hoặc đặt trong không gian thực tế.
+                            </p>
+                        </div>
+
+                        <div className="flex-1 relative bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center border border-gray-300">
+                            {/* Base Model / Room Image */}
+                            <img 
+                                src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=600" 
+                                className="w-full h-full object-cover opacity-80"
+                                alt="Model"
+                            />
+                            
+                            {/* Overlay Product (Simulated AR) */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2">
+                                <img 
+                                    src={product.image} 
+                                    className="w-full h-full object-contain mix-blend-multiply drop-shadow-2xl"
+                                    style={{ filter: 'contrast(1.1) brightness(1.05)' }}
+                                />
+                            </div>
+
+                            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                                <button className="bg-white/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold shadow-sm hover:bg-white">Người mẫu nam</button>
+                                <button className="bg-[#131921] text-white px-3 py-1 rounded-full text-xs font-bold shadow-sm">Người mẫu nữ</button>
+                                <button className="bg-white/80 backdrop-blur px-3 py-1 rounded-full text-xs font-bold shadow-sm hover:bg-white">Phòng khách</button>
+                            </div>
+                        </div>
+                        <p className="text-[10px] text-gray-400 text-center mt-2 italic">Hình ảnh chỉ mang tính chất mô phỏng.</p>
                     </div>
                 )}
 

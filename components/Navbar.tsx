@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Search, ShoppingCart, User as UserIcon, MapPin, Gavel, LayoutGrid, PlusCircle, Package, Video, Sparkles, Zap, BarChart3, Shield, Bot, BrainCircuit, Newspaper, Home, Crown, Camera } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, ShoppingCart, User as UserIcon, MapPin, Gavel, LayoutGrid, PlusCircle, Package, Video, Sparkles, Zap, BarChart3, Shield, Bot, BrainCircuit, Newspaper, Home, Crown, Camera, Mic, MicOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface NavbarProps {
@@ -21,7 +21,7 @@ interface NavbarProps {
   onOpenAvatarStudio: () => void;
   onOpenKOLStudio: () => void;
   onOpenRewards: () => void; 
-  onOpenVisualSearch: () => void; // New prop
+  onOpenVisualSearch: () => void;
   
   currentView: 'MARKET' | 'SOCIAL';
   onChangeView: (view: 'MARKET' | 'SOCIAL') => void;
@@ -35,6 +35,48 @@ const Navbar: React.FC<NavbarProps> = ({
   currentView, onChangeView
 }) => {
   const { user } = useAuth();
+  const [isListening, setIsListening] = useState(false);
+  const [voiceText, setVoiceText] = useState('');
+
+  // Voice Search Logic
+  const handleVoiceSearch = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert("Trình duyệt của bạn không hỗ trợ tìm kiếm bằng giọng nói.");
+        return;
+    }
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = 'vi-VN';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    if (isListening) {
+        recognition.stop();
+        setIsListening(false);
+        return;
+    }
+
+    recognition.start();
+    setIsListening(true);
+
+    recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setVoiceText(transcript);
+        onSearch(transcript);
+        setIsListening(false);
+    };
+
+    recognition.onerror = (event: any) => {
+        console.error("Speech recognition error", event.error);
+        setIsListening(false);
+    };
+
+    recognition.onend = () => {
+        setIsListening(false);
+    };
+  };
 
   return (
     <header className="bg-[#131921] text-white sticky top-0 z-50 shadow-md">
@@ -64,12 +106,24 @@ const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Search Bar - Flexible */}
-        <div className="flex-1 flex h-9 md:h-10 items-stretch bg-white rounded text-black overflow-hidden focus-within:ring-2 focus-within:ring-[#febd69]">
+        <div className={`flex-1 flex h-9 md:h-10 items-stretch bg-white rounded text-black overflow-hidden transition-all ${isListening ? 'ring-2 ring-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'focus-within:ring-2 focus-within:ring-[#febd69]'}`}>
+          <button 
+            onClick={handleVoiceSearch}
+            className={`px-3 border-r border-gray-200 transition-colors flex items-center justify-center ${isListening ? 'bg-red-50 text-red-600 animate-pulse' : 'hover:bg-gray-100 text-gray-500'}`}
+            title="Tìm kiếm bằng giọng nói"
+          >
+            {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+          </button>
+          
           <input 
             type="text" 
-            placeholder={currentView === 'MARKET' ? "Tìm kiếm sản phẩm..." : "Tìm kiếm KOL, bài viết..."}
+            value={voiceText} // Bind voice text
+            placeholder={isListening ? "Đang nghe bạn nói..." : (currentView === 'MARKET' ? "Tìm kiếm sản phẩm..." : "Tìm kiếm KOL, bài viết...")}
             className="flex-1 px-3 text-sm outline-none border-none"
-            onChange={(e) => onSearch(e.target.value)}
+            onChange={(e) => {
+                setVoiceText(e.target.value);
+                onSearch(e.target.value);
+            }}
           />
           {/* Visual Search Button */}
           <button 
