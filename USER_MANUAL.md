@@ -48,7 +48,7 @@ Nhấn vào bất kỳ thẻ sản phẩm nào để mở cửa sổ chi tiết.
     *   Số điện thoại.
     *   Địa chỉ chi tiết (Số nhà, đường, phường/xã).
 3.  **Phương thức thanh toán:** Chọn COD (Thanh toán khi nhận hàng) hoặc Chuyển khoản.
-4.  **Hoàn tất:** Sau khi đặt hàng thành công, hệ thống sẽ hiển thị **Mã đơn hàng** và tự động kích hoạt máy in để in **Phiếu Gửi Hàng (Shipping Label)**. Bạn có thể lưu phiếu này lại để đối chiếu.
+4.  **Hoàn tất:** Sau khi đặt hàng thành công, hệ thống sẽ hiển thị **Mã đơn hàng** và tự động kích hoạt máy in để in **Phiếu Gửi Hàng (Shipping Label)**. Bạn có thể lưu phiếu này lại để đối chiếu hoặc dán lên kiện hàng nếu cần trả hàng.
 
 ### 1.5. Chat & Hỗ trợ
 *   **Chat với Shop (Góc trái dưới):** Nhấn nút tròn màu đen để chat trực tiếp với người bán.
@@ -65,6 +65,7 @@ Nhấn nút **"Đăng bán"** (hoặc dấu + trên menu).
     *   **Tạo ảnh AI:** Nếu chưa có ảnh thật, nhấn "Tạo ảnh AI" để Imagen 3 vẽ ảnh sản phẩm chuyên nghiệp.
     *   **Tính giá thông minh (Smart Pricing):** Nhấn nút máy tính, nhập giá vốn. AI sẽ tính toán giá bán tối ưu.
     *   **Tuyển Đại Lý (MỚI):** Bật tùy chọn **"Tuyển Đại Lý / Dropship"** và nhập % hoa hồng bạn muốn chia sẻ. Sản phẩm của bạn sẽ xuất hiện trên kho hàng Agency để người khác bán giúp bạn.
+    *   **Quản lý tồn kho:** Nhập số lượng tồn kho chính xác để hệ thống AI cảnh báo khi sắp hết hàng.
 *   **Tab Affiliate Network:**
     *   Chọn sản phẩm từ kho hàng chung (Amazon, Shopee...).
     *   Nhấn "Thêm vào kho". Bạn sẽ bán sản phẩm này và nhận hoa hồng mà không cần nhập hàng.
@@ -75,11 +76,15 @@ Nhấn vào mục **"Đấu giá trực tiếp"** trên thanh menu phụ.
 2.  Nhập tiêu đề hấp dẫn.
 3.  Nhấn **"Bắt đầu Live"**.
 
-### 2.3. Quản lý Đơn hàng (Seller Dashboard)
+### 2.3. Quản lý Đơn hàng & Vận hành (Seller Dashboard)
 Vào Menu Tài khoản -> **Kênh người bán**.
-*   **Quản lý đơn:** Xem danh sách đơn hàng cần xử lý.
-*   **Thông tin giao hàng (MỚI):** Nhấn nút **"Địa chỉ giao hàng"** trên từng đơn để xem chi tiết thông tin người mua (Tên, SĐT, Địa chỉ) phục vụ việc đóng gói.
-*   **Cập nhật trạng thái:** Chuyển trạng thái đơn sang "Đã gửi" sau khi giao cho đơn vị vận chuyển.
+*   **Tab Tổng quan:** Xem doanh thu, lợi nhuận, biểu đồ tăng trưởng.
+*   **Tab Vận hành & In đơn (Logistics) - MỚI:** 
+    *   Chọn danh sách các đơn hàng cần gửi đi.
+    *   Nhấn **"In phiếu hàng loạt"** để in Shipping Label cho nhiều đơn cùng lúc.
+*   **Tab Kho hàng & AI (Warehouse) - MỚI:** 
+    *   Xem danh sách tồn kho.
+    *   Nhận cảnh báo từ Gemini AI về các sản phẩm bán chạy cần nhập thêm hoặc sản phẩm tồn kho lâu ngày cần xả hàng.
 
 ---
 
