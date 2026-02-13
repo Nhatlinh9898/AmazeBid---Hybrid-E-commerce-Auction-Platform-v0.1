@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Upload, Gavel, DollarSign, Tag, Info, PlusCircle, CreditCard, Landmark, Wallet, CheckCircle2, Sparkles, Search, Link2, Globe, Download, Calculator, ArrowRight, PieChart, AlertTriangle } from 'lucide-react';
+import { X, Upload, Gavel, DollarSign, Tag, Info, PlusCircle, CreditCard, Landmark, Wallet, CheckCircle2, Sparkles, Search, Link2, Globe, Download, Calculator, ArrowRight, PieChart, AlertTriangle, Wand2, RefreshCw } from 'lucide-react';
 import { Product, ItemType, OrderStatus } from '../types';
 import { PRODUCT_TEMPLATES, AFFILIATE_NETWORK_ITEMS } from '../data';
+import { generateProductImage } from '../services/geminiService';
 
 interface SellModalProps {
   onClose: () => void;
@@ -23,6 +24,9 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
       breakEvenCount: 20, // Mặc định thu hồi vốn sau 20 sản phẩm
       platformFeePercent: 5 // Phí sàn 5%
   });
+
+  // --- AI Image Gen State ---
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   // Derived Pricing Data
   const totalCapital = calcData.costPrice * calcData.totalQuantity;
@@ -48,7 +52,8 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
     isAffiliate: false,
     affiliateLink: '',
     platformName: '',
-    commissionRate: 0
+    commissionRate: 0,
+    condition: 'NEW' as 'NEW' | 'LIKE_NEW' | 'USED'
   });
 
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -97,6 +102,23 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
       setShowCalculator(false);
   };
 
+  const handleAiGenerateImage = async () => {
+      if (!formData.title) {
+          alert("Vui lòng nhập tên sản phẩm trước.");
+          return;
+      }
+      setIsGeneratingImage(true);
+      const prompt = `Professional product photography of ${formData.title}, ${formData.category}, studio lighting, high quality, white background`;
+      const imgData = await generateProductImage(prompt);
+      
+      if (imgData) {
+          setFormData({ ...formData, image: imgData });
+      } else {
+          alert("Không thể tạo ảnh lúc này. Vui lòng thử lại.");
+      }
+      setIsGeneratingImage(false);
+  };
+
   // Add item from Affiliate Network
   const addFromAffiliateNetwork = (item: typeof AFFILIATE_NETWORK_ITEMS[0]) => {
     const newProduct: Product = {
@@ -115,7 +137,8 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
         isAffiliate: true,
         platformName: item.platformName,
         commissionRate: item.commissionRate,
-        affiliateLink: `${item.affiliateLink}?ref_id=user_123` // Auto-generate link
+        affiliateLink: `${item.affiliateLink}?ref_id=user_123`, // Auto-generate link
+        condition: 'NEW'
     };
     onAddProduct(newProduct);
     onClose();
@@ -142,6 +165,7 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
       affiliateLink: formData.affiliateLink || manualAffiliateLink,
       platformName: formData.platformName || 'External',
       commissionRate: formData.commissionRate,
+      condition: formData.condition,
       ...(formData.type === ItemType.AUCTION ? { 
         currentBid: parseFloat(formData.price), 
         bidCount: 0,
@@ -302,7 +326,6 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
                             </div>
                         )}
                     </div>
-                    <p className="text-[10px] text-gray-400 mt-1 italic">Nhập tên để tìm kiếm thông tin có sẵn từ catalog.</p>
                     </div>
 
                     <div>
@@ -331,26 +354,53 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
                         <option value="Fashion">Thời trang</option>
                     </select>
                     </div>
+
+                    {/* Condition Selector */}
+                    <div>
+                        <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-wider">Tình trạng</label>
+                        <div className="flex gap-2">
+                            {['NEW', 'LIKE_NEW', 'USED'].map((cond) => (
+                                <button
+                                    key={cond}
+                                    type="button"
+                                    onClick={() => setFormData({...formData, condition: cond as any})}
+                                    className={`flex-1 py-2 rounded-lg text-xs font-bold border transition-all ${
+                                        formData.condition === cond 
+                                        ? 'bg-[#131921] text-white border-[#131921]' 
+                                        : 'bg-white text-gray-500 border-gray-200 hover:border-gray-400'
+                                    }`}
+                                >
+                                    {cond === 'NEW' ? 'Mới 100%' : cond === 'LIKE_NEW' ? 'Like New' : 'Đã dùng'}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
                 <div className="space-y-6">
-                    <div className="bg-gray-50 p-6 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center group hover:border-[#febd69] transition-all cursor-pointer relative overflow-hidden h-[150px]">
-                    {/* Preview Image if Auto-filled */}
-                    {formData.image.includes('picsum') ? (
-                        <>
-                            <div className="p-3 bg-white rounded-full shadow-sm mb-3 text-gray-400 group-hover:text-[#febd69] transition-colors z-10">
-                                <Upload size={28} />
+                    <div className="bg-gray-50 p-6 rounded-2xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center group hover:border-[#febd69] transition-all cursor-pointer relative overflow-hidden h-[200px]">
+                        {/* Preview Image if Auto-filled */}
+                        {isGeneratingImage ? (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 z-20">
+                                <Wand2 className="animate-spin text-[#febd69] mb-2" size={32} />
+                                <p className="text-xs font-bold text-gray-500">AI đang vẽ ảnh...</p>
                             </div>
-                            <p className="text-xs font-bold text-gray-500 z-10">Kéo thả hoặc tải ảnh lên</p>
-                        </>
-                    ) : (
-                        <>
-                            <img src={formData.image} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-30 transition-opacity" />
-                            <div className="z-10 bg-white/80 backdrop-blur px-4 py-2 rounded-full shadow-sm">
-                                <p className="text-xs font-bold text-gray-800 flex items-center gap-1"><CheckCircle2 size={12} className="text-green-600"/> Ảnh từ catalog</p>
+                        ) : null}
+
+                        <img src={formData.image} className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-30 transition-opacity" />
+                        
+                        <div className="z-10 flex flex-col items-center gap-3">
+                            <div className="bg-white/80 backdrop-blur px-4 py-2 rounded-full shadow-sm">
+                                <p className="text-xs font-bold text-gray-800 flex items-center gap-1"><CheckCircle2 size={12} className="text-green-600"/> Ảnh hiện tại</p>
                             </div>
-                        </>
-                    )}
+                            <button 
+                                type="button"
+                                onClick={handleAiGenerateImage}
+                                className="bg-[#131921] text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg flex items-center gap-2 hover:bg-black transition-all"
+                            >
+                                <Sparkles size={12} className="text-[#febd69]"/> Tạo ảnh AI
+                            </button>
+                        </div>
                     </div>
 
                     <div className="bg-gray-50 p-4 rounded-xl space-y-4">

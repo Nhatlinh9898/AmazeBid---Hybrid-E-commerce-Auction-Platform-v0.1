@@ -114,7 +114,7 @@ export interface Product {
   affiliateLink?: string;
   rating: number;
   reviewCount: number;
-  reviews?: Review[]; // Added reviews array
+  reviews?: Review[];
   originalPrice?: number;
   currentBid?: number;
   bidCount?: number;
@@ -124,6 +124,7 @@ export interface Product {
   stepPrice?: number;
   platformName?: string;
   commissionRate?: number;
+  condition?: 'NEW' | 'LIKE_NEW' | 'USED'; // New field
 }
 
 export interface LiveStream {

@@ -23,13 +23,14 @@ import VisualSearchModal from './components/VisualSearchModal';
 import ProductDetailModal from './components/ProductDetailModal';
 import CompareBar from './components/CompareBar'; 
 import CompareModal from './components/CompareModal'; 
-import CartDrawer from './components/CartDrawer'; // Import CartDrawer
+import CartDrawer from './components/CartDrawer'; 
+import FilterPanel from './components/FilterPanel'; // Import FilterPanel
 
 import { AuthProvider, useAuth } from './context/AuthContext'; 
 
 import { MOCK_PRODUCTS, MOCK_STREAMS } from './data';
 import { Product, CartItem, ItemType, OrderStatus, LiveStream, Bid, ContentPost } from './types';
-import { Filter, PackageSearch, Sparkles, User, Heart, Clock, History } from 'lucide-react';
+import { Filter, PackageSearch, Sparkles, User, Heart, Clock, History, SlidersHorizontal, ChevronDown } from 'lucide-react';
 
 const InnerApp: React.FC = () => {
   const { user } = useAuth();
@@ -41,12 +42,19 @@ const InnerApp: React.FC = () => {
   const [streams, setStreams] = useState<LiveStream[]>(MOCK_STREAMS);
   const [contentPosts, setContentPosts] = useState<ContentPost[]>([]); 
 
+  // Filter States
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [filterType, setFilterType] = useState<'ALL' | ItemType>('ALL');
+  const [showFilterPanel, setShowFilterPanel] = useState(false);
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(10000);
+  const [sortOption, setSortOption] = useState('POPULAR');
+  const [conditionFilter, setConditionFilter] = useState('ALL');
+
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]); 
-  const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]); // Store Product IDs
+  const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]); 
   
   // Modals
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -91,7 +99,7 @@ const InnerApp: React.FC = () => {
 
   const addToRecentlyViewed = (product: Product) => {
       setRecentlyViewed(prev => {
-          const newList = [product.id, ...prev.filter(id => id !== product.id)].slice(0, 5); // Keep last 5
+          const newList = [product.id, ...prev.filter(id => id !== product.id)].slice(0, 5); 
           localStorage.setItem('amaze_recent', JSON.stringify(newList));
           return newList;
       });
@@ -103,16 +111,31 @@ const InnerApp: React.FC = () => {
   };
 
   const filteredProducts = useMemo(() => {
-    return products.filter(p => {
+    let result = products.filter(p => {
       if (p.status !== OrderStatus.AVAILABLE) return false;
       if (showWishlistOnly && !wishlist.includes(p.id)) return false;
 
       const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCategory = selectedCategory === 'Tất cả' || p.category === selectedCategory || (selectedCategory === 'Điện tử' && p.category === 'Electronics');
       const matchesType = filterType === 'ALL' || p.type === filterType;
-      return matchesSearch && matchesCategory && matchesType;
+      
+      // Advanced Filters
+      const matchesPrice = p.price >= minPrice && (maxPrice > 0 ? p.price <= maxPrice : true);
+      const matchesCondition = conditionFilter === 'ALL' || !p.condition || p.condition === conditionFilter;
+
+      return matchesSearch && matchesCategory && matchesType && matchesPrice && matchesCondition;
     });
-  }, [searchTerm, products, selectedCategory, filterType, showWishlistOnly, wishlist]);
+
+    // Sorting
+    result = result.sort((a, b) => {
+        if (sortOption === 'PRICE_ASC') return a.price - b.price;
+        if (sortOption === 'PRICE_DESC') return b.price - a.price;
+        if (sortOption === 'NEWEST') return parseInt(b.id) - parseInt(a.id); // Assuming ID is timestamp
+        return 0; // Default POPULAR
+    });
+
+    return result;
+  }, [searchTerm, products, selectedCategory, filterType, showWishlistOnly, wishlist, minPrice, maxPrice, sortOption, conditionFilter]);
 
   const recentProducts = useMemo(() => {
       return recentlyViewed.map(id => products.find(p => p.id === id)).filter(p => p) as Product[];
@@ -159,11 +182,9 @@ const InnerApp: React.FC = () => {
           setCart([]);
           setIsCartOpen(false);
           showNotification("Thanh toán thành công! Đơn hàng đang được xử lý.");
-          // In real app, create Order in DB here
       }
   };
 
-  // Handle Negotiation Success OR Team Buy Success - Add to cart with NEW PRICE
   const handleAddToCartWithPrice = (product: Product, newPrice: number) => {
       const negotiatedProduct = { ...product, price: newPrice };
       setCart(prev => {
@@ -353,16 +374,43 @@ const InnerApp: React.FC = () => {
             )}
 
             {!showWishlistOnly && (
-                <div className="bg-white p-2 rounded-xl shadow-sm mb-8 flex items-center overflow-x-auto no-scrollbar gap-2 sticky top-[108px] z-40 border border-gray-100">
-                <div className="flex items-center gap-2 px-4 border-r border-gray-200 mr-2 shrink-0">
-                    <Filter size={18} className="text-gray-400" />
-                    <span className="text-xs font-bold text-gray-500 uppercase">Danh mục</span>
-                </div>
-                {categories.map(cat => (
-                    <button key={cat} onClick={() => setSelectedCategory(cat)} className={`px-6 py-2 rounded-full text-sm font-medium transition-all shrink-0 ${selectedCategory === cat ? 'bg-[#131921] text-white' : 'hover:bg-gray-100 text-gray-600'}`}>
-                    {cat}
-                    </button>
-                ))}
+                <div className="flex flex-col gap-4 mb-8 sticky top-[108px] z-40">
+                    <div className="bg-white p-2 rounded-xl shadow-sm flex items-center gap-2 border border-gray-100">
+                        {/* Filter Toggle Button */}
+                        <button 
+                            onClick={() => setShowFilterPanel(!showFilterPanel)}
+                            className={`px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition-all ${showFilterPanel ? 'bg-[#131921] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        >
+                            <SlidersHorizontal size={16}/> Bộ lọc
+                            <ChevronDown size={14} className={`transition-transform ${showFilterPanel ? 'rotate-180' : ''}`}/>
+                        </button>
+
+                        <div className="h-6 w-[1px] bg-gray-200 mx-2"></div>
+
+                        {/* Categories Scroll */}
+                        <div className="flex-1 overflow-x-auto no-scrollbar flex gap-2">
+                            {categories.map(cat => (
+                                <button key={cat} onClick={() => setSelectedCategory(cat)} className={`px-6 py-2 rounded-full text-sm font-medium transition-all shrink-0 ${selectedCategory === cat ? 'bg-[#131921] text-white' : 'hover:bg-gray-100 text-gray-600'}`}>
+                                {cat}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Filter Panel (Collapsible) */}
+                    {showFilterPanel && (
+                        <div className="animate-in slide-in-from-top-2">
+                            <FilterPanel 
+                                minPrice={minPrice} 
+                                maxPrice={maxPrice} 
+                                onPriceChange={(min, max) => { setMinPrice(min); setMaxPrice(max); }}
+                                sortOption={sortOption}
+                                onSortChange={setSortOption}
+                                condition={conditionFilter}
+                                onConditionChange={setConditionFilter}
+                            />
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -384,7 +432,7 @@ const InnerApp: React.FC = () => {
                 <div className="col-span-full bg-white rounded-2xl p-20 text-center shadow-sm">
                     <PackageSearch size={40} className="text-gray-300 mx-auto mb-6" />
                     <h3 className="text-xl font-bold text-gray-800">Không tìm thấy sản phẩm</h3>
-                    {showWishlistOnly && <p className="text-gray-500 mt-2">Bạn chưa yêu thích sản phẩm nào.</p>}
+                    <p className="text-gray-500 mt-2">Hãy thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
                 </div>
               )}
             </div>
