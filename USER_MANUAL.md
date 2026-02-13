@@ -11,10 +11,11 @@ Tài liệu này sẽ hướng dẫn bạn sử dụng từng tính năng trên 
 
 1.  [Dành Cho Người Mua (Buyer)](#1-dành-cho-người-mua)
 2.  [Dành Cho Người Bán (Seller)](#2-dành-cho-người-bán)
-3.  [Dành Cho Creator & KOL (Social)](#3-dành-cho-creator--kol)
-4.  [Các Tính Năng AI Đặc Biệt](#4-các-tính-năng-ai-đặc-biệt)
-5.  [Quản Lý Tài Khoản & Admin](#5-quản-lý-tài-khoản--admin)
-6.  [Cài Đặt Ứng Dụng (PWA)](#6-cài-đặt-ứng-dụng-pwa)
+3.  [Dành Cho Đại Lý & Dropshipper (Agency)](#3-dành-cho-đại-lý--dropshipper)
+4.  [Dành Cho Creator & KOL (Social)](#4-dành-cho-creator--kol)
+5.  [Các Tính Năng AI Đặc Biệt](#5-các-tính-năng-ai-đặc-biệt)
+6.  [Quản Lý Tài Khoản & Admin](#6-quản-lý-tài-khoản--admin)
+7.  [Cài Đặt Ứng Dụng (PWA)](#7-cài-đặt-ứng-dụng-pwa)
 
 ---
 
@@ -40,11 +41,14 @@ Nhấn vào bất kỳ thẻ sản phẩm nào để mở cửa sổ chi tiết.
 *   Nhấn **"Trả giá ngay"** -> Nhập số tiền bạn muốn đặt (phải cao hơn giá hiện tại + bước giá).
 *   Theo dõi lịch sử đấu giá để biết mình có đang dẫn đầu hay không.
 
-### 1.4. So sánh sản phẩm (Compare Arena)
-1.  Di chuột vào ảnh sản phẩm ngoài trang chủ, nhấn biểu tượng **Mũi tên 2 chiều (Compare)** ở góc trên phải.
-2.  Chọn tối đa 2 sản phẩm để đưa vào thanh so sánh (dưới cùng màn hình).
-3.  Nhấn **"So sánh ngay"**.
-4.  **AI Verdict:** Gemini sẽ lập bảng so sánh thông số kỹ thuật và đưa ra lời khuyên "Nên mua cái nào?" dựa trên nhu cầu (Hiệu năng hay Giá cả).
+### 1.4. Thanh toán & Giao nhận (MỚI)
+1.  **Giỏ hàng:** Nhấn biểu tượng Giỏ hàng -> Chọn **"Thanh toán ngay"**.
+2.  **Thông tin giao hàng:** Một cửa sổ sẽ hiện ra yêu cầu nhập:
+    *   Họ tên người nhận.
+    *   Số điện thoại.
+    *   Địa chỉ chi tiết (Số nhà, đường, phường/xã).
+3.  **Phương thức thanh toán:** Chọn COD (Thanh toán khi nhận hàng) hoặc Chuyển khoản.
+4.  **Hoàn tất:** Sau khi đặt hàng thành công, hệ thống sẽ hiển thị **Mã đơn hàng** và tự động kích hoạt máy in để in **Phiếu Gửi Hàng (Shipping Label)**. Bạn có thể lưu phiếu này lại để đối chiếu.
 
 ### 1.5. Chat & Hỗ trợ
 *   **Chat với Shop (Góc trái dưới):** Nhấn nút tròn màu đen để chat trực tiếp với người bán.
@@ -59,7 +63,8 @@ Nhấn nút **"Đăng bán"** (hoặc dấu + trên menu).
 *   **Tab Hàng Vật Lý:**
     *   Nhập tên sản phẩm (VD: iPhone 15). Hệ thống sẽ gợi ý tự động điền thông tin và ảnh mẫu.
     *   **Tạo ảnh AI:** Nếu chưa có ảnh thật, nhấn "Tạo ảnh AI" để Imagen 3 vẽ ảnh sản phẩm chuyên nghiệp.
-    *   **Tính giá thông minh (Smart Pricing):** Nhấn nút máy tính, nhập giá vốn. AI sẽ tính toán giá bán để bạn hòa vốn nhanh nhất và tối ưu lợi nhuận.
+    *   **Tính giá thông minh (Smart Pricing):** Nhấn nút máy tính, nhập giá vốn. AI sẽ tính toán giá bán tối ưu.
+    *   **Tuyển Đại Lý (MỚI):** Bật tùy chọn **"Tuyển Đại Lý / Dropship"** và nhập % hoa hồng bạn muốn chia sẻ. Sản phẩm của bạn sẽ xuất hiện trên kho hàng Agency để người khác bán giúp bạn.
 *   **Tab Affiliate Network:**
     *   Chọn sản phẩm từ kho hàng chung (Amazon, Shopee...).
     *   Nhấn "Thêm vào kho". Bạn sẽ bán sản phẩm này và nhận hoa hồng mà không cần nhập hàng.
@@ -69,46 +74,59 @@ Nhấn vào mục **"Đấu giá trực tiếp"** trên thanh menu phụ.
 1.  Chọn các sản phẩm trong kho bạn muốn bán trong buổi Live.
 2.  Nhập tiêu đề hấp dẫn.
 3.  Nhấn **"Bắt đầu Live"**.
-    *   Nếu có Camera: Bạn sẽ lên hình trực tiếp.
-    *   Nếu không có Camera hoặc muốn ẩn danh: Hệ thống sẽ chuyển sang chế độ **Audio/Avatar**.
 
 ### 2.3. Quản lý Đơn hàng (Seller Dashboard)
 Vào Menu Tài khoản -> **Kênh người bán**.
-*   Xem biểu đồ doanh thu, số lượng đơn hàng.
-*   Quản lý trạng thái đơn: Xác nhận gửi hàng, xem đơn hoàn trả.
-*   Xem hiệu quả doanh thu từ các link Affiliate.
+*   **Quản lý đơn:** Xem danh sách đơn hàng cần xử lý.
+*   **Thông tin giao hàng (MỚI):** Nhấn nút **"Địa chỉ giao hàng"** trên từng đơn để xem chi tiết thông tin người mua (Tên, SĐT, Địa chỉ) phục vụ việc đóng gói.
+*   **Cập nhật trạng thái:** Chuyển trạng thái đơn sang "Đã gửi" sau khi giao cho đơn vị vận chuyển.
 
 ---
 
-## 3. DÀNH CHO CREATOR & KOL
+## 3. DÀNH CHO ĐẠI LÝ & DROPSHIPPER (MỚI)
 
-### 3.1. AmazeKOL Factory (Tạo KOL AI)
+Tính năng **Agency Network** giúp bạn kinh doanh không cần vốn (Zero inventory).
+
+### 3.1. Tìm nguồn hàng
+1.  Trên thanh Menu, chọn **"Agency Network"** (Biểu tượng cặp táp).
+2.  Tại tab **Tìm nguồn hàng**:
+    *   Bạn sẽ thấy danh sách các sản phẩm đang tuyển đại lý.
+    *   Xem rõ **% Hoa hồng** và **Lợi nhuận dự kiến** trên mỗi sản phẩm.
+3.  Nhấn **"Nhập về kho"**. Sản phẩm sẽ ngay lập tức xuất hiện trong danh sách "Sản phẩm của tôi" và bạn có thể bắt đầu bán/livestream ngay lập tức.
+
+### 3.2. Quản lý hiệu quả
+*   Tại tab **Quản lý đại lý của tôi**: Xem tổng quan số lượng đại lý đang bán hàng cho bạn (nếu bạn là nhà cung cấp gốc).
+*   Xem doanh số tạo ra từ mạng lưới cộng tác viên.
+
+---
+
+## 4. DÀNH CHO CREATOR & KOL
+
+### 4.1. AmazeKOL Factory (Tạo KOL AI)
 Vào menu **"AmazeKOL AI"**.
 1.  Chọn ngành hàng (Thời trang, Công nghệ, Home Decor).
 2.  Nhấn "Khởi tạo".
-3.  AI sẽ tạo ra một hồ sơ KOL hoàn chỉnh theo phong cách "Unfulfilled" (Chưa hoàn hảo - xu hướng mới giúp tăng tương tác). Hồ sơ bao gồm: Tính cách, giọng nói, điểm mạnh/yếu.
-4.  Xem lộ trình 30 ý tưởng video viral được gợi ý riêng cho KOL đó.
+3.  AI sẽ tạo ra một hồ sơ KOL hoàn chỉnh theo phong cách "Unfulfilled" (Chưa hoàn hảo - xu hướng mới giúp tăng tương tác).
 
-### 3.2. Content Studio (Viết bài & Sản xuất Media)
+### 4.2. Content Studio (Viết bài & Sản xuất Media)
 Vào Menu Tài khoản -> **Content Studio**. Đây là công cụ "All-in-one" cho Creator:
-1.  **AI Writer:** Nhập tên sản phẩm, AI sẽ viết bài Blog/Review chuẩn SEO với giọng văn tùy chọn (Hài hước, Chuyên nghiệp...).
+1.  **AI Writer:** Nhập tên sản phẩm, AI sẽ viết bài Blog/Review chuẩn SEO.
 2.  **AI Image (Imagen 3):** Tạo ảnh minh họa sản phẩm sắc nét.
 3.  **AI Video (Veo):** Tạo video quảng cáo ngắn (cinematic) từ văn bản mô tả.
 4.  Đăng bài trực tiếp lên **AmazeFeed**.
 
-### 3.3. Virtual Avatar Studio
+### 4.3. Virtual Avatar Studio
 Vào Menu Tài khoản -> **Avatar Studio**.
 *   **3D Model:** Tương tác với nhân vật ảo (Mika, Tomo, Robo). Bạn có thể chat để yêu cầu nhân vật thực hiện hành động.
-*   **Video Reel:** (Tính năng đang phát triển) Tạo video ngắn với nhân vật ảo cử động và nói chuyện.
 
-### 3.4. AmazeFeed (Mạng xã hội mua sắm)
+### 4.4. AmazeFeed (Mạng xã hội mua sắm)
 Chuyển đổi chế độ xem sang **"AmazeFeed"** (trên thanh Navbar).
 *   Lướt xem các bài review ngắn, video TikTok-style.
 *   Mua hàng hoặc Đấu giá trực tiếp ngay trên bài viết (Sản phẩm được gắn thẻ ở góc dưới ảnh/video).
 
 ---
 
-## 4. CÁC TÍNH NĂNG AI ĐẶC BIỆT
+## 5. CÁC TÍNH NĂNG AI ĐẶC BIỆT
 
 Hệ thống sử dụng các mô hình AI tiên tiến nhất của Google:
 
@@ -119,15 +137,15 @@ Hệ thống sử dụng các mô hình AI tiên tiến nhất của Google:
 
 ---
 
-## 5. QUẢN LÝ TÀI KHOẢN & ADMIN
+## 6. QUẢN LÝ TÀI KHOẢN & ADMIN
 
-### 5.1. Rewards Hub (Trung tâm quà tặng)
+### 6.1. Rewards Hub (Trung tâm quà tặng)
 Nhấn vào biểu tượng **Vương miện (Crown)** hoặc số điểm trên thanh menu.
 *   **Điểm danh:** Nhấn vào thẻ user để điểm danh hàng ngày (+50 điểm).
 *   **Vòng quay may mắn:** Dùng 50 điểm để quay thưởng (Cơ hội trúng Jackpot 1000 điểm).
 *   **Đổi quà:** Dùng điểm để đổi Voucher giảm giá hoặc Freeship.
 
-### 5.2. Admin Dashboard (Dành cho Quản trị viên)
+### 6.2. Admin Dashboard (Dành cho Quản trị viên)
 Vào Menu Tài khoản -> **Admin Dashboard**.
 *   **Overview:** Xem tổng doanh thu toàn sàn, lượng user active theo thời gian thực.
 *   **Users:** Quản lý danh sách người dùng, xem top người mua/bán.
@@ -135,7 +153,7 @@ Vào Menu Tài khoản -> **Admin Dashboard**.
 
 ---
 
-## 6. CÀI ĐẶT ỨNG DỤNG (PWA)
+## 7. CÀI ĐẶT ỨNG DỤNG (PWA)
 
 AmazeBid hỗ trợ công nghệ **Progressive Web App (PWA)**, cho phép cài đặt như một ứng dụng gốc trên điện thoại và máy tính.
 
