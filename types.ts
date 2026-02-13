@@ -137,6 +137,12 @@ export interface Product {
   // New Field for Buyer Info
   buyerInfo?: ShippingInfo;
   buyerId?: string;
+
+  // New Fields for Agency/Resell Model
+  allowResell?: boolean; // Cho phép người khác lấy về bán
+  resellCommission?: number; // % Hoa hồng cho đại lý
+  originalSellerId?: string; // ID của nhà cung cấp gốc (nếu đây là hàng đại lý lấy về)
+  resellerCount?: number; // Số lượng đại lý đang bán sản phẩm này
 }
 
 export interface LiveStream {

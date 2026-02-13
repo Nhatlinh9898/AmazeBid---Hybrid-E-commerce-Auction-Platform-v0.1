@@ -25,7 +25,8 @@ import CompareBar from './components/CompareBar';
 import CompareModal from './components/CompareModal'; 
 import CartDrawer from './components/CartDrawer'; 
 import FilterPanel from './components/FilterPanel';
-import ChatWidget from './components/ChatWidget'; // Import ChatWidget
+import ChatWidget from './components/ChatWidget';
+import AgencyHub from './components/AgencyHub'; // Import AgencyHub
 
 import { AuthProvider, useAuth } from './context/AuthContext'; 
 
@@ -76,6 +77,7 @@ const InnerApp: React.FC = () => {
   const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
   const [selectedDetailProduct, setSelectedDetailProduct] = useState<Product | null>(null);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+  const [isAgencyHubOpen, setIsAgencyHubOpen] = useState(false); // Agency State
 
   // Compare List State
   const [compareList, setCompareList] = useState<Product[]>([]);
@@ -180,20 +182,15 @@ const InnerApp: React.FC = () => {
           return;
       }
       
-      // Process Order Logic
-      // In a real app, this would send data to backend.
-      // Here we simulate by creating "Sold" product entries for the seller dashboard.
       const newOrders = cart.map(item => ({
           ...item,
-          id: `order_${Date.now()}_${item.id}`, // New ID for order instance
+          id: `order_${Date.now()}_${item.id}`, 
           status: OrderStatus.PENDING_SHIPMENT,
           buyerInfo: shippingInfo,
           buyerId: user.id
       }));
 
-      // Add new orders to products list (so they appear in Order Dashboard)
       setProducts(prev => [...prev, ...newOrders]);
-      
       setCart([]);
       setIsCartOpen(false);
       showNotification("Đặt hàng thành công! Người bán sẽ sớm gửi hàng cho bạn.");
@@ -270,6 +267,26 @@ const InnerApp: React.FC = () => {
     showNotification(`Niêm yết thành công!`);
   };
 
+  // --- Import Wholesale Product Logic ---
+  const handleImportWholesaleProduct = (wholesaleProduct: Product) => {
+      if(!user) return;
+      const newProduct: Product = {
+          ...wholesaleProduct,
+          id: `resell_${Date.now()}_${wholesaleProduct.id}`,
+          sellerId: user.id,
+          originalSellerId: wholesaleProduct.sellerId, // Track original supplier
+          isAffiliate: true, // It acts like an affiliate product
+          platformName: 'AmazeAgency',
+          status: OrderStatus.AVAILABLE,
+          // Reset stats for new listing
+          reviewCount: 0,
+          bidCount: 0
+      };
+      setProducts(prev => [newProduct, ...prev]);
+      showNotification(`Đã nhập "${wholesaleProduct.title}" về kho hàng bán của bạn!`);
+      setIsAgencyHubOpen(false);
+  };
+
   const handleAddContentPost = (post: ContentPost) => {
       setContentPosts(prev => [post, ...prev]);
       showNotification(`Đã xuất bản bài viết lên AmazeFeed!`);
@@ -315,6 +332,7 @@ const InnerApp: React.FC = () => {
         onOpenKOLStudio={() => setIsKOLStudioOpen(true)}
         onOpenRewards={() => setIsRewardsHubOpen(true)}
         onOpenVisualSearch={() => setIsVisualSearchOpen(true)}
+        onOpenAgencyHub={() => user ? setIsAgencyHubOpen(true) : setIsAuthModalOpen(true)}
         
         currentView={currentView}
         onChangeView={setCurrentView}
@@ -481,6 +499,15 @@ const InnerApp: React.FC = () => {
       <VirtualAvatarStudio isOpen={isAvatarStudioOpen} onClose={() => setIsAvatarStudioOpen(false)} products={myProducts} />
       <RewardsHub isOpen={isRewardsHubOpen} onClose={() => setIsRewardsHubOpen(false)} />
       
+      {/* Agency Hub Modal */}
+      <AgencyHub 
+        isOpen={isAgencyHubOpen} 
+        onClose={() => setIsAgencyHubOpen(false)} 
+        products={products} 
+        onImportProduct={handleImportWholesaleProduct}
+        currentUserId={user?.id || ''}
+      />
+
       <VisualSearchModal 
         isOpen={isVisualSearchOpen} 
         onClose={() => setIsVisualSearchOpen(false)} 

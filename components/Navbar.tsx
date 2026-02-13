@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, ShoppingCart, User as UserIcon, MapPin, Gavel, LayoutGrid, PlusCircle, Package, Video, Sparkles, Zap, BarChart3, Shield, Bot, BrainCircuit, Newspaper, Home, Crown, Camera, Mic, MicOff, Heart, Bell } from 'lucide-react';
+import { Search, ShoppingCart, User as UserIcon, MapPin, Gavel, LayoutGrid, PlusCircle, Package, Video, Sparkles, Zap, BarChart3, Shield, Bot, BrainCircuit, Newspaper, Home, Crown, Camera, Mic, MicOff, Heart, Bell, Briefcase } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
 import { AppNotification } from '../types';
@@ -26,6 +26,7 @@ interface NavbarProps {
   onOpenKOLStudio: () => void;
   onOpenRewards: () => void; 
   onOpenVisualSearch: () => void;
+  onOpenAgencyHub: () => void; // New prop
   
   currentView: 'MARKET' | 'SOCIAL';
   onChangeView: (view: 'MARKET' | 'SOCIAL') => void;
@@ -35,7 +36,7 @@ const Navbar: React.FC<NavbarProps> = ({
   cartCount, wishlistCount, onSearch, openCart, openWishlist, openSellModal, openOrders, 
   onOpenLiveStudio, onViewLiveStreams, onOpenAuth, onOpenProfile, onOpenCustomerService, 
   onOpenContentStudio, onOpenSuperDeals, onOpenSellerDashboard, onOpenAdminDashboard, 
-  onOpenAvatarStudio, onOpenKOLStudio, onOpenRewards, onOpenVisualSearch,
+  onOpenAvatarStudio, onOpenKOLStudio, onOpenRewards, onOpenVisualSearch, onOpenAgencyHub,
   currentView, onChangeView
 }) => {
   const { user } = useAuth();
@@ -241,6 +242,9 @@ const Navbar: React.FC<NavbarProps> = ({
       <div className="bg-[#232f3e] px-2 py-1.5 flex items-center gap-4 text-[13px] font-medium overflow-x-auto no-scrollbar whitespace-nowrap border-t border-gray-700 md:border-t-0">
         <span onClick={onViewLiveStreams} className="text-[#febd69] font-bold flex items-center gap-1 cursor-pointer hover:underline">
             <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" /> Đấu giá trực tiếp
+        </span>
+        <span onClick={onOpenAgencyHub} className="text-purple-400 font-bold flex items-center gap-1 cursor-pointer hover:text-purple-300">
+            <Briefcase size={14}/> Agency Network
         </span>
         <span onClick={onOpenSuperDeals} className="text-red-400 font-bold flex items-center gap-1 cursor-pointer hover:underline">
             <Zap size={14} className="animate-pulse" /> Siêu Ưu Đãi
