@@ -554,7 +554,7 @@ const InnerApp: React.FC = () => {
       {activeStream && <LiveStreamViewer stream={activeStream} products={products} isHost={isHostMode} onClose={() => { setActiveStream(null); setIsHostMode(false); }} onPlaceBid={handleSubmitBid} onAddToCart={handleAddToCart} />}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       <UserProfile isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} myProducts={myProducts} myPosts={contentPosts} />
-      <CustomerServiceModal isOpen={isCustomerServiceOpen} onClose={() => setIsCustomerServiceOpen(false)} />
+      <CustomerServiceModal isOpen={isCustomerServiceOpen} onClose={() => setIsCustomerServiceOpen(false)} isDarkMode={isDarkMode} />
       <ContentStudioModal isOpen={isContentStudioOpen} onClose={() => setIsContentStudioOpen(false)} onSavePost={handleAddContentPost} myProducts={myProducts} />
 
       {notification && (

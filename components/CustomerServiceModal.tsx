@@ -5,6 +5,7 @@ import { X, Book, CreditCard, Package, Truck, RefreshCw, FileText, Scale, CheckC
 interface CustomerServiceModalProps {
   isOpen: boolean;
   onClose: () => void;
+  isDarkMode?: boolean;
 }
 
 const TOPICS = [
@@ -19,7 +20,7 @@ const TOPICS = [
   { id: 'AGREEMENT', title: 'Điều khoản sử dụng', icon: FileText },
 ];
 
-const CustomerServiceModal: React.FC<CustomerServiceModalProps> = ({ isOpen, onClose }) => {
+const CustomerServiceModal: React.FC<CustomerServiceModalProps> = ({ isOpen, onClose, isDarkMode = false }) => {
   const [activeTab, setActiveTab] = useState('GUIDE');
   const [hasAgreed, setHasAgreed] = useState(false);
 
@@ -188,12 +189,12 @@ const CustomerServiceModal: React.FC<CustomerServiceModalProps> = ({ isOpen, onC
 
       case 'LEGAL':
         return (
-          <div className="space-y-6 animate-in slide-in-from-right-4">
+          <div className={`space-y-6 animate-in slide-in-from-right-4`}>
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><ShieldCheck className="text-[#febd69]"/> Luật Thương Mại Điện Tử Việt Nam</h2>
             
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
-              <p className="font-bold text-blue-800">Nghị định 52/2013/NĐ-CP</p>
-              <p className="text-sm text-blue-700 mt-1">Quy định về quản lý hoạt động thương mại điện tử</p>
+            <div className={`bg-blue-50 border-l-4 p-4 ${isDarkMode ? 'border-blue-700 bg-blue-900' : 'border-blue-500'}`}>
+              <p className={`font-bold ${isDarkMode ? 'text-blue-300' : 'text-blue-800'}`}>Nghị định 52/2013/NĐ-CP</p>
+              <p className={`text-sm mt-1 ${isDarkMode ? 'text-blue-200' : 'text-blue-700'}`}>Quy định về quản lý hoạt động thương mại điện tử</p>
             </div>
 
             <div className="space-y-4">
@@ -310,7 +311,9 @@ const CustomerServiceModal: React.FC<CustomerServiceModalProps> = ({ isOpen, onC
                 <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><FileText className="text-[#febd69]"/> Điều khoản Sử dụng Dịch vụ</h2>
                 
                 {/* Scrollable Agreement Content */}
-                <div className="flex-1 overflow-y-auto bg-gray-50 border border-gray-300 p-6 rounded-xl mb-4 text-justify text-sm leading-relaxed custom-scrollbar shadow-inner">
+                <div className={`flex-1 overflow-y-auto p-6 rounded-xl mb-4 text-justify text-sm leading-relaxed custom-scrollbar shadow-inner ${
+                  isDarkMode ? 'bg-gray-800 text-gray-200 border-gray-700' : 'bg-gray-50 text-gray-700 border-gray-300'
+                }`}>
                     <h3 className="font-bold text-center mb-4 uppercase">ĐIỀU KHOẢN SỬ DỤNG DỊCH VỤ AMAZEBID<br/>Cập nhật lần cuối: 01/01/2024<br/>---</h3>
 
                     <p className="mb-3"><strong>Điều 1: Chấp nhận Điều khoản</strong><br/>
@@ -398,15 +401,15 @@ const CustomerServiceModal: React.FC<CustomerServiceModalProps> = ({ isOpen, onC
   return (
     <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-in fade-in" onClick={onClose} />
-      <div className="relative bg-white w-full max-w-5xl h-[85vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row animate-in zoom-in-95">
+      <div className={`relative bg-white w-full max-w-5xl h-[85vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row animate-in zoom-in-95 ${isDarkMode ? 'bg-gray-900 text-white' : ''}`}>
         
         {/* Sidebar */}
-        <div className="w-full md:w-64 bg-[#f3f4f6] border-r border-gray-200 flex flex-col shrink-0">
-            <div className="p-5 border-b border-gray-200 bg-white">
-                <h2 className="font-bold text-xl text-[#131921] flex items-center gap-2">
+        <div className={`w-full md:w-64 flex flex-col shrink-0 ${isDarkMode ? 'bg-gray-800' : 'bg-[#f3f4f6]'}`}>
+            <div className={`p-5 border-b ${isDarkMode ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'}`}>
+                <h2 className={`font-bold text-xl flex items-center gap-2 ${isDarkMode ? 'text-white' : 'text-[#131921]'}`}>
                     Dịch vụ KH
                 </h2>
-                <p className="text-xs text-gray-500">Trung tâm hỗ trợ & Pháp lý</p>
+                <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Trung tâm hỗ trợ & Pháp lý</p>
             </div>
             
             <nav className="p-4 space-y-2 overflow-y-auto flex-1 custom-scrollbar">
@@ -416,15 +419,17 @@ const CustomerServiceModal: React.FC<CustomerServiceModalProps> = ({ isOpen, onC
                         onClick={() => setActiveTab(topic.id)}
                         className={`w-full text-left px-4 py-3 rounded-lg text-sm font-bold flex items-center justify-between transition-all ${
                             activeTab === topic.id 
-                            ? 'bg-[#131921] text-white shadow-md' 
-                            : 'text-gray-600 hover:bg-white hover:shadow-sm'
+                                ? isDarkMode ? 'bg-blue-600 text-white shadow-md' : 'bg-[#131921] text-white shadow-md'
+                                : isDarkMode ? 'text-gray-300 hover:bg-gray-700' : 'text-gray-700 hover:bg-gray-100'
                         }`}
                     >
-                        <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-2">
                             <topic.icon size={18} />
                             {topic.title}
-                        </div>
-                        {activeTab === topic.id && <ChevronRight size={14}/>}
+                        </span>
+                        {activeTab === topic.id && (
+                            <ChevronRight size={16} className="animate-pulse" />
+                        )}
                     </button>
                 ))}
             </nav>
