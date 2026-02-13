@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Search, ShoppingCart, User as UserIcon, MapPin, Gavel, LayoutGrid, PlusCircle, Package, Video, Sparkles, Zap, BarChart3, Shield, Bot, BrainCircuit, Newspaper, Home, Crown } from 'lucide-react';
+import { Search, ShoppingCart, User as UserIcon, MapPin, Gavel, LayoutGrid, PlusCircle, Package, Video, Sparkles, Zap, BarChart3, Shield, Bot, BrainCircuit, Newspaper, Home, Crown, Camera } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface NavbarProps {
@@ -20,9 +20,9 @@ interface NavbarProps {
   onOpenAdminDashboard: () => void;
   onOpenAvatarStudio: () => void;
   onOpenKOLStudio: () => void;
-  onOpenRewards: () => void; // New prop for Rewards
+  onOpenRewards: () => void; 
+  onOpenVisualSearch: () => void; // New prop
   
-  // New Props for Navigation
   currentView: 'MARKET' | 'SOCIAL';
   onChangeView: (view: 'MARKET' | 'SOCIAL') => void;
 }
@@ -31,7 +31,7 @@ const Navbar: React.FC<NavbarProps> = ({
   cartCount, onSearch, openCart, openSellModal, openOrders, 
   onOpenLiveStudio, onViewLiveStreams, onOpenAuth, onOpenProfile, onOpenCustomerService, 
   onOpenContentStudio, onOpenSuperDeals, onOpenSellerDashboard, onOpenAdminDashboard, 
-  onOpenAvatarStudio, onOpenKOLStudio, onOpenRewards,
+  onOpenAvatarStudio, onOpenKOLStudio, onOpenRewards, onOpenVisualSearch,
   currentView, onChangeView
 }) => {
   const { user } = useAuth();
@@ -64,15 +64,24 @@ const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Search Bar - Flexible */}
-        <div className="flex-1 flex h-9 md:h-10 items-stretch">
+        <div className="flex-1 flex h-9 md:h-10 items-stretch bg-white rounded text-black overflow-hidden focus-within:ring-2 focus-within:ring-[#febd69]">
           <input 
             type="text" 
             placeholder={currentView === 'MARKET' ? "Tìm kiếm sản phẩm..." : "Tìm kiếm KOL, bài viết..."}
-            className="flex-1 px-3 text-black outline-none rounded-l text-sm"
+            className="flex-1 px-3 text-sm outline-none border-none"
             onChange={(e) => onSearch(e.target.value)}
           />
-          <button className="bg-[#febd69] hover:bg-[#f3a847] px-3 md:px-5 rounded-r text-black">
-            <Search size={18} />
+          {/* Visual Search Button */}
+          <button 
+            onClick={onOpenVisualSearch}
+            className="px-3 hover:bg-gray-100 text-gray-500 hover:text-black border-l border-gray-200 transition-colors"
+            title="Tìm bằng hình ảnh (AmazeLens)"
+          >
+            <Camera size={20} />
+          </button>
+          
+          <button className="bg-[#febd69] hover:bg-[#f3a847] px-4 md:px-5 flex items-center justify-center transition-colors">
+            <Search size={20} />
           </button>
         </div>
 

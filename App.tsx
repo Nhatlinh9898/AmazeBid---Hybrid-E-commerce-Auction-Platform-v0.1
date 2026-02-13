@@ -18,7 +18,8 @@ import AdminDashboard from './components/AdminDashboard';
 import KOLCreatorStudio from './components/KOLCreatorStudio';
 import VirtualAvatarStudio from './components/VirtualAvatarStudio'; 
 import SocialFeed from './components/SocialFeed'; 
-import RewardsHub from './components/RewardsHub'; // Import new RewardsHub
+import RewardsHub from './components/RewardsHub'; 
+import VisualSearchModal from './components/VisualSearchModal'; // Import Visual Search
 
 import { AuthProvider, useAuth } from './context/AuthContext'; 
 
@@ -56,7 +57,8 @@ const InnerApp: React.FC = () => {
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState(false);
   const [isAvatarStudioOpen, setIsAvatarStudioOpen] = useState(false);
   const [isKOLStudioOpen, setIsKOLStudioOpen] = useState(false);
-  const [isRewardsHubOpen, setIsRewardsHubOpen] = useState(false); // Rewards Hub State
+  const [isRewardsHubOpen, setIsRewardsHubOpen] = useState(false);
+  const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false); // New Modal State
 
   const [activeStream, setActiveStream] = useState<LiveStream | null>(null);
   const [isHostMode, setIsHostMode] = useState(false); 
@@ -160,6 +162,7 @@ const InnerApp: React.FC = () => {
         onOpenAvatarStudio={() => setIsAvatarStudioOpen(true)}
         onOpenKOLStudio={() => setIsKOLStudioOpen(true)}
         onOpenRewards={() => setIsRewardsHubOpen(true)}
+        onOpenVisualSearch={() => setIsVisualSearchOpen(true)}
         
         currentView={currentView}
         onChangeView={setCurrentView}
@@ -244,6 +247,15 @@ const InnerApp: React.FC = () => {
       
       <VirtualAvatarStudio isOpen={isAvatarStudioOpen} onClose={() => setIsAvatarStudioOpen(false)} products={myProducts} />
       <RewardsHub isOpen={isRewardsHubOpen} onClose={() => setIsRewardsHubOpen(false)} />
+      
+      {/* Visual Search Modal */}
+      <VisualSearchModal 
+        isOpen={isVisualSearchOpen} 
+        onClose={() => setIsVisualSearchOpen(false)} 
+        products={products}
+        onAddToCart={handleAddToCart}
+        onPlaceBid={handleOpenBidModal}
+      />
 
       <OrderDashboard isOpen={isOrderDashboardOpen} onClose={() => setIsOrderDashboardOpen(false)} products={products} currentUserId={user?.id || 'guest'} onUpdateStatus={handleOrderStatusUpdate} />
       {activeStream && <LiveStreamViewer stream={activeStream} products={products} isHost={isHostMode} onClose={() => { setActiveStream(null); setIsHostMode(false); }} onPlaceBid={handleSubmitBid} onAddToCart={handleAddToCart} />}
