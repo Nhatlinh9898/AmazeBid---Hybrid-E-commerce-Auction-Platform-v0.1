@@ -301,12 +301,11 @@ const InnerApp: React.FC = () => {
     setActiveStream(newStream);
     setIsHostMode(true);
   };
-
   const handleOrderStatusUpdate = (productId: string, newStatus: OrderStatus) => {
     setProducts(prev => prev.map(p => p.id === productId ? { ...p, status: newStatus } : p));
   };
 
-  const myProducts = useMemo(() => user ? products.filter(p => p.sellerId === user.id) : [], [products, user]);
+  const myProducts = useMemo(() => user ? products.filter(p => p.sellerId === user.id || p.sellerId === 'currentUser') : [], [products, user]);
   const superDealsProducts = useMemo(() => products.filter(p => p.type === ItemType.FIXED_PRICE && (p.originalPrice && p.originalPrice > p.price)), [products]);
 
   return (
@@ -489,7 +488,7 @@ const InnerApp: React.FC = () => {
       />
 
       {isSellModalOpen && <SellModal onClose={() => setIsSellModalOpen(false)} onAddProduct={handleAddProduct}/>}
-      {isCreateStreamModalOpen && <CreateStreamModal onClose={() => setIsCreateStreamModalOpen(false)} onStartStream={handleCreateStream} myProducts={products.filter(p => p.sellerId === user?.id)} onOpenSellModal={() => setIsSellModalOpen(true)}/>}
+      {isCreateStreamModalOpen && <CreateStreamModal onClose={() => setIsCreateStreamModalOpen(false)} onStartStream={handleCreateStream} myProducts={myProducts} onOpenSellModal={() => setIsSellModalOpen(true)}/>}
       {bidModalProduct && <BidModal product={bidModalProduct} onClose={() => setBidModalProduct(null)} onSubmitBid={(amount) => handleSubmitBid(bidModalProduct, amount)}/>}
       <SuperDealsModal isOpen={isSuperDealsOpen} onClose={() => setIsSuperDealsOpen(false)} products={superDealsProducts} onAddToCart={handleAddToCart} />
       <SellerDashboard isOpen={isSellerDashboardOpen} onClose={() => setIsSellerDashboardOpen(false)} products={products} currentUserId={user?.id || 'currentUser'} />

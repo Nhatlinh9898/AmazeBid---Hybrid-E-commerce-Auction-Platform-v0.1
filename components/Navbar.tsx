@@ -240,8 +240,11 @@ const Navbar: React.FC<NavbarProps> = ({
 
       {/* Sub-Nav - Scrollable on Mobile */}
       <div className="bg-[#232f3e] px-2 py-1.5 flex items-center gap-4 text-[13px] font-medium overflow-x-auto no-scrollbar whitespace-nowrap border-t border-gray-700 md:border-t-0">
-        <span onClick={onViewLiveStreams} className="text-[#febd69] font-bold flex items-center gap-1 cursor-pointer hover:underline">
+        <span onClick={user ? onOpenLiveStudio : onOpenAuth} className="text-[#febd69] font-bold flex items-center gap-1 cursor-pointer hover:underline">
             <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" /> Đấu giá trực tiếp
+        </span>
+        <span onClick={onViewLiveStreams} className="text-orange-400 font-bold flex items-center gap-1 cursor-pointer hover:text-orange-300">
+            <Video size={14}/> Xem Live
         </span>
         <span onClick={onOpenAgencyHub} className="text-purple-400 font-bold flex items-center gap-1 cursor-pointer hover:text-purple-300">
             <Briefcase size={14}/> Agency Network
