@@ -134,6 +134,9 @@ export interface Product {
   commissionRate?: number;
   condition?: 'NEW' | 'LIKE_NEW' | 'USED'; 
   
+  // Inventory
+  stock?: number; // Số lượng tồn kho
+
   // New Field for Buyer Info
   buyerInfo?: ShippingInfo;
   buyerId?: string;

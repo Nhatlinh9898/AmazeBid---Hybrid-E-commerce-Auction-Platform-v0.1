@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Upload, Gavel, DollarSign, Tag, Info, PlusCircle, CreditCard, Landmark, Wallet, CheckCircle2, Sparkles, Search, Link2, Globe, Download, Calculator, ArrowRight, PieChart, AlertTriangle, Wand2, RefreshCw, Briefcase, Percent } from 'lucide-react';
+import { X, Upload, Gavel, DollarSign, Tag, Info, PlusCircle, CreditCard, Landmark, Wallet, CheckCircle2, Sparkles, Search, Link2, Globe, Download, Calculator, ArrowRight, PieChart, AlertTriangle, Wand2, RefreshCw, Briefcase, Percent, Box } from 'lucide-react';
 import { Product, ItemType, OrderStatus } from '../types';
 import { PRODUCT_TEMPLATES, AFFILIATE_NETWORK_ITEMS } from '../data';
 import { generateProductImage } from '../services/geminiService';
@@ -52,6 +52,7 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
     platformName: '',
     commissionRate: 0,
     condition: 'NEW' as 'NEW' | 'LIKE_NEW' | 'USED',
+    stock: '1', // Default stock
     
     // Agency Settings
     allowResell: false,
@@ -137,7 +138,8 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
         platformName: item.platformName,
         commissionRate: item.commissionRate,
         affiliateLink: `${item.affiliateLink}?ref_id=user_123`,
-        condition: 'NEW'
+        condition: 'NEW',
+        stock: 999 // Affiliate usually has unlimited stock
     };
     onAddProduct(newProduct);
     onClose();
@@ -165,6 +167,7 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
       platformName: formData.platformName || 'External',
       commissionRate: formData.commissionRate,
       condition: formData.condition,
+      stock: parseInt(formData.stock) || 1,
       
       // Agency Settings
       allowResell: formData.allowResell,
@@ -312,18 +315,33 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
                     />
                     </div>
 
-                    <div>
-                        <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-wider">Danh mục</label>
-                        <select 
-                            className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-[#febd69] outline-none transition-all text-sm font-bold bg-white"
-                            value={formData.category}
-                            onChange={e => setFormData({...formData, category: e.target.value})}
-                        >
-                            <option value="Electronics">Điện tử</option>
-                            <option value="Collectibles">Đồ cổ / Sưu tầm</option>
-                            <option value="Home & Office">Nhà cửa & Đời sống</option>
-                            <option value="Fashion">Thời trang</option>
-                        </select>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-wider">Danh mục</label>
+                            <select 
+                                className="w-full border-2 border-gray-100 p-3 rounded-xl focus:border-[#febd69] outline-none transition-all text-sm font-bold bg-white"
+                                value={formData.category}
+                                onChange={e => setFormData({...formData, category: e.target.value})}
+                            >
+                                <option value="Electronics">Điện tử</option>
+                                <option value="Collectibles">Đồ cổ / Sưu tầm</option>
+                                <option value="Home & Office">Nhà cửa & Đời sống</option>
+                                <option value="Fashion">Thời trang</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase mb-2 tracking-wider">Tồn kho</label>
+                            <div className="relative">
+                                <Box size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
+                                <input 
+                                    type="number"
+                                    min="1"
+                                    className="w-full pl-9 p-3 border-2 border-gray-100 rounded-xl focus:border-[#febd69] outline-none transition-all text-sm font-bold"
+                                    value={formData.stock}
+                                    onChange={e => setFormData({...formData, stock: e.target.value})}
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -360,7 +378,7 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
 
                     <div>
                         <div className="flex justify-between items-center mb-2">
-                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider">{formData.type === ItemType.FIXED_PRICE ? 'Giá bán' : 'Giá khởi điểm'}</label>
+                            <label className="block text-xs font-black text-gray-400 uppercase tracking-wider">{formData.type === ItemType.FIXED_PRICE ? 'Giá bán' : 'Giá khởi điểm'}</label>
                             <button type="button" onClick={() => setShowCalculator(!showCalculator)} className="text-[10px] font-bold text-blue-600 flex items-center gap-1 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100">
                                 <Calculator size={12}/> Tính giá thông minh
                             </button>
