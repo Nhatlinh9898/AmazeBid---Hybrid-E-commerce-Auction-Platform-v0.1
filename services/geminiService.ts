@@ -223,10 +223,9 @@ export const compareProducts = async (p1: Product, p2: Product): Promise<Compari
     }
 };
 
-/** New Function: AI Negotiation */
 export interface NegotiationResult {
     status: 'ACCEPTED' | 'REJECTED' | 'COUNTER_OFFER';
-    sellerResponse: string; // Câu trả lời của chủ shop
+    sellerResponse: string; 
     finalPrice?: number;
 }
 
@@ -238,9 +237,7 @@ export const negotiateWithAI = async (
 ): Promise<NegotiationResult | null> => {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     
-    // Logic giả lập giá sàn (Floor Price) = 85% giá gốc
     const floorPrice = product.price * 0.85;
-
     const historyText = chatHistory.map(m => `${m.role}: ${m.text}`).join('\n');
 
     const prompt = `Bạn là chủ cửa hàng AmazeBid (AI Shopkeeper). Bạn đang bán sản phẩm "${product.title}" với giá niêm yết $${product.price}.
@@ -276,5 +273,25 @@ export const negotiateWithAI = async (
     } catch (e) {
         console.error("Negotiation Error:", e);
         return null;
+    }
+};
+
+/** New Function: AI Viral Copywriter for Group Buying */
+export const generateRecruitmentMessage = async (productName: string, teamPrice: number, style: 'FUNNY' | 'URGENT' | 'EMOTIONAL'): Promise<string> => {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const prompt = `Viết một tin nhắn ngắn (dưới 30 từ) để rủ bạn bè mua chung sản phẩm "${productName}" với giá siêu rẻ $${teamPrice} trên AmazeBid.
+    Phong cách: ${style} (Hài hước / Gấp gáp / Tình cảm).
+    Có dùng Emoji.
+    Mục tiêu: Khiến người nhận bấm vào link ngay lập tức.
+    Chỉ trả về nội dung tin nhắn.`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-3-flash-preview',
+            contents: prompt,
+        });
+        return response.text || `Mua chung ${productName} giá ${teamPrice} với mình đi! 🔥`;
+    } catch (e) {
+        return `Mua chung ${productName} giá ${teamPrice} với mình đi! 🔥`;
     }
 };

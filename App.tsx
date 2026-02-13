@@ -118,7 +118,7 @@ const InnerApp: React.FC = () => {
     showNotification(`Đã thêm ${product.title} vào giỏ hàng`);
   };
 
-  // Handle Negotiation Success - Add to cart with NEW PRICE
+  // Handle Negotiation Success OR Team Buy Success - Add to cart with NEW PRICE
   const handleAddToCartWithPrice = (product: Product, newPrice: number) => {
       // Clone product with new price
       const negotiatedProduct = { ...product, price: newPrice };
@@ -137,7 +137,7 @@ const InnerApp: React.FC = () => {
           }
           return [...prev, { ...negotiatedProduct, quantity: 1 }];
       });
-      showNotification(`Đã chốt đơn ${product.title} với giá thương lượng $${newPrice}!`);
+      showNotification(`Đã chốt đơn ${product.title} với giá đặc biệt $${newPrice}!`);
   };
 
   const handleOpenBidModal = (product: Product) => {
@@ -317,7 +317,7 @@ const InnerApp: React.FC = () => {
         product={selectedDetailProduct}
         onAddToCart={handleAddToCart}
         onPlaceBid={handleOpenBidModal}
-        onAddToCartWithPrice={handleAddToCartWithPrice} // Pass Negotiation Handler
+        onAddToCartWithPrice={handleAddToCartWithPrice} // Pass Negotiation & Team Buy Handler
       />
 
       <CompareBar 

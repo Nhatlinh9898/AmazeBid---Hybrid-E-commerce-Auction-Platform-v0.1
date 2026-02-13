@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, ShoppingCart, Gavel, Heart, Share2, Star, ShieldCheck, Truck, RotateCcw, BrainCircuit, BarChart3, AlertCircle, CheckCircle2, ChevronRight, Clock, MessageSquare } from 'lucide-react';
+import { X, ShoppingCart, Gavel, Heart, Share2, Star, ShieldCheck, Truck, RotateCcw, BrainCircuit, BarChart3, AlertCircle, CheckCircle2, ChevronRight, Clock, MessageSquare, Users } from 'lucide-react';
 import { Product, ItemType } from '../types';
 import { analyzeProductDeal, ProductAnalysis } from '../services/geminiService';
 import NegotiationModal from './NegotiationModal';
+import TeamBuyModal from './TeamBuyModal'; // Import
 
 interface ProductDetailModalProps {
   isOpen: boolean;
@@ -11,7 +12,7 @@ interface ProductDetailModalProps {
   product: Product | null;
   onAddToCart: (p: Product) => void;
   onPlaceBid: (p: Product) => void;
-  onAddToCartWithPrice?: (p: Product, price: number) => void; // New prop for negotiated price
+  onAddToCartWithPrice?: (p: Product, price: number) => void;
 }
 
 const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose, product, onAddToCart, onPlaceBid, onAddToCartWithPrice }) => {
@@ -19,8 +20,9 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
   const [analysis, setAnalysis] = useState<ProductAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   
-  // Negotiation State
+  // Negotiation & Team Buy State
   const [isNegotiating, setIsNegotiating] = useState(false);
+  const [isTeamBuying, setIsTeamBuying] = useState(false); // New state
 
   useEffect(() => {
     if (isOpen && product) {
@@ -42,7 +44,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
           onAddToCartWithPrice(p, finalPrice);
       }
       setIsNegotiating(false);
-      onClose(); // Close detail modal too
+      onClose();
   };
 
   if (!isOpen || !product) return null;
@@ -63,6 +65,9 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
           default: return 'text-gray-600 bg-gray-50 border-gray-200';
       }
   };
+
+  // Calculate Team Price Display (20% off)
+  const teamPrice = Math.floor(product.price * 0.8);
 
   return (
     <div className="fixed inset-0 z-[250] flex items-center justify-center p-4">
@@ -151,11 +156,19 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
                                                 <span className="text-lg text-gray-400 line-through decoration-2">${product.originalPrice.toLocaleString()}</span>
                                             )}
                                         </div>
-                                        {product.originalPrice && (
-                                            <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded mt-2 inline-block">
-                                                Tiết kiệm {Math.round((1 - product.price/product.originalPrice)*100)}%
-                                            </span>
-                                        )}
+                                        {/* Team Buy Promo */}
+                                        <div onClick={() => setIsTeamBuying(true)} className="mt-3 cursor-pointer bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-3 rounded-xl flex justify-between items-center shadow-lg hover:scale-[1.02] transition-transform">
+                                            <div className="flex items-center gap-2">
+                                                <div className="bg-white/20 p-1.5 rounded-lg"><Users size={18}/></div>
+                                                <div>
+                                                    <p className="text-xs font-bold opacity-90">Mua chung 2 người</p>
+                                                    <p className="text-lg font-black">${teamPrice}</p>
+                                                </div>
+                                            </div>
+                                            <div className="bg-white text-purple-700 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1">
+                                                Tạo nhóm <ChevronRight size={12}/>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -297,6 +310,20 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
             onClose={() => setIsNegotiating(false)}
             product={product}
             onSuccess={handleNegotiationSuccess}
+          />
+      )}
+
+      {/* Team Buy Modal Layer */}
+      {isTeamBuying && product && (
+          <TeamBuyModal 
+            isOpen={isTeamBuying}
+            onClose={() => setIsTeamBuying(false)}
+            product={product}
+            onConfirmTeam={(p, price) => {
+                if(onAddToCartWithPrice) onAddToCartWithPrice(p, price);
+                setIsTeamBuying(false);
+                onClose(); // Close main detail modal
+            }}
           />
       )}
     </div>
