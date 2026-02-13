@@ -1,219 +1,459 @@
 
-# Hướng Dẫn Xây Dựng Backend - AmazeBid System
+# Hướng Dẫn Xây Dựng Backend Full-Stack (Chi Tiết A-Z)
 
-Tài liệu này hướng dẫn chi tiết cách xây dựng hệ thống Backend (Server & Database) để thay thế dữ liệu giả lập (Mock Data) hiện tại trên Frontend.
-
-## 1. Công nghệ đề xuất (Tech Stack)
-
-Để tương thích tốt nhất với Frontend ReactJS hiện tại và xử lý tính năng đấu giá Real-time, chúng ta sử dụng **MERN Stack**:
-
-*   **Runtime:** Node.js
-*   **Framework:** Express.js
-*   **Database:** MongoDB (Sử dụng Mongoose ODM)
-*   **Real-time Engine:** Socket.io (Quan trọng cho Đấu giá & Livestream)
-*   **Authentication:** JWT (JSON Web Token)
+Tài liệu này cung cấp **toàn bộ mã nguồn (Source Code)** cần thiết để xây dựng Backend cho AmazeBid sử dụng **Node.js, Express, MongoDB và Socket.io**.
 
 ---
 
-## 2. Cấu trúc Thư mục Dự án (Backend)
+## 1. Khởi tạo Dự án & Cài đặt
+
+### Bước 1: Tạo thư mục và khởi tạo
+Mở Terminal, chạy các lệnh sau:
 
 ```bash
-server/
+mkdir amazebid-server
+cd amazebid-server
+npm init -y
+```
+
+### Bước 2: Cài đặt thư viện (Dependencies)
+```bash
+npm install express mongoose dotenv cors socket.io bcryptjs jsonwebtoken @google/genai
+npm install --save-dev nodemon
+```
+
+*   `express`: Web framework.
+*   `mongoose`: Kết nối MongoDB.
+*   `dotenv`: Quản lý biến môi trường.
+*   `cors`: Cho phép Frontend gọi API.
+*   `socket.io`: Xử lý Real-time (Đấu giá/Live).
+*   `bcryptjs`: Mã hóa mật khẩu.
+*   `jsonwebtoken`: Tạo Token đăng nhập.
+*   `@google/genai`: SDK mới nhất của Google Gemini.
+
+---
+
+## 2. Cấu trúc Thư mục
+
+Hãy tạo các thư mục và file theo cấu trúc sau:
+
+```
+amazebid-server/
 ├── config/
-│   └── db.js           # Kết nối MongoDB
-├── models/             # Định nghĩa Database Schemas
+│   └── db.js               # Kết nối Database
+├── controllers/            # Logic xử lý (Hàm)
+│   ├── authController.js
+│   ├── productController.js
+│   └── aiController.js
+├── middleware/
+│   └── authMiddleware.js   # Kiểm tra đăng nhập
+├── models/                 # Định nghĩa dữ liệu (Schema)
 │   ├── User.js
 │   ├── Product.js
-│   ├── Bid.js
 │   └── Order.js
-├── routes/             # Định nghĩa API Endpoints
+├── routes/                 # Định nghĩa đường dẫn API
 │   ├── authRoutes.js
 │   ├── productRoutes.js
-│   └── orderRoutes.js
-├── controllers/        # Logic xử lý
-├── middleware/         # Xác thực Token (authMiddleware)
-├── socket/             # Logic Real-time
-│   └── auctionHandler.js
-├── .env                # Biến môi trường (DB_URI, JWT_SECRET)
-└── server.js           # Entry point
+│   └── aiRoutes.js
+├── .env                    # File cấu hình (Mật)
+└── server.js               # File chạy chính
 ```
 
 ---
 
-## 3. Thiết kế Cơ sở dữ liệu (Database Schema)
+## 3. Code Chi Tiết Từng File
 
-Dưới đây là các Schema Mongoose cần thiết để khớp với `types.ts` ở Frontend.
+### 3.1. Cấu hình (`.env` & `config/db.js`)
 
-### 3.1. User Schema (`models/User.js`)
+**File: `.env`**
+```env
+PORT=5000
+MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/amazebid?retryWrites=true&w=majority
+JWT_SECRET=S3cretK3y_ChangeThisToSomethingComplex
+GEMINI_API_KEY=AIzaSy... (API Key lấy từ Google AI Studio)
+```
+
+**File: `config/db.js`**
 ```javascript
+const mongoose = require('mongoose');
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log('MongoDB Connected Successfully');
+  } catch (error) {
+    console.error('MongoDB Connection Failed:', error.message);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
+```
+
+---
+
+### 3.2. Models (Schemas)
+
+**File: `models/User.js`**
+```javascript
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
 const userSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true }, // Hash bằng bcrypt
-  phone: { type: String },
-  balance: { type: Number, default: 0 }, // Số dư ví
-  avatar: { type: String },
+  password: { type: String, required: true },
+  balance: { type: Number, default: 0 },
+  points: { type: Number, default: 0 },
   role: { type: String, enum: ['USER', 'ADMIN'], default: 'USER' },
-  socialAccounts: [{
-    provider: String, // google, facebook
-    id: String
-  }]
+  avatar: { type: String, default: 'https://ui-avatars.com/api/?background=random' }
 }, { timestamps: true });
+
+// Tự động mã hóa mật khẩu trước khi lưu
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+// Hàm kiểm tra mật khẩu
+userSchema.methods.matchPassword = async function(enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+module.exports = mongoose.model('User', userSchema);
 ```
 
-### 3.2. Product Schema (`models/Product.js`)
+**File: `models/Product.js`**
 ```javascript
+const mongoose = require('mongoose');
+
 const productSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: String,
+  price: { type: Number, required: true },
   image: String,
   category: String,
   type: { type: String, enum: ['FIXED_PRICE', 'AUCTION'], default: 'FIXED_PRICE' },
   
-  // Giá
-  price: { type: Number, required: true }, // Giá gốc hoặc Giá khởi điểm
-  
   // Đấu giá
   currentBid: { type: Number, default: 0 },
   bidCount: { type: Number, default: 0 },
-  endTime: { type: Date }, // Thời gian kết thúc đấu giá
+  endTime: Date,
+  bidHistory: [{
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    userName: String,
+    amount: Number,
+    timestamp: { type: Date, default: Date.now }
+  }],
+
   sellerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  
-  // Affiliate
-  isAffiliate: { type: Boolean, default: false },
-  affiliateLink: String,
-  
   status: { type: String, default: 'AVAILABLE' }
 }, { timestamps: true });
-```
 
-### 3.3. Bid Schema (`models/Bid.js`) - Lịch sử đấu giá
-```javascript
-const bidSchema = new mongoose.Schema({
-  productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  amount: { type: Number, required: true },
-}, { timestamps: true });
+module.exports = mongoose.model('Product', productSchema);
 ```
 
 ---
 
-## 4. Triển khai Real-time với Socket.io
+### 3.3. Middleware (Bảo vệ Route)
 
-Đây là phần quan trọng nhất để tính năng đấu giá hoạt động mượt mà.
-
-### Logic tại `server.js`:
-
+**File: `middleware/authMiddleware.js`**
 ```javascript
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
+const protect = async (req, res, next) => {
+  let token;
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select('-password');
+      next();
+    } catch (error) {
+      res.status(401).json({ message: 'Token không hợp lệ' });
+    }
+  }
+
+  if (!token) {
+    res.status(401).json({ message: 'Không có quyền truy cập, vui lòng đăng nhập' });
+  }
+};
+
+module.exports = { protect };
+```
+
+---
+
+### 3.4. Controllers (Logic xử lý)
+
+**File: `controllers/authController.js`**
+```javascript
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+};
+
+// @desc    Đăng ký user
+// @route   POST /api/auth/register
+exports.registerUser = async (req, res) => {
+  const { fullName, email, password } = req.body;
+  
+  try {
+    const userExists = await User.findOne({ email });
+    if (userExists) return res.status(400).json({ message: 'Email đã tồn tại' });
+
+    const user = await User.create({ fullName, email, password });
+    
+    if (user) {
+      res.status(201).json({
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        token: generateToken(user._id),
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Đăng nhập
+// @route   POST /api/auth/login
+exports.loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user && (await user.matchPassword(password))) {
+      res.json({
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        avatar: user.avatar,
+        token: generateToken(user._id),
+      });
+    } else {
+      res.status(401).json({ message: 'Sai email hoặc mật khẩu' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+```
+
+**File: `controllers/productController.js`**
+```javascript
+const Product = require('../models/Product');
+
+// @desc    Lấy tất cả sản phẩm
+// @route   GET /api/products
+exports.getProducts = async (req, res) => {
+  try {
+    const products = await Product.find({}).sort({ createdAt: -1 });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Tạo sản phẩm mới
+// @route   POST /api/products
+exports.createProduct = async (req, res) => {
+  const { title, description, price, image, category, type, endTime } = req.body;
+
+  try {
+    const product = new Product({
+      title, description, price, image, category, type,
+      endTime: type === 'AUCTION' ? endTime : null,
+      sellerId: req.user._id
+    });
+
+    const createdProduct = await product.save();
+    res.status(201).json(createdProduct);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+```
+
+**File: `controllers/aiController.js`**
+```javascript
+const { GoogleGenAI } = require("@google/genai");
+
+// @desc    Gọi Gemini API để phân tích hoặc chat
+// @route   POST /api/ai/generate
+exports.generateContent = async (req, res) => {
+  const { prompt, modelName = "gemini-1.5-flash" } = req.body;
+
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(500).json({ message: "Server chưa cấu hình API Key" });
+  }
+
+  try {
+    const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const model = genAI.getGenerativeModel({ model: modelName });
+    
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    res.json({ result: text });
+  } catch (error) {
+    console.error("AI Error:", error);
+    res.status(500).json({ message: "Lỗi khi gọi AI" });
+  }
+};
+```
+
+---
+
+### 3.5. Routes (Đường dẫn)
+
+**File: `routes/authRoutes.js`**
+```javascript
+const express = require('express');
+const router = express.Router();
+const { registerUser, loginUser } = require('../controllers/authController');
+
+router.post('/register', registerUser);
+router.post('/login', loginUser);
+
+module.exports = router;
+```
+
+**File: `routes/productRoutes.js`**
+```javascript
+const express = require('express');
+const router = express.Router();
+const { getProducts, createProduct } = require('../controllers/productController');
+const { protect } = require('../middleware/authMiddleware');
+
+router.route('/').get(getProducts).post(protect, createProduct);
+
+module.exports = router;
+```
+
+**File: `routes/aiRoutes.js`**
+```javascript
+const express = require('express');
+const router = express.Router();
+const { generateContent } = require('../controllers/aiController');
+
+router.post('/generate', generateContent);
+
+module.exports = router;
+```
+
+---
+
+### 3.6. Server Chính & Socket.io
+
+**File: `server.js`**
+```javascript
+const express = require('express');
+const dotenv = require('dotenv');
+const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
+const connectDB = require('./config/db');
+const Product = require('./models/Product');
+
+dotenv.config();
+connectDB();
+
 const app = express();
 const server = http.createServer(app);
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Routes
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/products', require('./routes/productRoutes'));
+app.use('/api/ai', require('./routes/aiRoutes'));
+
+// Socket.io (Real-time Auction)
 const io = new Server(server, {
-  cors: { origin: "*" } // Cho phép Frontend kết nối
+  cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
 io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
+  console.log('New client connected:', socket.id);
 
-  // 1. Người dùng tham gia vào "phòng" của một sản phẩm cụ thể
-  socket.on('join_product_room', (productId) => {
+  // Tham gia phòng đấu giá của sản phẩm cụ thể
+  socket.on('join_product', (productId) => {
     socket.join(productId);
+    console.log(`User joined product room: ${productId}`);
   });
 
-  // 2. Xử lý khi có người đặt giá (Bid)
+  // Xử lý khi có người đặt giá
   socket.on('place_bid', async (data) => {
-    const { productId, userId, amount } = data;
-    
-    // TODO: Kiểm tra Database xem giá mới có > giá hiện tại không
-    // const product = await Product.findById(productId);
-    // if (amount <= product.currentBid) return socket.emit('error', 'Giá quá thấp');
+    const { productId, userId, userName, amount } = data;
 
-    // Cập nhật DB
-    // await Product.updateOne({ _id: productId }, { currentBid: amount, $inc: { bidCount: 1 } });
-    // await Bid.create({ productId, userId, amount });
+    try {
+      // 1. Cập nhật DB
+      const product = await Product.findById(productId);
+      if (amount <= product.currentBid) {
+        socket.emit('error_bid', 'Giá phải cao hơn giá hiện tại!');
+        return;
+      }
 
-    // 3. Gửi thông báo cập nhật giá mới cho TẤT CẢ mọi người đang xem sản phẩm này
-    io.to(productId).emit('new_bid_update', {
-      productId,
-      newPrice: amount,
-      bidderName: "Tên Người Dùng (Lấy từ DB)",
-      timestamp: new Date()
-    });
+      product.currentBid = amount;
+      product.bidCount += 1;
+      product.bidHistory.push({
+        user: userId,
+        userName: userName,
+        amount: amount,
+        timestamp: new Date()
+      });
+      await product.save();
+
+      // 2. Gửi thông báo realtime cho TẤT CẢ mọi người trong phòng
+      io.to(productId).emit('new_bid_update', {
+        currentBid: amount,
+        bidCount: product.bidCount,
+        lastBidder: userName,
+        history: product.bidHistory
+      });
+
+    } catch (err) {
+      console.error(err);
+    }
   });
 
   socket.on('disconnect', () => {
-    console.log('User disconnected');
+    console.log('Client disconnected');
   });
 });
 
-server.listen(5000, () => console.log('Server running on port 5000'));
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 ```
 
 ---
 
-## 5. API Endpoints (RESTful)
+## 4. Cách Chạy Backend
 
-Frontend sẽ gọi các API này thông qua file `services/api.ts` đã tạo.
+1.  Đảm bảo MongoDB đang chạy (hoặc dùng MongoDB Atlas Cloud).
+2.  Chạy lệnh sau tại thư mục gốc:
+    ```bash
+    npm run dev
+    ```
+    *(Nếu đã cài nodemon, server sẽ tự khởi động lại khi sửa code)*.
 
-### Auth Module (`/api/auth`)
-*   `POST /register`: Tạo user mới.
-*   `POST /login`: Kiểm tra password, trả về JWT Token.
-*   `POST /login-phone`: (Mock OTP) Kiểm tra số điện thoại, nếu chưa có thì tạo user mới.
-*   `GET /profile`: Trả về thông tin user dựa trên Token gửi lên Header.
+## 5. Kết nối Frontend
 
-### Product Module (`/api/products`)
-*   `GET /`: Lấy danh sách sản phẩm (Hỗ trợ query `?category=Electronics&type=AUCTION`).
-*   `GET /:id`: Lấy chi tiết sản phẩm + Lịch sử đấu giá (`Bid.find({ productId: id })`).
-*   `POST /`: Đăng bán sản phẩm mới (Cần Token).
+Trong file `services/api.ts` ở Frontend, hãy trỏ về server này:
 
-### Order Module (`/api/orders`)
-*   `POST /`: Tạo đơn hàng từ giỏ hàng.
-*   `GET /me`: Lấy danh sách đơn mua/bán của user hiện tại.
-*   `PUT /:id/status`: Cập nhật trạng thái đơn (Shipped, Delivered...).
-
----
-
-## 6. Tích hợp AI (Gemini) ở Backend (Bảo mật)
-
-Hiện tại Frontend đang gọi trực tiếp Google Gemini API. Để bảo mật API Key, bạn nên chuyển logic này về Backend.
-
-**Quy trình mới:**
-1.  Frontend gửi text prompt lên: `POST /api/ai/generate-content`.
-2.  Backend (Node.js) sử dụng thư viện `@google/genai` với `process.env.API_KEY` (được ẩn trên server).
-3.  Backend trả về kết quả text/image cho Frontend.
-
-```javascript
-// routes/aiRoutes.js
-const { GoogleGenAI } = require("@google/genai");
-const genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-router.post('/generate-content', async (req, res) => {
-  const { prompt } = req.body;
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-  const result = await model.generateContent(prompt);
-  res.json({ text: result.response.text() });
-});
+```typescript
+const BASE_URL = 'http://localhost:5000/api'; 
+// Hoặc URL Render khi deploy: https://amazebid-api.onrender.com/api
 ```
 
----
-
-## 7. Các bước chạy Backend
-
-1.  Cài đặt dependencies:
-    ```bash
-    npm install express mongoose socket.io cors dotenv jsonwebtoken bcryptjs
-    ```
-2.  Tạo file `.env`:
-    ```env
-    PORT=5000
-    MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/amazebid
-    JWT_SECRET=ma_bao_mat_cua_ban
-    GEMINI_API_KEY=AIzaSy...
-    ```
-3.  Khởi chạy:
-    ```bash
-    node server.js
-    ```
-4.  Cập nhật file `.env` ở Frontend (nếu có) hoặc sửa `services/api.ts` để trỏ về `http://localhost:5000/api`.
-
+Với cấu hình này, bạn đã có một hệ thống Backend hoàn chỉnh, bảo mật và hỗ trợ realtime thực thụ.
