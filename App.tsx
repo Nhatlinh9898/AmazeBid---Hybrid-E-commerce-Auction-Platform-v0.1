@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import ProductCard from './components/ProductCard';
 import GeminiAssistant from './components/GeminiAssistant';
@@ -23,12 +23,13 @@ import VisualSearchModal from './components/VisualSearchModal';
 import ProductDetailModal from './components/ProductDetailModal';
 import CompareBar from './components/CompareBar'; 
 import CompareModal from './components/CompareModal'; 
+import CartDrawer from './components/CartDrawer'; // Import CartDrawer
 
 import { AuthProvider, useAuth } from './context/AuthContext'; 
 
 import { MOCK_PRODUCTS, MOCK_STREAMS } from './data';
 import { Product, CartItem, ItemType, OrderStatus, LiveStream, Bid, ContentPost } from './types';
-import { Filter, PackageSearch, Sparkles, User, Heart } from 'lucide-react';
+import { Filter, PackageSearch, Sparkles, User, Heart, Clock, History } from 'lucide-react';
 
 const InnerApp: React.FC = () => {
   const { user } = useAuth();
@@ -44,7 +45,8 @@ const InnerApp: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [filterType, setFilterType] = useState<'ALL' | ItemType>('ALL');
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [wishlist, setWishlist] = useState<string[]>([]); // Array of Product IDs
+  const [wishlist, setWishlist] = useState<string[]>([]); 
+  const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]); // Store Product IDs
   
   // Modals
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -72,16 +74,37 @@ const InnerApp: React.FC = () => {
   const [activeStream, setActiveStream] = useState<LiveStream | null>(null);
   const [isHostMode, setIsHostMode] = useState(false); 
   const [showLiveList, setShowLiveList] = useState(false);
-  const [showWishlistOnly, setShowWishlistOnly] = useState(false); // Filter for Wishlist view
+  const [showWishlistOnly, setShowWishlistOnly] = useState(false); 
   const [notification, setNotification] = useState<string | null>(null);
 
   const categories = ['Tất cả', 'Điện tử', 'Thời trang', 'Đồ cổ', 'Máy tính', 'Nhà cửa', 'Làm đẹp', 'Music'];
 
+  // --- Load Recently Viewed from Local Storage ---
+  useEffect(() => {
+      const saved = localStorage.getItem('amaze_recent');
+      if (saved) {
+          try {
+              setRecentlyViewed(JSON.parse(saved));
+          } catch(e) {}
+      }
+  }, []);
+
+  const addToRecentlyViewed = (product: Product) => {
+      setRecentlyViewed(prev => {
+          const newList = [product.id, ...prev.filter(id => id !== product.id)].slice(0, 5); // Keep last 5
+          localStorage.setItem('amaze_recent', JSON.stringify(newList));
+          return newList;
+      });
+  };
+
+  const handleOpenDetail = (product: Product) => {
+      setSelectedDetailProduct(product);
+      addToRecentlyViewed(product);
+  };
+
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
       if (p.status !== OrderStatus.AVAILABLE) return false;
-      
-      // Wishlist Filter
       if (showWishlistOnly && !wishlist.includes(p.id)) return false;
 
       const matchesSearch = p.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -91,12 +114,73 @@ const InnerApp: React.FC = () => {
     });
   }, [searchTerm, products, selectedCategory, filterType, showWishlistOnly, wishlist]);
 
+  const recentProducts = useMemo(() => {
+      return recentlyViewed.map(id => products.find(p => p.id === id)).filter(p => p) as Product[];
+  }, [recentlyViewed, products]);
+
   const showNotification = (msg: string) => {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // --- Compare Logic ---
+  // --- Cart Logic ---
+  const handleAddToCart = (product: Product) => {
+    setCart(prev => {
+      const existing = prev.find(item => item.id === product.id);
+      if (existing) {
+        return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+    showNotification(`Đã thêm ${product.title} vào giỏ hàng`);
+    setIsCartOpen(true); // Auto open drawer
+  };
+
+  const handleUpdateCartQuantity = (id: string, delta: number) => {
+      setCart(prev => prev.map(item => {
+          if (item.id === id) {
+              return { ...item, quantity: Math.max(1, item.quantity + delta) };
+          }
+          return item;
+      }));
+  };
+
+  const handleRemoveFromCart = (id: string) => {
+      setCart(prev => prev.filter(item => item.id !== id));
+  };
+
+  const handleCheckout = () => {
+      if (!user) {
+          setIsCartOpen(false);
+          setIsAuthModalOpen(true);
+          return;
+      }
+      if (confirm(`Xác nhận thanh toán ${cart.length} món hàng?`)) {
+          setCart([]);
+          setIsCartOpen(false);
+          showNotification("Thanh toán thành công! Đơn hàng đang được xử lý.");
+          // In real app, create Order in DB here
+      }
+  };
+
+  // Handle Negotiation Success OR Team Buy Success - Add to cart with NEW PRICE
+  const handleAddToCartWithPrice = (product: Product, newPrice: number) => {
+      const negotiatedProduct = { ...product, price: newPrice };
+      setCart(prev => {
+          const existing = prev.find(item => item.id === product.id);
+          if (existing) {
+              return prev.map(item => 
+                  item.id === product.id 
+                  ? { ...item, quantity: item.quantity + 1, price: newPrice } 
+                  : item
+              );
+          }
+          return [...prev, { ...negotiatedProduct, quantity: 1 }];
+      });
+      showNotification(`Đã chốt đơn ${product.title} với giá đặc biệt $${newPrice}!`);
+      setIsCartOpen(true);
+  };
+
   const handleToggleCompare = (product: Product) => {
       setCompareList(prev => {
           const exists = prev.find(p => p.id === product.id);
@@ -113,7 +197,6 @@ const InnerApp: React.FC = () => {
       });
   };
 
-  // --- Wishlist Logic ---
   const handleToggleWishlist = (product: Product) => {
       setWishlist(prev => {
           if (prev.includes(product.id)) {
@@ -124,39 +207,6 @@ const InnerApp: React.FC = () => {
               return [...prev, product.id];
           }
       });
-  };
-
-  const handleAddToCart = (product: Product) => {
-    setCart(prev => {
-      const existing = prev.find(item => item.id === product.id);
-      if (existing) {
-        return prev.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
-      }
-      return [...prev, { ...product, quantity: 1 }];
-    });
-    showNotification(`Đã thêm ${product.title} vào giỏ hàng`);
-  };
-
-  // Handle Negotiation Success OR Team Buy Success - Add to cart with NEW PRICE
-  const handleAddToCartWithPrice = (product: Product, newPrice: number) => {
-      // Clone product with new price
-      const negotiatedProduct = { ...product, price: newPrice };
-      
-      setCart(prev => {
-          // If item exists, we update price if it's the same item, or handle differently.
-          // For simplicity, we treat it as a new cart entry or update existing.
-          const existing = prev.find(item => item.id === product.id);
-          if (existing) {
-              // Update price and quantity
-              return prev.map(item => 
-                  item.id === product.id 
-                  ? { ...item, quantity: item.quantity + 1, price: newPrice } // Update price to negotiated one
-                  : item
-              );
-          }
-          return [...prev, { ...negotiatedProduct, quantity: 1 }];
-      });
-      showNotification(`Đã chốt đơn ${product.title} với giá đặc biệt $${newPrice}!`);
   };
 
   const handleOpenBidModal = (product: Product) => {
@@ -188,7 +238,6 @@ const InnerApp: React.FC = () => {
   const handleAddContentPost = (post: ContentPost) => {
       setContentPosts(prev => [post, ...prev]);
       showNotification(`Đã xuất bản bài viết lên AmazeFeed!`);
-      // Auto switch to feed to see the new post
       setCurrentView('SOCIAL');
   };
 
@@ -274,13 +323,33 @@ const InnerApp: React.FC = () => {
             )}
 
             {!showLiveList && !showWishlistOnly && (
-                <div className="relative h-[250px] md:h-[350px] mb-8 overflow-hidden rounded-xl shadow-lg group">
-                    <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&q=80&w=1500" alt="Banner" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
-                    <div className="absolute inset-0 bg-black/40 flex flex-col justify-center p-8 md:p-12 text-white">
-                        <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">MUA SẮM THÔNG MINH<br/>ĐẤU GIÁ ĐỈNH CAO</h1>
-                        <button onClick={() => user ? setIsSellModalOpen(true) : setIsAuthModalOpen(true)} className="bg-[#febd69] text-black font-bold px-6 py-3 rounded-lg hover:bg-[#f3a847] w-fit shadow-lg transition-transform hover:-translate-y-1">Đăng bán ngay</button>
+                <>
+                    <div className="relative h-[250px] md:h-[350px] mb-8 overflow-hidden rounded-xl shadow-lg group">
+                        <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&q=80&w=1500" alt="Banner" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+                        <div className="absolute inset-0 bg-black/40 flex flex-col justify-center p-8 md:p-12 text-white">
+                            <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">MUA SẮM THÔNG MINH<br/>ĐẤU GIÁ ĐỈNH CAO</h1>
+                            <button onClick={() => user ? setIsSellModalOpen(true) : setIsAuthModalOpen(true)} className="bg-[#febd69] text-black font-bold px-6 py-3 rounded-lg hover:bg-[#f3a847] w-fit shadow-lg transition-transform hover:-translate-y-1">Đăng bán ngay</button>
+                        </div>
                     </div>
-                </div>
+
+                    {/* Recently Viewed Section */}
+                    {recentProducts.length > 0 && (
+                        <div className="mb-8">
+                            <h3 className="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                                <History size={20} className="text-[#febd69]"/> Đã xem gần đây
+                            </h3>
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                {recentProducts.map(p => (
+                                    <div key={`recent_${p.id}`} onClick={() => handleOpenDetail(p)} className="bg-white p-3 rounded-lg border border-gray-200 cursor-pointer hover:shadow-md transition-all">
+                                        <img src={p.image} className="w-full aspect-square object-cover rounded mb-2 bg-gray-50"/>
+                                        <p className="text-xs font-bold truncate">{p.title}</p>
+                                        <p className="text-xs text-[#b12704] font-black">${p.price}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </>
             )}
 
             {!showWishlistOnly && (
@@ -304,7 +373,7 @@ const InnerApp: React.FC = () => {
                     product={product} 
                     onAddToCart={handleAddToCart} 
                     onPlaceBid={handleOpenBidModal}
-                    onOpenDetail={setSelectedDetailProduct}
+                    onOpenDetail={handleOpenDetail} 
                     onToggleCompare={handleToggleCompare} 
                     isCompared={compareList.some(p => p.id === product.id)}
                     isWishlisted={wishlist.includes(product.id)}
@@ -328,6 +397,16 @@ const InnerApp: React.FC = () => {
             onPlaceBid={handleOpenBidModal}
           />
       )}
+
+      {/* Modals & Drawers */}
+      <CartDrawer 
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cart}
+        onUpdateQuantity={handleUpdateCartQuantity}
+        onRemoveItem={handleRemoveFromCart}
+        onCheckout={handleCheckout}
+      />
 
       {isSellModalOpen && <SellModal onClose={() => setIsSellModalOpen(false)} onAddProduct={handleAddProduct}/>}
       {isCreateStreamModalOpen && <CreateStreamModal onClose={() => setIsCreateStreamModalOpen(false)} onStartStream={handleCreateStream} myProducts={products.filter(p => p.sellerId === user?.id)} onOpenSellModal={() => setIsSellModalOpen(true)}/>}
@@ -354,7 +433,7 @@ const InnerApp: React.FC = () => {
         product={selectedDetailProduct}
         onAddToCart={handleAddToCart}
         onPlaceBid={handleOpenBidModal}
-        onAddToCartWithPrice={handleAddToCartWithPrice} // Pass Negotiation & Team Buy Handler
+        onAddToCartWithPrice={handleAddToCartWithPrice}
       />
 
       <CompareBar 
@@ -378,7 +457,7 @@ const InnerApp: React.FC = () => {
       <ContentStudioModal isOpen={isContentStudioOpen} onClose={() => setIsContentStudioOpen(false)} onSavePost={handleAddContentPost} myProducts={myProducts} />
 
       {notification && (
-        <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[300] bg-[#131921] text-white px-8 py-3 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4 border-2 border-[#febd69] flex items-center gap-3">
+        <div className="fixed top-28 left-1/2 -translate-x-1/2 z-[500] bg-[#131921] text-white px-8 py-3 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4 border-2 border-[#febd69] flex items-center gap-3">
           <Sparkles className="text-[#febd69]" size={16} />
           <span className="text-sm font-bold">{notification}</span>
         </div>
