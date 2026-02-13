@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, ShoppingCart, Gavel, Heart, Share2, Star, ShieldCheck, Truck, RotateCcw, BrainCircuit, BarChart3, AlertCircle, CheckCircle2, ChevronRight, Clock, MessageSquare, Users } from 'lucide-react';
+import { X, ShoppingCart, Gavel, Heart, Share2, Star, ShieldCheck, Truck, RotateCcw, BrainCircuit, BarChart3, AlertCircle, CheckCircle2, ChevronRight, Clock, MessageSquare, Users, Mail, Send } from 'lucide-react';
 import { Product, ItemType } from '../types';
 import { analyzeProductDeal, ProductAnalysis } from '../services/geminiService';
+import { emailService } from '../services/emailService';
 import NegotiationModal from './NegotiationModal';
-import TeamBuyModal from './TeamBuyModal'; // Import
+import TeamBuyModal from './TeamBuyModal';
 
 interface ProductDetailModalProps {
   isOpen: boolean;
@@ -22,12 +23,19 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
   
   // Negotiation & Team Buy State
   const [isNegotiating, setIsNegotiating] = useState(false);
-  const [isTeamBuying, setIsTeamBuying] = useState(false); // New state
+  const [isTeamBuying, setIsTeamBuying] = useState(false);
+
+  // Email Sharing State
+  const [showEmailShare, setShowEmailShare] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
+  const [emailNote, setEmailNote] = useState('');
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   useEffect(() => {
     if (isOpen && product) {
         setActiveTab('OVERVIEW');
         setAnalysis(null);
+        setShowEmailShare(false);
     }
   }, [isOpen, product]);
 
@@ -45,6 +53,17 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
       }
       setIsNegotiating(false);
       onClose();
+  };
+
+  const handleSendEmail = async () => {
+      if (!product || !emailInput) return;
+      setIsSendingEmail(true);
+      await emailService.sendProductShare(emailInput, product, emailNote);
+      setIsSendingEmail(false);
+      setShowEmailShare(false);
+      setEmailInput('');
+      setEmailNote('');
+      alert("Đã gửi thông tin sản phẩm qua email thành công!");
   };
 
   if (!isOpen || !product) return null;
@@ -117,7 +136,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
                 </button>
             </div>
 
-            <div className="p-6 md:p-8 flex-1">
+            <div className="p-6 md:p-8 flex-1 relative">
                 {activeTab === 'OVERVIEW' && (
                     <div className="animate-in slide-in-from-right-4 space-y-6">
                         <div>
@@ -268,12 +287,65 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
                         <p className="text-xs mt-2">Dữ liệu review sẽ được tổng hợp từ lịch sử mua hàng.</p>
                     </div>
                 )}
+
+                {/* Email Share Overlay */}
+                {showEmailShare && (
+                    <div className="absolute inset-0 bg-white/95 z-20 flex flex-col items-center justify-center p-8 animate-in fade-in">
+                        <button 
+                            onClick={() => setShowEmailShare(false)}
+                            className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full"
+                        >
+                            <X size={20} />
+                        </button>
+                        <div className="w-full max-w-sm">
+                            <div className="text-center mb-6">
+                                <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <Mail size={32} />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900">Gửi qua Email</h3>
+                                <p className="text-sm text-gray-500">Chia sẻ sản phẩm này cho bạn bè hoặc lưu lại để xem sau.</p>
+                            </div>
+                            <div className="space-y-4">
+                                <input 
+                                    className="w-full border border-gray-300 p-3 rounded-xl focus:border-[#febd69] outline-none"
+                                    placeholder="Nhập địa chỉ email..."
+                                    type="email"
+                                    value={emailInput}
+                                    onChange={e => setEmailInput(e.target.value)}
+                                    autoFocus
+                                />
+                                <textarea 
+                                    className="w-full border border-gray-300 p-3 rounded-xl focus:border-[#febd69] outline-none resize-none"
+                                    placeholder="Lời nhắn (Tùy chọn)..."
+                                    rows={3}
+                                    value={emailNote}
+                                    onChange={e => setEmailNote(e.target.value)}
+                                />
+                                <button 
+                                    onClick={handleSendEmail}
+                                    disabled={!emailInput || isSendingEmail}
+                                    className="w-full bg-[#131921] text-white font-bold py-3 rounded-xl hover:bg-black transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                >
+                                    {isSendingEmail ? 'Đang gửi...' : 'Gửi Ngay'}
+                                    {!isSendingEmail && <Send size={16} />}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Sticky Action Footer */}
             <div className="p-4 border-t border-gray-200 bg-white sticky bottom-0 flex gap-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                <button className="p-3 border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors">
+                <button 
+                    onClick={() => setShowEmailShare(true)}
+                    className="p-3 border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors relative group"
+                    title="Chia sẻ qua Email"
+                >
                     <Share2 size={24} />
+                    <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                        Chia sẻ Email
+                    </span>
                 </button>
                 
                 {product.type === ItemType.FIXED_PRICE && (

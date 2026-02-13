@@ -2,6 +2,7 @@
 import React from 'react';
 import { Package, Truck, CheckCircle, AlertTriangle, X, RefreshCw, Box, Gavel, ShoppingBag, Trash2 } from 'lucide-react';
 import { Product, OrderStatus, ItemType } from '../types';
+import { emailService } from '../services/emailService';
 
 interface OrderDashboardProps {
   isOpen: boolean;
@@ -20,6 +21,14 @@ const OrderDashboard: React.FC<OrderDashboardProps> = ({
   const mySales = products.filter(p => p.sellerId === currentUserId && p.status !== OrderStatus.AVAILABLE);
   const myPurchases = products.filter(p => p.sellerId !== currentUserId && p.status !== OrderStatus.AVAILABLE);
   const myInventory = products.filter(p => p.sellerId === currentUserId && p.status === OrderStatus.AVAILABLE);
+
+  const handleUpdateStatus = (product: Product, newStatus: OrderStatus) => {
+      onUpdateStatus(product.id, newStatus);
+      // Trigger Email Notification
+      // Giả sử user hiện tại là người bán, gửi mail cho người mua (ở đây mock email người mua)
+      const buyerEmail = "buyer@example.com"; 
+      emailService.sendOrderStatusUpdate(buyerEmail, product, newStatus);
+  };
 
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
@@ -118,7 +127,7 @@ const OrderDashboard: React.FC<OrderDashboardProps> = ({
                     <div className="flex flex-col gap-2 min-w-[140px]">
                       {item.status === OrderStatus.PENDING_SHIPMENT && (
                         <button 
-                          onClick={() => onUpdateStatus(item.id, OrderStatus.SHIPPED)}
+                          onClick={() => handleUpdateStatus(item, OrderStatus.SHIPPED)}
                           className="bg-[#131921] text-white text-xs py-2 px-3 rounded font-bold hover:bg-black transition-all"
                         >
                           Xác nhận đã gửi
@@ -168,7 +177,7 @@ const OrderDashboard: React.FC<OrderDashboardProps> = ({
                       )}
                       {item.status === OrderStatus.SHIPPED && (
                         <button 
-                          onClick={() => onUpdateStatus(item.id, OrderStatus.COMPLETED)}
+                          onClick={() => handleUpdateStatus(item, OrderStatus.COMPLETED)}
                           className="bg-[#febd69] text-black text-xs py-2 px-3 rounded font-bold hover:bg-[#f3a847] transition-all"
                         >
                           Đã nhận & Hài lòng
@@ -176,7 +185,7 @@ const OrderDashboard: React.FC<OrderDashboardProps> = ({
                       )}
                       {item.status === OrderStatus.SHIPPED && (
                          <button 
-                          onClick={() => onUpdateStatus(item.id, OrderStatus.RETURNED)}
+                          onClick={() => handleUpdateStatus(item, OrderStatus.RETURNED)}
                           className="border border-red-200 text-red-600 text-xs py-2 px-3 rounded font-bold hover:bg-red-50 transition-all"
                         >
                           Yêu cầu trả hàng
