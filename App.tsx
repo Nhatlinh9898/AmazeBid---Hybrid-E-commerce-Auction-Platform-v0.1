@@ -32,13 +32,18 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 
 import { MOCK_PRODUCTS, MOCK_STREAMS } from './data';
 import { Product, CartItem, ItemType, OrderStatus, LiveStream, Bid, ContentPost, ShippingInfo } from './types';
-import { Filter, PackageSearch, Sparkles, User, Heart, Clock, History, SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { Filter, PackageSearch, Sparkles, User, Heart, Clock, History, SlidersHorizontal, ChevronDown, Moon, Sun } from 'lucide-react';
 
 const InnerApp: React.FC = () => {
   const { user } = useAuth();
   
   // --- STATE ---
   const [currentView, setCurrentView] = useState<'MARKET' | 'SOCIAL'>('MARKET');
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    // Load dark mode preference from localStorage
+    const saved = localStorage.getItem('amaze_dark_mode');
+    return saved === 'true';
+  });
 
   const [products, setProducts] = useState<Product[]>(MOCK_PRODUCTS);
   const [streams, setStreams] = useState<LiveStream[]>(MOCK_STREAMS);
@@ -99,6 +104,13 @@ const InnerApp: React.FC = () => {
           } catch(e) {}
       }
   }, []);
+
+  // --- Dark Mode Toggle ---
+  const toggleDarkMode = () => {
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('amaze_dark_mode', newMode.toString());
+  };
 
   const addToRecentlyViewed = (product: Product) => {
       setRecentlyViewed(prev => {
@@ -309,7 +321,7 @@ const InnerApp: React.FC = () => {
   const superDealsProducts = useMemo(() => products.filter(p => p.type === ItemType.FIXED_PRICE && (p.originalPrice && p.originalPrice > p.price)), [products]);
 
   return (
-    <div className="min-h-screen bg-[#f3f4f6] pb-20">
+    <div className={`min-h-screen pb-20 ${isDarkMode ? 'bg-black' : 'bg-[#f3f4f6]'}`}>
       <Navbar 
         cartCount={cart.reduce((s, i) => s + i.quantity, 0)} 
         wishlistCount={wishlist.length}
@@ -332,20 +344,21 @@ const InnerApp: React.FC = () => {
         onOpenRewards={() => setIsRewardsHubOpen(true)}
         onOpenVisualSearch={() => setIsVisualSearchOpen(true)}
         onOpenAgencyHub={() => user ? setIsAgencyHubOpen(true) : setIsAuthModalOpen(true)}
-        
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={toggleDarkMode}
         currentView={currentView}
         onChangeView={setCurrentView}
       />
 
       {/* Main Content Area based on View */}
       {currentView === 'MARKET' ? (
-          <main className="max-w-[1500px] mx-auto px-4 py-6 animate-in fade-in">
+          <main className={`max-w-[1500px] mx-auto px-4 py-6 animate-in fade-in ${isDarkMode ? 'text-white' : ''}`}>
             {showWishlistOnly && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6 flex justify-between items-center animate-in slide-in-from-top-2">
-                    <div className="flex items-center gap-2 text-red-600 font-bold">
+                <div className={`${isDarkMode ? 'bg-red-900 border-red-700' : 'bg-red-50 border border-red-200'} rounded-xl p-4 mb-6 flex justify-between items-center animate-in slide-in-from-top-2`}>
+                    <div className={`flex items-center gap-2 font-bold ${isDarkMode ? 'text-red-300' : 'text-red-600'}`}>
                         <Heart fill="currentColor"/> Danh sách yêu thích ({wishlist.length})
                     </div>
-                    <button onClick={() => setShowWishlistOnly(false)} className="text-sm underline text-gray-500 hover:text-black">
+                    <button onClick={() => setShowWishlistOnly(false)} className={`text-sm underline ${isDarkMode ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-black'}`}>
                         Xem tất cả sản phẩm
                     </button>
                 </div>

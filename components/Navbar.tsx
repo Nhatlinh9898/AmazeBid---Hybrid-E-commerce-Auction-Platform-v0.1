@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, ShoppingCart, User as UserIcon, MapPin, Gavel, LayoutGrid, PlusCircle, Package, Video, Sparkles, Zap, BarChart3, Shield, Bot, BrainCircuit, Newspaper, Home, Crown, Camera, Mic, MicOff, Heart, Bell, Briefcase } from 'lucide-react';
+import { Search, ShoppingCart, User as UserIcon, MapPin, Gavel, LayoutGrid, PlusCircle, Package, Video, Sparkles, Zap, BarChart3, Shield, Bot, BrainCircuit, Newspaper, Home, Crown, Camera, Mic, MicOff, Heart, Bell, Briefcase, Moon, Sun } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
 import { AppNotification } from '../types';
@@ -27,6 +27,8 @@ interface NavbarProps {
   onOpenRewards: () => void; 
   onOpenVisualSearch: () => void;
   onOpenAgencyHub: () => void; // New prop
+  isDarkMode: boolean;
+  onToggleDarkMode: () => void;
   
   currentView: 'MARKET' | 'SOCIAL';
   onChangeView: (view: 'MARKET' | 'SOCIAL') => void;
@@ -37,6 +39,7 @@ const Navbar: React.FC<NavbarProps> = ({
   onOpenLiveStudio, onViewLiveStreams, onOpenAuth, onOpenProfile, onOpenCustomerService, 
   onOpenContentStudio, onOpenSuperDeals, onOpenSellerDashboard, onOpenAdminDashboard, 
   onOpenAvatarStudio, onOpenKOLStudio, onOpenRewards, onOpenVisualSearch, onOpenAgencyHub,
+  isDarkMode, onToggleDarkMode,
   currentView, onChangeView
 }) => {
   const { user } = useAuth();
@@ -113,7 +116,7 @@ const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="bg-[#131921] text-white sticky top-0 z-50 shadow-md">
+    <header className={`${isDarkMode ? 'bg-gray-900' : 'bg-[#131921]'} text-white sticky top-0 z-50 shadow-md`}>
       {/* Top Bar */}
       <div className="max-w-[1500px] mx-auto flex items-center p-2 gap-2 md:gap-4">
         {/* Logo */}
@@ -124,23 +127,31 @@ const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* View Switcher (Desktop) */}
-        <div className="hidden md:flex bg-[#232f3e] rounded-lg p-1 mx-4">
+        <div className={`hidden md:flex rounded-lg p-1 mx-4 ${isDarkMode ? 'bg-gray-800' : 'bg-[#232f3e]'}`}>
             <button 
                 onClick={() => onChangeView('MARKET')}
-                className={`px-4 py-1.5 rounded-md text-xs font-bold flex items-center gap-2 transition-all ${currentView === 'MARKET' ? 'bg-[#febd69] text-black shadow-sm' : 'text-gray-300 hover:text-white'}`}
+                className={`px-4 py-1.5 rounded-md text-xs font-bold flex items-center gap-2 transition-all ${
+                  currentView === 'MARKET' 
+                    ? 'bg-[#febd69] text-black shadow-sm' 
+                    : isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-300 hover:text-white'
+                }`}
             >
                 <Home size={14} /> Mua sắm
             </button>
             <button 
                 onClick={() => onChangeView('SOCIAL')}
-                className={`px-4 py-1.5 rounded-md text-xs font-bold flex items-center gap-2 transition-all ${currentView === 'SOCIAL' ? 'bg-[#febd69] text-black shadow-sm' : 'text-gray-300 hover:text-white'}`}
+                className={`px-4 py-1.5 rounded-md text-xs font-bold flex items-center gap-2 transition-all ${
+                  currentView === 'SOCIAL' 
+                    ? 'bg-[#febd69] text-black shadow-sm' 
+                    : isDarkMode ? 'text-gray-300 hover:text-white' : 'text-gray-300 hover:text-white'
+                }`}
             >
                 <Newspaper size={14} /> AmazeFeed
             </button>
         </div>
 
         {/* Search Bar - Flexible */}
-        <div className={`flex-1 flex h-9 md:h-10 items-stretch bg-white rounded text-black overflow-hidden transition-all ${isListening ? 'ring-2 ring-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'focus-within:ring-2 focus-within:ring-[#febd69]'}`}>
+        <div className={`flex-1 flex h-9 md:h-10 items-stretch rounded text-black overflow-hidden transition-all ${isDarkMode ? 'bg-gray-800' : 'bg-white'} ${isListening ? 'ring-2 ring-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]' : 'focus-within:ring-2 focus-within:ring-[#febd69]'}`}>
           <button 
             onClick={handleVoiceSearch}
             className={`px-3 border-r border-gray-200 transition-colors flex items-center justify-center ${isListening ? 'bg-red-50 text-red-600 animate-pulse' : 'hover:bg-gray-100 text-gray-500'}`}
@@ -172,6 +183,15 @@ const Navbar: React.FC<NavbarProps> = ({
             <Search size={20} />
           </button>
         </div>
+
+        {/* Dark Mode Toggle */}
+        <button 
+          onClick={onToggleDarkMode}
+          className="p-2 rounded-lg hover:bg-gray-700 transition-colors"
+          title={isDarkMode ? "Chuyển sang sáng" : "Chuyển sang tối"}
+        >
+          {isDarkMode ? <Sun size={20} className="text-yellow-400" /> : <Moon size={20} className="text-gray-300" />}
+        </button>
 
         {/* User Account & Cart */}
         <div className="flex items-center gap-1 md:gap-3 shrink-0">
@@ -223,23 +243,31 @@ const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Mobile View Switcher (Only visible on mobile) */}
-      <div className="md:hidden flex border-t border-gray-700">
+      <div className={`md:flex border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-700'}`}>
          <button 
             onClick={() => onChangeView('MARKET')}
-            className={`flex-1 py-3 text-xs font-bold flex items-center justify-center gap-2 ${currentView === 'MARKET' ? 'bg-[#febd69] text-black' : 'bg-[#232f3e] text-gray-400'}`}
+            className={`flex-1 py-3 text-xs font-bold flex items-center justify-center gap-2 ${
+              currentView === 'MARKET' 
+                ? 'bg-[#febd69] text-black' 
+                : isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-[#232f3e] text-gray-400'
+            }`}
         >
             <Home size={14} /> Mua sắm
         </button>
         <button 
             onClick={() => onChangeView('SOCIAL')}
-            className={`flex-1 py-3 text-xs font-bold flex items-center justify-center gap-2 ${currentView === 'SOCIAL' ? 'bg-[#febd69] text-black' : 'bg-[#232f3e] text-gray-400'}`}
+            className={`flex-1 py-3 text-xs font-bold flex items-center justify-center gap-2 ${
+              currentView === 'SOCIAL' 
+                ? 'bg-[#febd69] text-black' 
+                : isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-[#232f3e] text-gray-400'
+            }`}
         >
             <Newspaper size={14} /> AmazeFeed
         </button>
       </div>
 
       {/* Sub-Nav - Scrollable on Mobile */}
-      <div className="bg-[#232f3e] px-2 py-1.5 flex items-center gap-4 text-[13px] font-medium overflow-x-auto no-scrollbar whitespace-nowrap border-t border-gray-700 md:border-t-0">
+      <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-[#232f3e]'} px-2 py-1.5 flex items-center gap-4 text-[13px] font-medium overflow-x-auto no-scrollbar whitespace-nowrap ${isDarkMode ? 'border-gray-700' : 'border-gray-700'} md:border-t-0`}>
         <span onClick={user ? onOpenLiveStudio : onOpenAuth} className="text-[#febd69] font-bold flex items-center gap-1 cursor-pointer hover:underline">
             <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse" /> Đấu giá trực tiếp
         </span>
