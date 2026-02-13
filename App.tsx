@@ -21,8 +21,8 @@ import SocialFeed from './components/SocialFeed';
 import RewardsHub from './components/RewardsHub'; 
 import VisualSearchModal from './components/VisualSearchModal'; 
 import ProductDetailModal from './components/ProductDetailModal';
-import CompareBar from './components/CompareBar'; // Import CompareBar
-import CompareModal from './components/CompareModal'; // Import CompareModal
+import CompareBar from './components/CompareBar'; 
+import CompareModal from './components/CompareModal'; 
 
 import { AuthProvider, useAuth } from './context/AuthContext'; 
 
@@ -63,7 +63,7 @@ const InnerApp: React.FC = () => {
   const [isRewardsHubOpen, setIsRewardsHubOpen] = useState(false);
   const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
   const [selectedDetailProduct, setSelectedDetailProduct] = useState<Product | null>(null);
-  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false); // Compare Modal
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
   // Compare List State
   const [compareList, setCompareList] = useState<Product[]>([]);
@@ -116,6 +116,28 @@ const InnerApp: React.FC = () => {
       return [...prev, { ...product, quantity: 1 }];
     });
     showNotification(`Đã thêm ${product.title} vào giỏ hàng`);
+  };
+
+  // Handle Negotiation Success - Add to cart with NEW PRICE
+  const handleAddToCartWithPrice = (product: Product, newPrice: number) => {
+      // Clone product with new price
+      const negotiatedProduct = { ...product, price: newPrice };
+      
+      setCart(prev => {
+          // If item exists, we update price if it's the same item, or handle differently.
+          // For simplicity, we treat it as a new cart entry or update existing.
+          const existing = prev.find(item => item.id === product.id);
+          if (existing) {
+              // Update price and quantity
+              return prev.map(item => 
+                  item.id === product.id 
+                  ? { ...item, quantity: item.quantity + 1, price: newPrice } // Update price to negotiated one
+                  : item
+              );
+          }
+          return [...prev, { ...negotiatedProduct, quantity: 1 }];
+      });
+      showNotification(`Đã chốt đơn ${product.title} với giá thương lượng $${newPrice}!`);
   };
 
   const handleOpenBidModal = (product: Product) => {
@@ -249,8 +271,8 @@ const InnerApp: React.FC = () => {
                     onAddToCart={handleAddToCart} 
                     onPlaceBid={handleOpenBidModal}
                     onOpenDetail={setSelectedDetailProduct}
-                    onToggleCompare={handleToggleCompare} // Pass toggle compare handler
-                    isCompared={compareList.some(p => p.id === product.id)} // Pass compared status
+                    onToggleCompare={handleToggleCompare} 
+                    isCompared={compareList.some(p => p.id === product.id)}
                 />
               ))}
               {filteredProducts.length === 0 && (
@@ -281,7 +303,6 @@ const InnerApp: React.FC = () => {
       <VirtualAvatarStudio isOpen={isAvatarStudioOpen} onClose={() => setIsAvatarStudioOpen(false)} products={myProducts} />
       <RewardsHub isOpen={isRewardsHubOpen} onClose={() => setIsRewardsHubOpen(false)} />
       
-      {/* Visual Search Modal */}
       <VisualSearchModal 
         isOpen={isVisualSearchOpen} 
         onClose={() => setIsVisualSearchOpen(false)} 
@@ -290,16 +311,15 @@ const InnerApp: React.FC = () => {
         onPlaceBid={handleOpenBidModal}
       />
 
-      {/* Product Detail Modal */}
       <ProductDetailModal 
         isOpen={!!selectedDetailProduct}
         onClose={() => setSelectedDetailProduct(null)}
         product={selectedDetailProduct}
         onAddToCart={handleAddToCart}
         onPlaceBid={handleOpenBidModal}
+        onAddToCartWithPrice={handleAddToCartWithPrice} // Pass Negotiation Handler
       />
 
-      {/* Compare Components */}
       <CompareBar 
         products={compareList} 
         onRemove={(id) => setCompareList(prev => prev.filter(p => p.id !== id))}

@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { X, ShoppingCart, Gavel, Heart, Share2, Star, ShieldCheck, Truck, RotateCcw, BrainCircuit, BarChart3, AlertCircle, CheckCircle2, ChevronRight, Clock } from 'lucide-react';
+import { X, ShoppingCart, Gavel, Heart, Share2, Star, ShieldCheck, Truck, RotateCcw, BrainCircuit, BarChart3, AlertCircle, CheckCircle2, ChevronRight, Clock, MessageSquare } from 'lucide-react';
 import { Product, ItemType } from '../types';
 import { analyzeProductDeal, ProductAnalysis } from '../services/geminiService';
+import NegotiationModal from './NegotiationModal';
 
 interface ProductDetailModalProps {
   isOpen: boolean;
@@ -10,12 +11,16 @@ interface ProductDetailModalProps {
   product: Product | null;
   onAddToCart: (p: Product) => void;
   onPlaceBid: (p: Product) => void;
+  onAddToCartWithPrice?: (p: Product, price: number) => void; // New prop for negotiated price
 }
 
-const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose, product, onAddToCart, onPlaceBid }) => {
+const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose, product, onAddToCart, onPlaceBid, onAddToCartWithPrice }) => {
   const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'AI_INSIGHTS' | 'REVIEWS'>('OVERVIEW');
   const [analysis, setAnalysis] = useState<ProductAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  
+  // Negotiation State
+  const [isNegotiating, setIsNegotiating] = useState(false);
 
   useEffect(() => {
     if (isOpen && product) {
@@ -30,6 +35,14 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
       const result = await analyzeProductDeal(product);
       setAnalysis(result);
       setIsAnalyzing(false);
+  };
+
+  const handleNegotiationSuccess = (p: Product, finalPrice: number) => {
+      if (onAddToCartWithPrice) {
+          onAddToCartWithPrice(p, finalPrice);
+      }
+      setIsNegotiating(false);
+      onClose(); // Close detail modal too
   };
 
   if (!isOpen || !product) return null;
@@ -249,6 +262,16 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
                 <button className="p-3 border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors">
                     <Share2 size={24} />
                 </button>
+                
+                {product.type === ItemType.FIXED_PRICE && (
+                    <button 
+                        onClick={() => setIsNegotiating(true)}
+                        className="px-4 border border-[#febd69] bg-white text-black font-bold text-sm rounded-xl hover:bg-[#febd69] transition-colors flex items-center gap-2 whitespace-nowrap"
+                    >
+                        <MessageSquare size={18}/> Thương lượng
+                    </button>
+                )}
+
                 <button 
                     onClick={handleAction}
                     className={`flex-1 font-bold text-lg rounded-xl shadow-lg transition-transform active:scale-[0.98] flex items-center justify-center gap-2 ${
@@ -266,6 +289,16 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ isOpen, onClose
             </div>
         </div>
       </div>
+      
+      {/* Negotiation Modal Layer */}
+      {isNegotiating && product && (
+          <NegotiationModal 
+            isOpen={isNegotiating}
+            onClose={() => setIsNegotiating(false)}
+            product={product}
+            onSuccess={handleNegotiationSuccess}
+          />
+      )}
     </div>
   );
 };

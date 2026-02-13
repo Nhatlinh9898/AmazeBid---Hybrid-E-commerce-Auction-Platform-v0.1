@@ -186,7 +186,6 @@ export const analyzeProductDeal = async (product: Product): Promise<ProductAnaly
     }
 };
 
-/** New Function: Compare Products */
 export interface ComparisonResult {
     winnerId: string;
     reason: string;
@@ -220,6 +219,62 @@ export const compareProducts = async (p1: Product, p2: Product): Promise<Compari
         return JSON.parse(response.text) as ComparisonResult;
     } catch (e) {
         console.error("Comparison Error:", e);
+        return null;
+    }
+};
+
+/** New Function: AI Negotiation */
+export interface NegotiationResult {
+    status: 'ACCEPTED' | 'REJECTED' | 'COUNTER_OFFER';
+    sellerResponse: string; // Câu trả lời của chủ shop
+    finalPrice?: number;
+}
+
+export const negotiateWithAI = async (
+    product: Product, 
+    userOffer: number, 
+    userMessage: string, 
+    chatHistory: {role: string, text: string}[]
+): Promise<NegotiationResult | null> => {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    
+    // Logic giả lập giá sàn (Floor Price) = 85% giá gốc
+    const floorPrice = product.price * 0.85;
+
+    const historyText = chatHistory.map(m => `${m.role}: ${m.text}`).join('\n');
+
+    const prompt = `Bạn là chủ cửa hàng AmazeBid (AI Shopkeeper). Bạn đang bán sản phẩm "${product.title}" với giá niêm yết $${product.price}.
+    Giá sàn thấp nhất bạn có thể bán là $${floorPrice} (TUYỆT ĐỐI KHÔNG TIẾT LỘ GIÁ SÀN CHO KHÁCH).
+    
+    Khách hàng vừa trả giá: $${userOffer}.
+    Lời nhắn của khách: "${userMessage}".
+
+    Lịch sử chat:
+    ${historyText}
+
+    Nhiệm vụ của bạn:
+    1. Nếu giá khách trả >= Giá sàn: Chấp nhận (ACCEPTED).
+    2. Nếu giá khách trả < Giá sàn nhưng gần (khoảng 80-84%): Đưa ra giá Counter Offer (COUNTER_OFFER) cao hơn giá sàn một chút.
+    3. Nếu giá quá thấp: Từ chối khéo léo hoặc Counter Offer về mức giá niêm yết giảm nhẹ.
+    
+    Hãy trả lời ngắn gọn, hài hước, đôi khi "chảnh" một chút hoặc than nghèo kể khổ để giữ giá.
+
+    Trả về JSON:
+    {
+        "status": "ACCEPTED" | "REJECTED" | "COUNTER_OFFER",
+        "sellerResponse": "Câu trả lời của bạn (Tiếng Việt)",
+        "finalPrice": con số (nếu accept thì là giá khách, nếu counter thì là giá bạn muốn, nếu reject thì null)
+    }`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-3-flash-preview',
+            contents: prompt,
+            config: { responseMimeType: "application/json" }
+        });
+        return JSON.parse(response.text) as NegotiationResult;
+    } catch (e) {
+        console.error("Negotiation Error:", e);
         return null;
     }
 };
