@@ -14,7 +14,9 @@ const TOPICS = [
   { id: 'SHIPPING', title: 'Gửi & Nhận hàng', icon: Truck },
   { id: 'RETURN', title: 'Trả hàng & Hoàn tiền', icon: RefreshCw },
   { id: 'TAX', title: 'Khai báo thuế tự chủ', icon: Scale },
-  { id: 'AGREEMENT', title: 'Hợp đồng thỏa thuận', icon: FileText },
+  { id: 'LEGAL', title: 'Luật TMĐT Việt Nam', icon: ShieldCheck },
+  { id: 'CONTRACT', title: 'Hợp đồng mua bán', icon: FileText },
+  { id: 'AGREEMENT', title: 'Điều khoản sử dụng', icon: FileText },
 ];
 
 const CustomerServiceModal: React.FC<CustomerServiceModalProps> = ({ isOpen, onClose }) => {
@@ -184,38 +186,185 @@ const CustomerServiceModal: React.FC<CustomerServiceModalProps> = ({ isOpen, onC
             </div>
         );
 
+      case 'LEGAL':
+        return (
+          <div className="space-y-6 animate-in slide-in-from-right-4">
+            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><ShieldCheck className="text-[#febd69]"/> Luật Thương Mại Điện Tử Việt Nam</h2>
+            
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
+              <p className="font-bold text-blue-800">Nghị định 52/2013/NĐ-CP</p>
+              <p className="text-sm text-blue-700 mt-1">Quy định về quản lý hoạt động thương mại điện tử</p>
+            </div>
+
+            <div className="space-y-4">
+              <div className="bg-white p-4 shadow-sm border rounded-lg">
+                <h3 className="font-bold text-[#131921] mb-2">Điều 4: Nghĩa vụ của website thương mại điện tử</h3>
+                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                  <li>Công bố thông tin về người bán (tên, địa chỉ, điện thoại, email)</li>
+                  <li>Cung cấp thông tin chi tiết về hàng hóa, dịch vụ</li>
+                  <li>Công bố giá bán hàng hóa, dịch vụ rõ ràng</li>
+                  <li>Cung cấp phương thức thanh toán an toàn, bảo mật</li>
+                  <li>Chịu trách nhiệm về thông tin do mình cung cấp</li>
+                </ul>
+              </div>
+
+              <div className="bg-white p-4 shadow-sm border rounded-lg">
+                <h3 className="font-bold text-[#131921] mb-2">Điều 20: Quy định về giao dịch</h3>
+                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                  <li>Hợp đồng điện tử có giá trị pháp lý như hợp đồng viết</li>
+                  <li>Thời gian xác nhận giao dịch không quá 24h</li>
+                  <li>Phải cung cấp hóa đơn điện tử cho mọi giao dịch</li>
+                  <li>Lưu trữ thông tin giao dịch tối thiểu 03 năm</li>
+                </ul>
+              </div>
+
+              <div className="bg-white p-4 shadow-sm border rounded-lg">
+                <h3 className="font-bold text-[#131921] mb-2">Điều 25: Bảo vệ người tiêu dùng</h3>
+                <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                  <li>Được xem thông tin đầy đủ trước khi mua</li>
+                  <li>Được xác nhận thông tin đơn hàng</li>
+                  <li>Được hủy giao dịch trong vòng 07 ngày (đối với hàng dịch vụ)</li>
+                  <li>Được bảo mật thông tin cá nhân</li>
+                  <li>Được khiếu nại và bồi thường thiệt hại</li>
+                </ul>
+              </div>
+
+              <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                <p className="font-bold text-yellow-800 mb-2">Lưu ý quan trọng:</p>
+                <p className="text-sm text-yellow-700">AmazeBid tuân thủ tuyệt đối Nghị định 52/2013/NĐ-CP và các quy định pháp luật Việt Nam về thương mại điện tử.</p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'CONTRACT':
+        return (
+          <div className="space-y-6 animate-in slide-in-from-right-4">
+            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><FileText className="text-[#febd69]"/> Hợp Đồng Mua Bán Điện Tử</h2>
+            
+            <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+              <h3 className="font-bold text-lg mb-3">Mẫu Hợp Đồng Mua Bán Chuẩn</h3>
+              
+              <div className="bg-white p-6 rounded-lg border space-y-4 text-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="font-bold text-gray-700">Bên A (Người bán)</label>
+                    <div className="mt-1 p-3 bg-gray-50 rounded border border-gray-200">
+                      <p className="font-medium">Họ và tên: Nguyễn Văn A</p>
+                      <p className="text-gray-600">Địa chỉ: 123 Nguyễn Trãi, Q.1, TP.HCM</p>
+                      <p className="text-gray-600">Điện thoại: 0901234567</p>
+                      <p className="text-gray-600">Email: seller@gmail.com</p>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="font-bold text-gray-700">Bên B (Người mua)</label>
+                    <div className="mt-1 p-3 bg-gray-50 rounded border border-gray-200">
+                      <p className="font-medium">Họ và tên: Trần Thị B</p>
+                      <p className="text-gray-600">Địa chỉ: 456 Lê Lợi, Q.3, TP.HCM</p>
+                      <p className="text-gray-600">Điện thoại: 0987654321</p>
+                      <p className="text-gray-600">Email: buyer@gmail.com</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4">
+                  <h4 className="font-bold mb-3">Điều khoản hợp đồng</h4>
+                  <div className="space-y-3 text-gray-700">
+                    <div>
+                      <p className="font-medium">Điều 1: Đối tượng hợp đồng</p>
+                      <p>Bên A đồng ý bán và Bên B đồng ý mua các sản phẩm theo thông tin chi tiết trong đơn hàng.</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Điều 2: Giá trị và thanh toán</p>
+                      <p>Tổng giá trị hợp đồng: [Thể hiện theo đơn hàng]. Bên B thanh toán 100% giá trị trước khi nhận hàng.</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Điều 3: Giao nhận hàng</p>
+                      <p>Thời gian giao hàng: [Theo thỏa thuận]. Địa chỉ giao hàng: [Địa chỉ người mua].</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Điều 4: Bảo hành và đổi trả</p>
+                      <p>Sản phẩm được bảo hành [Theo chính sách]. Được đổi trả trong vòng [Theo quy định] ngày nếu có lỗi từ nhà sản xuất.</p>
+                    </div>
+                    <div>
+                      <p className="font-medium">Điều 5: Giải quyết tranh chấp</p>
+                      <p>Các bên thỏa thuận giải quyết tranh chấp thông qua thương lượng. Nếu không thành công, tranh chấp sẽ được giải quyết tại Tòa án nhân dân có thẩm quyền.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 mt-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>Lưu ý pháp lý:</strong> Hợp đồng điện tử có giá trị pháp lý theo Điều 20 Nghị định 52/2013/NĐ-CP. 
+                    Hợp đồng được tự động tạo và lưu trữ khi người mua xác nhận đơn hàng.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
       case 'AGREEMENT':
         return (
             <div className="h-full flex flex-col animate-in slide-in-from-right-4">
-                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><FileText className="text-[#febd69]"/> Hợp đồng Thỏa thuận Người dùng</h2>
+                <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><FileText className="text-[#febd69]"/> Điều khoản Sử dụng Dịch vụ</h2>
                 
                 {/* Scrollable Agreement Content */}
                 <div className="flex-1 overflow-y-auto bg-gray-50 border border-gray-300 p-6 rounded-xl mb-4 text-justify text-sm leading-relaxed custom-scrollbar shadow-inner">
-                    <h3 className="font-bold text-center mb-4 uppercase">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM<br/>Độc lập - Tự do - Hạnh phúc<br/>---</h3>
-                    <h4 className="font-bold text-center mb-6">THỎA THUẬN CUNG CẤP VÀ SỬ DỤNG DỊCH VỤ TMĐT AMAZEBID</h4>
+                    <h3 className="font-bold text-center mb-4 uppercase">ĐIỀU KHOẢN SỬ DỤNG DỊCH VỤ AMAZEBID<br/>Cập nhật lần cuối: 01/01/2024<br/>---</h3>
 
-                    <p className="mb-3"><strong>Điều 1: Định nghĩa</strong><br/>AmazeBid là sàn giao dịch thương mại điện tử...</p>
+                    <p className="mb-3"><strong>Điều 1: Chấp nhận Điều khoản</strong><br/>
+                    Bằng việc sử dụng dịch vụ AmazeBid, bạn xác nhận đã đọc, hiểu và đồng ý bị ràng buộc bởi các điều khoản này.</p>
                     
-                    <p className="mb-3"><strong>Điều 2: Quyền và nghĩa vụ của người dùng</strong><br/>
-                    1. Người dùng cam kết cung cấp thông tin chính xác, trung thực.<br/>
-                    2. Người dùng chịu trách nhiệm bảo mật tài khoản và mật khẩu.<br/>
-                    3. Không sử dụng dịch vụ vào mục đích lừa đảo, phát tán nội dung đồi trụy, vi phạm pháp luật.<br/>
-                    4. Tôn trọng quyền sở hữu trí tuệ của AmazeBid và các bên thứ ba.</p>
+                    <p className="mb-3"><strong>Điều 2: Định nghĩa Dịch vụ</strong><br/>
+                    AmazeBid là nền tảng thương mại điện tử kết nối người mua và người bán. Chúng tôi cung cấp công nghệ trung gian thanh toán và giải quyết tranh chấp.</p>
 
-                    <p className="mb-3"><strong>Điều 3: Chính sách giao dịch</strong><br/>
-                    Mọi giao dịch trên AmazeBid tuân thủ quy chế hoạt động đã được công bố. AmazeBid đóng vai trò trung gian thanh toán SafePay để bảo vệ quyền lợi hai bên.</p>
+                    <p className="mb-3"><strong>Điều 3: Quyền và Nghĩa vụ Người dùng</strong><br/>
+                    1. Cung cấp thông tin chính xác, đầy đủ và cập nhật<br/>
+                    2. Bảo mật tài khoản và chịu trách nhiệm về mọi hoạt động dưới tài khoản<br/>
+                    3. Không sử dụng dịch vụ cho mục đích phi pháp, lừa đảo<br/>
+                    4. Tôn trọng quyền sở hữu trí tuệ và không vi phạm bản quyền</p>
 
-                    <p className="mb-3"><strong>Điều 4: Miễn trừ trách nhiệm</strong><br/>
-                    AmazeBid không chịu trách nhiệm về chất lượng hàng hóa thực tế (trừ hàng Mall), tuy nhiên chúng tôi hỗ trợ giải quyết tranh chấp công bằng dựa trên bằng chứng.</p>
+                    <p className="mb-3"><strong>Điều 4: Quyền và Nghĩa vụ Người bán</strong><br/>
+                    1. Đăng bán sản phẩm hợp pháp, có nguồn gốc rõ ràng<br/>
+                    2. Cung cấp thông tin chính xác về sản phẩm<br/>
+                    3. Chịu trách nhiệm về chất lượng và giao hàng đúng hẹn<br/>
+                    4. Tuân thủ chính sách bảo hành, đổi trả</p>
 
-                    <p className="mb-3"><strong>Điều 5: Cam kết thuế</strong><br/>
-                    Người bán cam kết tự chịu trách nhiệm về nghĩa vụ thuế đối với nhà nước theo quy định hiện hành.</p>
+                    <p className="mb-3"><strong>Điều 5: Giao dịch và Thanh toán</strong><br/>
+                    1. Mọi giao dịch được bảo vệ bởi cơ chế SafePay<br/>
+                    2. Tiền chỉ được giải ngân cho người bán sau khi người mua xác nhận đã nhận hàng<br/>
+                    3. Phí dịch vụ: 5% trên giá trị đơn hàng thành công<br/>
+                    4. Phương thức thanh toán: Thẻ ngân hàng, chuyển khoản, ví điện tử</p>
 
-                    <p className="mb-3"><strong>Điều 6: Điều khoản thi hành</strong><br/>
-                    Thỏa thuận này có hiệu lực kể từ khi người dùng bấm nút "Tôi đồng ý". AmazeBid có quyền sửa đổi bổ sung thỏa thuận và sẽ thông báo trước 5 ngày.</p>
+                    <p className="mb-3"><strong>Điều 6: Bảo vệ Người tiêu dùng</strong><br/>
+                    1. Được xem thông tin đầy đủ trước khi mua<br/>
+                    2. Được hủy giao dịch trong vòng 7 ngày (đối với dịch vụ)<br/>
+                    3. Được bảo mật thông tin cá nhân<br/>
+                    4. Được khiếu nại và bồi thường thiệt hại</p>
+
+                    <p className="mb-3"><strong>Điều 7: Trách nhiệm Thuế</strong><br/>
+                    1. Người bán chịu trách nhiệm kê khai và nộp thuế thu nhập cá nhân<br/>
+                    2. AmazeBid không chịu trách nhiệm về nghĩa vụ thuế của người bán<br/>
+                    3. Tuân thủ Luật Quản lý thuế và Nghị định 52/2013/NĐ-CP</p>
+
+                    <p className="mb-3"><strong>Điều 8: Giải quyết Tranh chấp</strong><br/>
+                    1. Ưu tiên giải quyết thông qua thương lượng<br/>
+                    2. Thời hạn khiếu nại: 3 ngày kể từ khi nhận hàng<br/>
+                    3. Nếu không giải quyết được, tranh chấp sẽ được xử lý tại cơ quan có thẩm quyền</p>
+
+                    <p className="mb-3"><strong>Điều 9: Miễn trừ Trách nhiệm</strong><br/>
+                    1. AmazeBid không chịu trách nhiệm về chất lượng thực tế của sản phẩm<br/>
+                    2. Không chịu trách nhiệm về thiệt hại gián tiếp phát sinh<br/>
+                    3. Không bảo đảm tính sẵn sàng của dịch vụ 100% thời gian</p>
+
+                    <p className="mb-3"><strong>Điều 10: Sửa đổi Điều khoản</strong><br/>
+                    AmazeBid có quyền sửa đổi điều khoản và sẽ thông báo trước 7 ngày. Việc tiếp tục sử dụng dịch vụ sau thông báo coi như đồng ý với điều khoản đã sửa đổi.</p>
                     
-                    <br/><br/>
-                    <p className="italic text-center text-gray-500">Bản cập nhật ngày 01/01/2024</p>
+                    <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mt-4">
+                      <p className="font-bold text-yellow-800 mb-2">Lưu ý quan trọng:</p>
+                      <p className="text-sm text-yellow-700">Các điều khoản này được xây dựng dựa trên Nghị định 52/2013/NĐ-CP và Luật Bảo vệ người tiêu dùng Việt Nam.</p>
+                    </div>
                 </div>
 
                 {/* Footer Action */}
@@ -233,7 +382,7 @@ const CustomerServiceModal: React.FC<CustomerServiceModalProps> = ({ isOpen, onC
                                 onClick={handleAgree}
                                 className="w-full bg-[#131921] hover:bg-black text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2"
                             >
-                                <CheckCircle2 size={20} /> TÔI ĐÃ ĐỌC VÀ ĐỒNG Ý
+                                <CheckCircle2 size={20} /> TÔI ĐỒNG Ý VỚI ĐIỀU KHOẢN
                             </button>
                         </div>
                     )}
