@@ -147,9 +147,8 @@ export const analyzeProductImage = async (base64Image: string): Promise<{ query:
   }
 };
 
-/** New Function: Analyze Product Value */
 export interface ProductAnalysis {
-    score: number; // 1-10
+    score: number;
     verdict: "EXCELLENT_DEAL" | "GOOD_PRICE" | "FAIR" | "OVERPRICED";
     pros: string[];
     cons: string[];
@@ -183,6 +182,44 @@ export const analyzeProductDeal = async (product: Product): Promise<ProductAnaly
         return JSON.parse(response.text) as ProductAnalysis;
     } catch (e) {
         console.error("Deal Analysis Error:", e);
+        return null;
+    }
+};
+
+/** New Function: Compare Products */
+export interface ComparisonResult {
+    winnerId: string;
+    reason: string;
+    differences: { feature: string; item1Value: string; item2Value: string; advantage: 'item1' | 'item2' | 'draw' }[];
+    advice: string;
+}
+
+export const compareProducts = async (p1: Product, p2: Product): Promise<ComparisonResult | null> => {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const prompt = `So sánh 2 sản phẩm sau để giúp người mua chọn lựa:
+    
+    Sản phẩm 1 (ID: ${p1.id}): ${p1.title} - Giá: $${p1.price} - Mô tả: ${p1.description}
+    Sản phẩm 2 (ID: ${p2.id}): ${p2.title} - Giá: $${p2.price} - Mô tả: ${p2.description}
+
+    Hãy đóng vai một chuyên gia tư vấn mua sắm. Trả về JSON:
+    {
+        "winnerId": "ID sản phẩm chiến thắng (hoặc 'draw')",
+        "reason": "Lý do ngắn gọn tại sao thắng",
+        "differences": [
+            { "feature": "Tiêu chí (Giá/Hiệu năng/Thương hiệu...)", "item1Value": "Giá trị SP1", "item2Value": "Giá trị SP2", "advantage": "item1" hoặc "item2" hoặc "draw" }
+        ],
+        "advice": "Lời khuyên nên mua bên nào trong trường hợp nào (Ngắn gọn)"
+    }`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-3-flash-preview',
+            contents: prompt,
+            config: { responseMimeType: "application/json" }
+        });
+        return JSON.parse(response.text) as ComparisonResult;
+    } catch (e) {
+        console.error("Comparison Error:", e);
         return null;
     }
 };

@@ -1,16 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
-import { Star, Clock, Gavel, ShoppingCart, ExternalLink, Link2, Eye } from 'lucide-react';
+import { Star, Clock, Gavel, ShoppingCart, ExternalLink, Link2, Eye, ArrowRightLeft } from 'lucide-react';
 import { Product, ItemType } from '../types';
 
 interface ProductCardProps {
   product: Product;
   onAddToCart: (p: Product) => void;
   onPlaceBid: (p: Product) => void;
-  onOpenDetail?: (p: Product) => void; // Optional for backward compatibility, but recommended
+  onOpenDetail?: (p: Product) => void;
+  onToggleCompare?: (p: Product) => void; // New prop
+  isCompared?: boolean; // New prop
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlaceBid, onOpenDetail }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlaceBid, onOpenDetail, onToggleCompare, isCompared }) => {
   const [timeLeft, setTimeLeft] = useState<string>('');
 
   useEffect(() => {
@@ -35,7 +37,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlace
   }, [product]);
 
   const handleAction = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent opening detail modal when clicking action button
+    e.stopPropagation(); 
     if (product.isAffiliate && product.affiliateLink) {
         window.open(product.affiliateLink, '_blank');
     } else if (product.type === ItemType.FIXED_PRICE) {
@@ -43,6 +45,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlace
     } else {
         onPlaceBid(product);
     }
+  };
+
+  const handleCompareClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (onToggleCompare) onToggleCompare(product);
   };
 
   const handleClickCard = () => {
@@ -54,7 +61,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlace
   return (
     <div 
         onClick={handleClickCard}
-        className="bg-white border border-gray-200 rounded p-4 hover:shadow-lg transition-all flex flex-col group h-full cursor-pointer relative"
+        className={`bg-white border rounded p-4 hover:shadow-lg transition-all flex flex-col group h-full cursor-pointer relative ${isCompared ? 'border-[#febd69] ring-1 ring-[#febd69]' : 'border-gray-200'}`}
     >
       <div className="relative overflow-hidden aspect-square mb-3 bg-gray-50 rounded">
         <img 
@@ -64,11 +71,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlace
         />
         
         {/* Quick Look Overlay */}
-        <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
             <span className="bg-white/90 text-black text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
                 <Eye size={12}/> Xem nhanh
             </span>
         </div>
+
+        {/* Compare Button (Overlay Top Right) */}
+        <button 
+            onClick={handleCompareClick}
+            className={`absolute top-2 right-2 p-1.5 rounded-full z-20 shadow-md transition-colors ${
+                isCompared 
+                ? 'bg-[#febd69] text-black' 
+                : 'bg-white text-gray-400 hover:text-black opacity-0 group-hover:opacity-100'
+            }`}
+            title="So sánh"
+        >
+            <ArrowRightLeft size={14} />
+        </button>
 
         {product.type === ItemType.AUCTION && (
           <div className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md z-10">
@@ -76,7 +96,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlace
           </div>
         )}
         {product.isAffiliate && (
-          <div className="absolute top-2 right-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md z-10">
+          <div className="absolute top-2 left-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md z-10">
             <Link2 size={10} /> {product.platformName || 'Affiliate'}
           </div>
         )}

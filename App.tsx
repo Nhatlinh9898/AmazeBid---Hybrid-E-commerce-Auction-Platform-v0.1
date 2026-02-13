@@ -20,7 +20,9 @@ import VirtualAvatarStudio from './components/VirtualAvatarStudio';
 import SocialFeed from './components/SocialFeed'; 
 import RewardsHub from './components/RewardsHub'; 
 import VisualSearchModal from './components/VisualSearchModal'; 
-import ProductDetailModal from './components/ProductDetailModal'; // Import Detail Modal
+import ProductDetailModal from './components/ProductDetailModal';
+import CompareBar from './components/CompareBar'; // Import CompareBar
+import CompareModal from './components/CompareModal'; // Import CompareModal
 
 import { AuthProvider, useAuth } from './context/AuthContext'; 
 
@@ -60,7 +62,11 @@ const InnerApp: React.FC = () => {
   const [isKOLStudioOpen, setIsKOLStudioOpen] = useState(false);
   const [isRewardsHubOpen, setIsRewardsHubOpen] = useState(false);
   const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
-  const [selectedDetailProduct, setSelectedDetailProduct] = useState<Product | null>(null); // State for product detail
+  const [selectedDetailProduct, setSelectedDetailProduct] = useState<Product | null>(null);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false); // Compare Modal
+
+  // Compare List State
+  const [compareList, setCompareList] = useState<Product[]>([]);
 
   const [activeStream, setActiveStream] = useState<LiveStream | null>(null);
   const [isHostMode, setIsHostMode] = useState(false); 
@@ -82,6 +88,23 @@ const InnerApp: React.FC = () => {
   const showNotification = (msg: string) => {
     setNotification(msg);
     setTimeout(() => setNotification(null), 3000);
+  };
+
+  // --- Compare Logic ---
+  const handleToggleCompare = (product: Product) => {
+      setCompareList(prev => {
+          const exists = prev.find(p => p.id === product.id);
+          if (exists) {
+              return prev.filter(p => p.id !== product.id);
+          } else {
+              if (prev.length >= 2) {
+                  showNotification("Chỉ có thể so sánh tối đa 2 sản phẩm cùng lúc.");
+                  return prev;
+              }
+              showNotification(`Đã thêm ${product.title} vào so sánh`);
+              return [...prev, product];
+          }
+      });
   };
 
   const handleAddToCart = (product: Product) => {
@@ -225,7 +248,9 @@ const InnerApp: React.FC = () => {
                     product={product} 
                     onAddToCart={handleAddToCart} 
                     onPlaceBid={handleOpenBidModal}
-                    onOpenDetail={setSelectedDetailProduct} // Pass handler
+                    onOpenDetail={setSelectedDetailProduct}
+                    onToggleCompare={handleToggleCompare} // Pass toggle compare handler
+                    isCompared={compareList.some(p => p.id === product.id)} // Pass compared status
                 />
               ))}
               {filteredProducts.length === 0 && (
@@ -272,6 +297,20 @@ const InnerApp: React.FC = () => {
         product={selectedDetailProduct}
         onAddToCart={handleAddToCart}
         onPlaceBid={handleOpenBidModal}
+      />
+
+      {/* Compare Components */}
+      <CompareBar 
+        products={compareList} 
+        onRemove={(id) => setCompareList(prev => prev.filter(p => p.id !== id))}
+        onClear={() => setCompareList([])}
+        onCompare={() => setIsCompareModalOpen(true)}
+      />
+      <CompareModal 
+        isOpen={isCompareModalOpen} 
+        onClose={() => setIsCompareModalOpen(false)} 
+        products={compareList} 
+        onAddToCart={handleAddToCart}
       />
 
       <OrderDashboard isOpen={isOrderDashboardOpen} onClose={() => setIsOrderDashboardOpen(false)} products={products} currentUserId={user?.id || 'guest'} onUpdateStatus={handleOrderStatusUpdate} />
