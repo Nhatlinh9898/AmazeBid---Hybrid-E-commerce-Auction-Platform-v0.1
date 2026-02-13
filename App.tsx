@@ -19,7 +19,8 @@ import KOLCreatorStudio from './components/KOLCreatorStudio';
 import VirtualAvatarStudio from './components/VirtualAvatarStudio'; 
 import SocialFeed from './components/SocialFeed'; 
 import RewardsHub from './components/RewardsHub'; 
-import VisualSearchModal from './components/VisualSearchModal'; // Import Visual Search
+import VisualSearchModal from './components/VisualSearchModal'; 
+import ProductDetailModal from './components/ProductDetailModal'; // Import Detail Modal
 
 import { AuthProvider, useAuth } from './context/AuthContext'; 
 
@@ -58,7 +59,8 @@ const InnerApp: React.FC = () => {
   const [isAvatarStudioOpen, setIsAvatarStudioOpen] = useState(false);
   const [isKOLStudioOpen, setIsKOLStudioOpen] = useState(false);
   const [isRewardsHubOpen, setIsRewardsHubOpen] = useState(false);
-  const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false); // New Modal State
+  const [isVisualSearchOpen, setIsVisualSearchOpen] = useState(false);
+  const [selectedDetailProduct, setSelectedDetailProduct] = useState<Product | null>(null); // State for product detail
 
   const [activeStream, setActiveStream] = useState<LiveStream | null>(null);
   const [isHostMode, setIsHostMode] = useState(false); 
@@ -218,7 +220,13 @@ const InnerApp: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {filteredProducts.map(product => (
-                <ProductCard key={product.id} product={product} onAddToCart={handleAddToCart} onPlaceBid={handleOpenBidModal} />
+                <ProductCard 
+                    key={product.id} 
+                    product={product} 
+                    onAddToCart={handleAddToCart} 
+                    onPlaceBid={handleOpenBidModal}
+                    onOpenDetail={setSelectedDetailProduct} // Pass handler
+                />
               ))}
               {filteredProducts.length === 0 && (
                 <div className="col-span-full bg-white rounded-2xl p-20 text-center shadow-sm">
@@ -253,6 +261,15 @@ const InnerApp: React.FC = () => {
         isOpen={isVisualSearchOpen} 
         onClose={() => setIsVisualSearchOpen(false)} 
         products={products}
+        onAddToCart={handleAddToCart}
+        onPlaceBid={handleOpenBidModal}
+      />
+
+      {/* Product Detail Modal */}
+      <ProductDetailModal 
+        isOpen={!!selectedDetailProduct}
+        onClose={() => setSelectedDetailProduct(null)}
+        product={selectedDetailProduct}
         onAddToCart={handleAddToCart}
         onPlaceBid={handleOpenBidModal}
       />

@@ -96,7 +96,6 @@ export const generateProductImage = async (prompt: string) => {
   } catch (e) { return null; }
 };
 
-/** Added generateProductVideo function using Veo model */
 export const generateProductVideo = async (prompt: string) => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
@@ -116,7 +115,6 @@ export const generateProductVideo = async (prompt: string) => {
 
     const downloadLink = operation.response?.generatedVideos?.[0]?.video?.uri;
     if (downloadLink) {
-        // Appending the API key is required when fetching from the Veo download link.
         return `${downloadLink}&key=${process.env.API_KEY}`;
     }
     return null;
@@ -126,11 +124,9 @@ export const generateProductVideo = async (prompt: string) => {
   }
 };
 
-/** New Function for Visual Search */
 export const analyzeProductImage = async (base64Image: string): Promise<{ query: string, category: string } | null> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   try {
-    // Remove header data:image/png;base64,
     const base64Data = base64Image.split(',')[1];
     
     const response = await ai.models.generateContent({
@@ -147,7 +143,46 @@ export const analyzeProductImage = async (base64Image: string): Promise<{ query:
     return JSON.parse(response.text);
   } catch (e) {
     console.error("Visual Search Error:", e);
-    // Mock response fallback for demo if API fails
     return { query: "Sản phẩm", category: "Electronics" };
   }
+};
+
+/** New Function: Analyze Product Value */
+export interface ProductAnalysis {
+    score: number; // 1-10
+    verdict: "EXCELLENT_DEAL" | "GOOD_PRICE" | "FAIR" | "OVERPRICED";
+    pros: string[];
+    cons: string[];
+    priceAnalysis: string;
+}
+
+export const analyzeProductDeal = async (product: Product): Promise<ProductAnalysis | null> => {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const prompt = `Phân tích xem sản phẩm này có đáng mua không dựa trên giá và tên gọi:
+    Sản phẩm: ${product.title}
+    Giá hiện tại: $${product.price}
+    ${product.originalPrice ? `Giá gốc: $${product.originalPrice}` : ''}
+    Mô tả: ${product.description}
+
+    Hãy đóng vai một chuyên gia thẩm định giá.
+    Trả về JSON với cấu trúc:
+    {
+        "score": number (1-10),
+        "verdict": "EXCELLENT_DEAL" | "GOOD_PRICE" | "FAIR" | "OVERPRICED",
+        "pros": ["Điểm mạnh 1", "Điểm mạnh 2"],
+        "cons": ["Điểm yếu 1", "Điểm yếu 2"],
+        "priceAnalysis": "Nhận xét ngắn gọn về giá (tiếng Việt)"
+    }`;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-3-flash-preview',
+            contents: prompt,
+            config: { responseMimeType: "application/json" }
+        });
+        return JSON.parse(response.text) as ProductAnalysis;
+    } catch (e) {
+        console.error("Deal Analysis Error:", e);
+        return null;
+    }
 };

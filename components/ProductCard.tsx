@@ -1,15 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
-import { Star, Clock, Gavel, ShoppingCart, ExternalLink, Link2 } from 'lucide-react';
+import { Star, Clock, Gavel, ShoppingCart, ExternalLink, Link2, Eye } from 'lucide-react';
 import { Product, ItemType } from '../types';
 
 interface ProductCardProps {
   product: Product;
   onAddToCart: (p: Product) => void;
   onPlaceBid: (p: Product) => void;
+  onOpenDetail?: (p: Product) => void; // Optional for backward compatibility, but recommended
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlaceBid }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlaceBid, onOpenDetail }) => {
   const [timeLeft, setTimeLeft] = useState<string>('');
 
   useEffect(() => {
@@ -33,7 +34,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlace
     }
   }, [product]);
 
-  const handleAction = () => {
+  const handleAction = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent opening detail modal when clicking action button
     if (product.isAffiliate && product.affiliateLink) {
         window.open(product.affiliateLink, '_blank');
     } else if (product.type === ItemType.FIXED_PRICE) {
@@ -43,21 +45,38 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart, onPlace
     }
   };
 
+  const handleClickCard = () => {
+      if (onOpenDetail) {
+          onOpenDetail(product);
+      }
+  };
+
   return (
-    <div className="bg-white border border-gray-200 rounded p-4 hover:shadow-lg transition-shadow flex flex-col group h-full">
+    <div 
+        onClick={handleClickCard}
+        className="bg-white border border-gray-200 rounded p-4 hover:shadow-lg transition-all flex flex-col group h-full cursor-pointer relative"
+    >
       <div className="relative overflow-hidden aspect-square mb-3 bg-gray-50 rounded">
         <img 
           src={product.image} 
           alt={product.title} 
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
+        
+        {/* Quick Look Overlay */}
+        <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <span className="bg-white/90 text-black text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
+                <Eye size={12}/> Xem nhanh
+            </span>
+        </div>
+
         {product.type === ItemType.AUCTION && (
-          <div className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md">
+          <div className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md z-10">
             <Clock size={10} /> ĐANG ĐẤU GIÁ
           </div>
         )}
         {product.isAffiliate && (
-          <div className="absolute top-2 right-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md">
+          <div className="absolute top-2 right-2 bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md z-10">
             <Link2 size={10} /> {product.platformName || 'Affiliate'}
           </div>
         )}
