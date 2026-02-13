@@ -1,8 +1,9 @@
 
 import React, { useState, useMemo } from 'react';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, CreditCard, Ticket } from 'lucide-react';
-import { CartItem } from '../types';
+import { CartItem, ShippingInfo } from '../types';
 import { useAuth } from '../context/AuthContext';
+import CheckoutModal from './CheckoutModal'; // Import CheckoutModal
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -10,7 +11,7 @@ interface CartDrawerProps {
   cartItems: CartItem[];
   onUpdateQuantity: (id: string, delta: number) => void;
   onRemoveItem: (id: string) => void;
-  onCheckout: () => void;
+  onCheckout: (shippingInfo: ShippingInfo) => void; // Updated signature
 }
 
 const CartDrawer: React.FC<CartDrawerProps> = ({ 
@@ -19,6 +20,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
   const { user } = useAuth();
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
 
   const subtotal = useMemo(() => {
     return cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -39,6 +41,16 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
           alert("Mã giảm giá không hợp lệ hoặc đã hết hạn.");
           setDiscount(0);
       }
+  };
+
+  const handleStartCheckout = () => {
+      setIsCheckoutModalOpen(true);
+  };
+
+  const handleFinalCheckout = (info: ShippingInfo) => {
+      onCheckout(info);
+      setIsCheckoutModalOpen(false);
+      onClose(); // Close cart drawer
   };
 
   return (
@@ -163,7 +175,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                 </div>
 
                 <button 
-                    onClick={onCheckout}
+                    onClick={handleStartCheckout}
                     className="w-full bg-[#febd69] hover:bg-[#f3a847] text-black font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
                 >
                     <CreditCard size={20} /> Thanh toán ngay (${total.toLocaleString()})
@@ -171,6 +183,14 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
             </div>
         )}
       </div>
+
+      <CheckoutModal 
+        isOpen={isCheckoutModalOpen}
+        onClose={() => setIsCheckoutModalOpen(false)}
+        cartItems={cartItems}
+        totalAmount={total}
+        onSubmitOrder={handleFinalCheckout}
+      />
     </>
   );
 };

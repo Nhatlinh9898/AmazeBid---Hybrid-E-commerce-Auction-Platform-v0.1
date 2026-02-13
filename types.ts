@@ -13,6 +13,14 @@ export enum OrderStatus {
   RETURNED = 'RETURNED'
 }
 
+export interface ShippingInfo {
+  fullName: string;
+  phone: string;
+  address: string;
+  city: string;
+  note?: string;
+}
+
 export interface Review {
   id: string;
   userId: string;
@@ -125,6 +133,10 @@ export interface Product {
   platformName?: string;
   commissionRate?: number;
   condition?: 'NEW' | 'LIKE_NEW' | 'USED'; 
+  
+  // New Field for Buyer Info
+  buyerInfo?: ShippingInfo;
+  buyerId?: string;
 }
 
 export interface LiveStream {

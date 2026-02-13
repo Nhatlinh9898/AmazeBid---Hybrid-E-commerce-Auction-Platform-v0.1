@@ -1,7 +1,7 @@
 
-import React from 'react';
-import { Package, Truck, CheckCircle, AlertTriangle, X, RefreshCw, Box, Gavel, ShoppingBag, Trash2 } from 'lucide-react';
-import { Product, OrderStatus, ItemType } from '../types';
+import React, { useState } from 'react';
+import { Package, Truck, CheckCircle, AlertTriangle, X, RefreshCw, Box, Gavel, ShoppingBag, Trash2, MapPin, Phone, User } from 'lucide-react';
+import { Product, OrderStatus, ItemType, ShippingInfo } from '../types';
 import { emailService } from '../services/emailService';
 
 interface OrderDashboardProps {
@@ -15,6 +15,8 @@ interface OrderDashboardProps {
 const OrderDashboard: React.FC<OrderDashboardProps> = ({ 
   isOpen, onClose, products, currentUserId, onUpdateStatus 
 }) => {
+  const [selectedBuyerInfo, setSelectedBuyerInfo] = useState<ShippingInfo | null>(null);
+
   if (!isOpen) return null;
 
   // Filter products
@@ -24,8 +26,6 @@ const OrderDashboard: React.FC<OrderDashboardProps> = ({
 
   const handleUpdateStatus = (product: Product, newStatus: OrderStatus) => {
       onUpdateStatus(product.id, newStatus);
-      // Trigger Email Notification
-      // Giả sử user hiện tại là người bán, gửi mail cho người mua (ở đây mock email người mua)
       const buyerEmail = "buyer@example.com"; 
       emailService.sendOrderStatusUpdate(buyerEmail, product, newStatus);
   };
@@ -60,7 +60,7 @@ const OrderDashboard: React.FC<OrderDashboardProps> = ({
 
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50 custom-scrollbar">
           
-          {/* Inventory Section (New) */}
+          {/* Inventory Section */}
           <div className="mb-8">
              <h3 className="text-lg font-bold mb-4 flex items-center gap-2 border-b pb-2 border-gray-200 text-gray-800">
               <span className="bg-purple-100 text-purple-800 w-6 h-6 rounded-full flex items-center justify-center text-xs border border-purple-200">
@@ -117,9 +117,17 @@ const OrderDashboard: React.FC<OrderDashboardProps> = ({
                         <span className="font-bold text-green-600">+${item.price}</span>
                       </div>
                       <div className="text-xs text-gray-500 mb-2">Thanh toán qua: {item.payoutMethod || 'Bank Transfer'}</div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                          {getStatusBadge(item.status)}
                          <span className="text-[10px] text-gray-400">ID: {item.id}</span>
+                         {item.buyerInfo && (
+                             <button 
+                                onClick={() => setSelectedBuyerInfo(item.buyerInfo || null)}
+                                className="text-xs bg-gray-100 hover:bg-gray-200 text-blue-600 px-2 py-1 rounded font-bold flex items-center gap-1"
+                             >
+                                 <MapPin size={10}/> Địa chỉ giao hàng
+                             </button>
+                         )}
                       </div>
                     </div>
                     
@@ -203,6 +211,55 @@ const OrderDashboard: React.FC<OrderDashboardProps> = ({
 
         </div>
         
+        {/* Shipping Info Modal Layer */}
+        {selectedBuyerInfo && (
+            <div className="absolute inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-in fade-in">
+                <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm animate-in zoom-in-95 relative">
+                    <button onClick={() => setSelectedBuyerInfo(null)} className="absolute top-4 right-4 text-gray-400 hover:text-black">
+                        <X size={20}/>
+                    </button>
+                    <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+                        <MapPin className="text-red-500"/> Thông tin giao hàng
+                    </h3>
+                    <div className="space-y-4">
+                        <div className="flex gap-3 items-start">
+                            <User className="text-gray-400 mt-1" size={18}/>
+                            <div>
+                                <p className="text-xs text-gray-500 uppercase font-bold">Người nhận</p>
+                                <p className="font-bold text-gray-800">{selectedBuyerInfo.fullName}</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-3 items-start">
+                            <Phone className="text-gray-400 mt-1" size={18}/>
+                            <div>
+                                <p className="text-xs text-gray-500 uppercase font-bold">Số điện thoại</p>
+                                <p className="font-bold text-gray-800">{selectedBuyerInfo.phone}</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-3 items-start">
+                            <MapPin className="text-gray-400 mt-1" size={18}/>
+                            <div>
+                                <p className="text-xs text-gray-500 uppercase font-bold">Địa chỉ</p>
+                                <p className="font-bold text-gray-800">{selectedBuyerInfo.address}</p>
+                                <p className="text-sm text-gray-600">{selectedBuyerInfo.city}</p>
+                            </div>
+                        </div>
+                        {selectedBuyerInfo.note && (
+                            <div className="bg-yellow-50 p-3 rounded-lg text-sm text-yellow-800 border border-yellow-200">
+                                <strong>Ghi chú:</strong> {selectedBuyerInfo.note}
+                            </div>
+                        )}
+                    </div>
+                    <button 
+                        onClick={() => setSelectedBuyerInfo(null)}
+                        className="w-full mt-6 bg-[#131921] text-white py-2 rounded-lg font-bold hover:bg-black"
+                    >
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        )}
+
         <div className="bg-gray-100 p-4 text-xs text-gray-500 text-center border-t border-gray-200">
           AmazeBid SafePay™ đảm bảo an toàn cho giao dịch. Tiền chỉ được chuyển khi người mua xác nhận. <br/>
           Nếu trả hàng, phí vận chuyển sẽ được tính cho người mua theo chính sách.

@@ -1,7 +1,7 @@
 
 # Hướng Dẫn Sử Dụng Hệ Thống AmazeBid
 
-Chào mừng bạn đến với **AmazeBid** - Nền tảng Thương mại điện tử & Đấu giá kết hợp mạng xã hội, được hỗ trợ bởi trí tuệ nhân tạo (AI) Gemini.
+Chào mừng bạn đến với **AmazeBid** - Nền tảng Thương mại điện tử & Đấu giá kết hợp mạng xã hội, được hỗ trợ toàn diện bởi hệ sinh thái trí tuệ nhân tạo (AI) Google Gemini.
 
 Tài liệu này sẽ hướng dẫn bạn sử dụng từng tính năng trên trang web.
 
@@ -14,6 +14,7 @@ Tài liệu này sẽ hướng dẫn bạn sử dụng từng tính năng trên 
 3.  [Dành Cho Creator & KOL (Social)](#3-dành-cho-creator--kol)
 4.  [Các Tính Năng AI Đặc Biệt](#4-các-tính-năng-ai-đặc-biệt)
 5.  [Quản Lý Tài Khoản & Admin](#5-quản-lý-tài-khoản--admin)
+6.  [Cài Đặt Ứng Dụng (PWA)](#6-cài-đặt-ứng-dụng-pwa)
 
 ---
 
@@ -22,16 +23,16 @@ Tài liệu này sẽ hướng dẫn bạn sử dụng từng tính năng trên 
 ### 1.1. Tìm kiếm & Duyệt sản phẩm
 *   **Thanh tìm kiếm thông minh:**
     *   **Gõ từ khóa:** Nhập tên sản phẩm vào ô tìm kiếm.
-    *   **Giọng nói (Voice Search):** Nhấn biểu tượng Micro 🎤 và nói tên sản phẩm (Hỗ trợ tiếng Việt).
-    *   **Hình ảnh (AmazeLens):** Nhấn biểu tượng Camera 📷, tải lên ảnh chụp sản phẩm bất kỳ. AI sẽ phân tích và tìm sản phẩm tương tự.
+    *   **Giọng nói (Voice Search):** Nhấn biểu tượng Micro 🎤 trên thanh tìm kiếm và nói tên sản phẩm (Hỗ trợ tiếng Việt).
+    *   **Hình ảnh (AmazeLens):** Nhấn biểu tượng Camera 📷, tải lên hoặc chụp ảnh sản phẩm bất kỳ ngoài đời thực. Gemini Vision sẽ phân tích và tìm sản phẩm tương tự trong kho hàng.
 *   **Lọc:** Sử dụng các nút danh mục (Điện tử, Thời trang, v.v.) bên dưới banner để lọc nhanh.
 
 ### 1.2. Xem chi tiết sản phẩm
 Nhấn vào bất kỳ thẻ sản phẩm nào để mở cửa sổ chi tiết. Tại đây có 3 tab chính:
 1.  **Tổng quan:** Xem giá, mô tả, đánh giá sao.
-    *   *Nút "Thương lượng":* Chat với AI chủ shop để trả giá (chỉ áp dụng cho hàng Mua ngay).
-    *   *Nút "Mua chung 2 người":* Tạo nhóm mua để được giảm giá 20%.
-2.  **Phân tích AI:** Nhấn nút này để Gemini AI đánh giá xem sản phẩm có phải là "kèo thơm" (Good Deal) hay không, liệt kê ưu/nhược điểm.
+    *   *Nút "Thương lượng" (Negotiation):* Chat trực tiếp với AI đóng vai chủ shop để trả giá (chỉ áp dụng cho hàng Mua ngay). AI có quyền quyết định giảm giá dựa trên biên độ lợi nhuận.
+    *   *Nút "Mua chung 2 người" (Team Buy):* Tạo nhóm mua để được giảm giá 20%. AI sẽ giúp bạn viết lời mời "rủ rê" bạn bè cực cuốn.
+2.  **Phân tích AI:** Nhấn nút này để Gemini AI đánh giá xem sản phẩm có phải là "kèo thơm" (Good Deal) hay không, liệt kê ưu/nhược điểm khách quan.
 3.  **Phòng thử đồ (Try-On):** Xem mô phỏng sản phẩm (quần áo/nội thất) trên người mẫu hoặc không gian ảo.
 
 ### 1.3. Đấu giá (Auction)
@@ -39,11 +40,15 @@ Nhấn vào bất kỳ thẻ sản phẩm nào để mở cửa sổ chi tiết.
 *   Nhấn **"Trả giá ngay"** -> Nhập số tiền bạn muốn đặt (phải cao hơn giá hiện tại + bước giá).
 *   Theo dõi lịch sử đấu giá để biết mình có đang dẫn đầu hay không.
 
-### 1.4. So sánh sản phẩm
+### 1.4. So sánh sản phẩm (Compare Arena)
 1.  Di chuột vào ảnh sản phẩm ngoài trang chủ, nhấn biểu tượng **Mũi tên 2 chiều (Compare)** ở góc trên phải.
-2.  Chọn tối đa 2 sản phẩm.
-3.  Thanh so sánh sẽ hiện ở dưới cùng, nhấn **"So sánh ngay"**.
-4.  AI sẽ lập bảng so sánh chi tiết và đưa ra lời khuyên nên mua cái nào.
+2.  Chọn tối đa 2 sản phẩm để đưa vào thanh so sánh (dưới cùng màn hình).
+3.  Nhấn **"So sánh ngay"**.
+4.  **AI Verdict:** Gemini sẽ lập bảng so sánh thông số kỹ thuật và đưa ra lời khuyên "Nên mua cái nào?" dựa trên nhu cầu (Hiệu năng hay Giá cả).
+
+### 1.5. Chat & Hỗ trợ
+*   **Chat với Shop (Góc trái dưới):** Nhấn nút tròn màu đen để chat trực tiếp với người bán.
+*   **Gemini Assistant (Góc phải dưới):** Trợ lý ảo toàn năng. Bạn có thể hỏi bất cứ điều gì (VD: "Tìm cho tôi đồng hồ dưới 200 đô", "So sánh iPhone 14 và 15").
 
 ---
 
@@ -53,8 +58,8 @@ Nhấn vào bất kỳ thẻ sản phẩm nào để mở cửa sổ chi tiết.
 Nhấn nút **"Đăng bán"** (hoặc dấu + trên menu).
 *   **Tab Hàng Vật Lý:**
     *   Nhập tên sản phẩm (VD: iPhone 15). Hệ thống sẽ gợi ý tự động điền thông tin và ảnh mẫu.
-    *   Chọn hình thức: *Mua ngay* (Fixed Price) hoặc *Đấu giá* (Auction).
-    *   **Tính giá thông minh:** Nhấn nút máy tính, nhập giá vốn. AI sẽ tính toán giá bán để bạn hòa vốn nhanh nhất.
+    *   **Tạo ảnh AI:** Nếu chưa có ảnh thật, nhấn "Tạo ảnh AI" để Imagen 3 vẽ ảnh sản phẩm chuyên nghiệp.
+    *   **Tính giá thông minh (Smart Pricing):** Nhấn nút máy tính, nhập giá vốn. AI sẽ tính toán giá bán để bạn hòa vốn nhanh nhất và tối ưu lợi nhuận.
 *   **Tab Affiliate Network:**
     *   Chọn sản phẩm từ kho hàng chung (Amazon, Shopee...).
     *   Nhấn "Thêm vào kho". Bạn sẽ bán sản phẩm này và nhận hoa hồng mà không cần nhập hàng.
@@ -65,13 +70,13 @@ Nhấn vào mục **"Đấu giá trực tiếp"** trên thanh menu phụ.
 2.  Nhập tiêu đề hấp dẫn.
 3.  Nhấn **"Bắt đầu Live"**.
     *   Nếu có Camera: Bạn sẽ lên hình trực tiếp.
-    *   Nếu không có Camera: Bạn có thể dùng **Avatar 3D** để thay thế (vào Studio Avatar).
+    *   Nếu không có Camera hoặc muốn ẩn danh: Hệ thống sẽ chuyển sang chế độ **Audio/Avatar**.
 
 ### 2.3. Quản lý Đơn hàng (Seller Dashboard)
 Vào Menu Tài khoản -> **Kênh người bán**.
 *   Xem biểu đồ doanh thu, số lượng đơn hàng.
 *   Quản lý trạng thái đơn: Xác nhận gửi hàng, xem đơn hoàn trả.
-*   Xem hiệu quả của các link Affiliate.
+*   Xem hiệu quả doanh thu từ các link Affiliate.
 
 ---
 
@@ -79,31 +84,38 @@ Vào Menu Tài khoản -> **Kênh người bán**.
 
 ### 3.1. AmazeKOL Factory (Tạo KOL AI)
 Vào menu **"AmazeKOL AI"**.
-1.  Chọn ngành hàng (Thời trang, Công nghệ...).
+1.  Chọn ngành hàng (Thời trang, Công nghệ, Home Decor).
 2.  Nhấn "Khởi tạo".
-3.  AI sẽ tạo ra một hồ sơ KOL hoàn chỉnh (Tính cách, giọng nói, điểm mạnh/yếu).
-4.  Xem kế hoạch 30 ý tưởng video viral được gợi ý riêng cho KOL đó.
+3.  AI sẽ tạo ra một hồ sơ KOL hoàn chỉnh theo phong cách "Unfulfilled" (Chưa hoàn hảo - xu hướng mới giúp tăng tương tác). Hồ sơ bao gồm: Tính cách, giọng nói, điểm mạnh/yếu.
+4.  Xem lộ trình 30 ý tưởng video viral được gợi ý riêng cho KOL đó.
 
-### 3.2. Content Studio (Viết bài SEO)
-Vào Menu Tài khoản -> **Content Studio**.
-1.  Nhập tên sản phẩm hoặc chọn từ kho.
-2.  AI sẽ tự động viết bài Blog/Review chuẩn SEO.
-3.  **Tạo ảnh/Video:** Sử dụng công cụ tích hợp để tạo ảnh minh họa hoặc video quảng cáo ngắn bằng AI (Veo/Imagen).
-4.  Đăng bài lên **AmazeFeed**.
+### 3.2. Content Studio (Viết bài & Sản xuất Media)
+Vào Menu Tài khoản -> **Content Studio**. Đây là công cụ "All-in-one" cho Creator:
+1.  **AI Writer:** Nhập tên sản phẩm, AI sẽ viết bài Blog/Review chuẩn SEO với giọng văn tùy chọn (Hài hước, Chuyên nghiệp...).
+2.  **AI Image (Imagen 3):** Tạo ảnh minh họa sản phẩm sắc nét.
+3.  **AI Video (Veo):** Tạo video quảng cáo ngắn (cinematic) từ văn bản mô tả.
+4.  Đăng bài trực tiếp lên **AmazeFeed**.
 
-### 3.3. AmazeFeed (Mạng xã hội)
+### 3.3. Virtual Avatar Studio
+Vào Menu Tài khoản -> **Avatar Studio**.
+*   **3D Model:** Tương tác với nhân vật ảo (Mika, Tomo, Robo). Bạn có thể chat để yêu cầu nhân vật thực hiện hành động.
+*   **Video Reel:** (Tính năng đang phát triển) Tạo video ngắn với nhân vật ảo cử động và nói chuyện.
+
+### 3.4. AmazeFeed (Mạng xã hội mua sắm)
 Chuyển đổi chế độ xem sang **"AmazeFeed"** (trên thanh Navbar).
 *   Lướt xem các bài review ngắn, video TikTok-style.
-*   Mua hàng hoặc Đấu giá trực tiếp ngay trên bài viết (Sản phẩm được gắn thẻ ở góc dưới).
+*   Mua hàng hoặc Đấu giá trực tiếp ngay trên bài viết (Sản phẩm được gắn thẻ ở góc dưới ảnh/video).
 
 ---
 
 ## 4. CÁC TÍNH NĂNG AI ĐẶC BIỆT
 
-*   **Gemini Assistant (Chatbot):** Nằm ở góc dưới bên phải màn hình. Bạn có thể hỏi bất cứ điều gì (VD: "Tìm cho tôi đồng hồ dưới 200 đô", "So sánh iPhone 14 và 15").
-*   **Smart Pricing (Định giá):** Giúp người bán tính toán điểm hòa vốn và lợi nhuận.
-*   **Negotiation AI (Mặc cả):** AI đóng vai người bán để thương lượng giá với khách hàng 24/7.
-*   **Viral Writer:** Tự động viết lời mời mua chung (Team Buy) hài hước hoặc gấp gáp để thu hút bạn bè.
+Hệ thống sử dụng các mô hình AI tiên tiến nhất của Google:
+
+*   **Gemini 3 Pro / Flash:** Bộ não xử lý ngôn ngữ tự nhiên, dùng cho Chatbot, viết nội dung, phân tích giá và thương lượng.
+*   **Gemini 2.5 Vision:** Đôi mắt của hệ thống, dùng cho tính năng AmazeLens (Tìm kiếm bằng hình ảnh).
+*   **Imagen 3:** Họa sĩ AI, dùng để tạo ảnh sản phẩm chất lượng cao.
+*   **Veo:** Đạo diễn AI, dùng để tạo video quảng cáo từ văn bản.
 
 ---
 
@@ -112,15 +124,23 @@ Chuyển đổi chế độ xem sang **"AmazeFeed"** (trên thanh Navbar).
 ### 5.1. Rewards Hub (Trung tâm quà tặng)
 Nhấn vào biểu tượng **Vương miện (Crown)** hoặc số điểm trên thanh menu.
 *   **Điểm danh:** Nhấn vào thẻ user để điểm danh hàng ngày (+50 điểm).
-*   **Vòng quay may mắn:** Dùng 50 điểm để quay thưởng (Cơ hội trúng Jackpot).
+*   **Vòng quay may mắn:** Dùng 50 điểm để quay thưởng (Cơ hội trúng Jackpot 1000 điểm).
 *   **Đổi quà:** Dùng điểm để đổi Voucher giảm giá hoặc Freeship.
 
 ### 5.2. Admin Dashboard (Dành cho Quản trị viên)
 Vào Menu Tài khoản -> **Admin Dashboard**.
-*   **Overview:** Xem tổng doanh thu toàn sàn, lượng user active.
-*   **Users:** Quản lý danh sách người dùng, xem ai mua nhiều nhất.
-*   **System:** Kiểm tra trạng thái Server, kết nối Database và Deploy code.
+*   **Overview:** Xem tổng doanh thu toàn sàn, lượng user active theo thời gian thực.
+*   **Users:** Quản lý danh sách người dùng, xem top người mua/bán.
+*   **System:** Kiểm tra trạng thái Server, biến môi trường và Deployment.
 
 ---
 
-**Lưu ý:** Đây là phiên bản Demo. Các giao dịch tiền tệ là giả lập. Tuy nhiên, các tính năng AI (Chat, Phân tích, Tạo ảnh) đều hoạt động thực tế nếu bạn đã cấu hình API Key.
+## 6. CÀI ĐẶT ỨNG DỤNG (PWA)
+
+AmazeBid hỗ trợ công nghệ **Progressive Web App (PWA)**, cho phép cài đặt như một ứng dụng gốc trên điện thoại và máy tính.
+
+1.  **Trên Android (Chrome):** Nhấn vào menu (3 chấm) -> Chọn "Cài đặt ứng dụng" hoặc "Thêm vào màn hình chính".
+2.  **Trên iOS (Safari):** Nhấn nút Chia sẻ -> Chọn "Thêm vào Màn hình chính" (Add to Home Screen).
+3.  **Trên Máy tính (Chrome/Edge):** Nhấn vào biểu tượng cài đặt trên thanh địa chỉ.
+
+Sau khi cài đặt, bạn có thể truy cập AmazeBid ngay từ màn hình chính với trải nghiệm toàn màn hình mượt mà.

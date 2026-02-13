@@ -30,7 +30,7 @@ import ChatWidget from './components/ChatWidget'; // Import ChatWidget
 import { AuthProvider, useAuth } from './context/AuthContext'; 
 
 import { MOCK_PRODUCTS, MOCK_STREAMS } from './data';
-import { Product, CartItem, ItemType, OrderStatus, LiveStream, Bid, ContentPost } from './types';
+import { Product, CartItem, ItemType, OrderStatus, LiveStream, Bid, ContentPost, ShippingInfo } from './types';
 import { Filter, PackageSearch, Sparkles, User, Heart, Clock, History, SlidersHorizontal, ChevronDown } from 'lucide-react';
 
 const InnerApp: React.FC = () => {
@@ -173,17 +173,30 @@ const InnerApp: React.FC = () => {
       setCart(prev => prev.filter(item => item.id !== id));
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = (shippingInfo: ShippingInfo) => {
       if (!user) {
           setIsCartOpen(false);
           setIsAuthModalOpen(true);
           return;
       }
-      if (confirm(`Xác nhận thanh toán ${cart.length} món hàng?`)) {
-          setCart([]);
-          setIsCartOpen(false);
-          showNotification("Thanh toán thành công! Đơn hàng đang được xử lý.");
-      }
+      
+      // Process Order Logic
+      // In a real app, this would send data to backend.
+      // Here we simulate by creating "Sold" product entries for the seller dashboard.
+      const newOrders = cart.map(item => ({
+          ...item,
+          id: `order_${Date.now()}_${item.id}`, // New ID for order instance
+          status: OrderStatus.PENDING_SHIPMENT,
+          buyerInfo: shippingInfo,
+          buyerId: user.id
+      }));
+
+      // Add new orders to products list (so they appear in Order Dashboard)
+      setProducts(prev => [...prev, ...newOrders]);
+      
+      setCart([]);
+      setIsCartOpen(false);
+      showNotification("Đặt hàng thành công! Người bán sẽ sớm gửi hàng cho bạn.");
   };
 
   const handleAddToCartWithPrice = (product: Product, newPrice: number) => {
