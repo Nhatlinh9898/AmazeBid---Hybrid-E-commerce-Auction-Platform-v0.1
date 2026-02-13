@@ -39,6 +39,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           balance: 0,
           points: 150,
           tier: 'SILVER',
+          role: email.includes('admin') ? 'ADMIN' : 'USER', // Add role based on email
           paymentMethods: [
             { id: 'pm_1', type: 'BANK', providerName: 'Vietcombank', accountNumber: '9988776655', holderName: 'NGUYEN VAN A', isDefault: true }
           ],

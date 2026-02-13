@@ -258,6 +258,24 @@ const Navbar: React.FC<NavbarProps> = ({
         <span onClick={onOpenKOLStudio} className="text-purple-300 cursor-pointer hover:text-purple-100 flex items-center gap-1">
             <Sparkles size={14}/> AmazeKOL AI
         </span>
+        <span onClick={user ? openOrders : onOpenAuth} className="text-blue-300 cursor-pointer hover:text-blue-100 flex items-center gap-1">
+            <Package size={14}/> Đơn hàng
+        </span>
+        <span onClick={user ? onOpenSellerDashboard : onOpenAuth} className="text-green-300 cursor-pointer hover:text-green-100 flex items-center gap-1">
+            <BarChart3 size={14}/> Seller Hub
+        </span>
+        <span onClick={user && user.role === 'ADMIN' ? onOpenAdminDashboard : onOpenAuth} className="text-red-300 cursor-pointer hover:text-red-100 flex items-center gap-1">
+            <Shield size={14} /> Admin
+        </span>
+        <span onClick={user ? onOpenCustomerService : onOpenAuth} className="text-cyan-300 cursor-pointer hover:text-cyan-100 flex items-center gap-1">
+            <Bot size={14} /> Hỗ trợ
+        </span>
+        <span onClick={user ? onOpenContentStudio : onOpenAuth} className="text-pink-300 cursor-pointer hover:text-pink-100 flex items-center gap-1">
+            <BrainCircuit size={14} /> Content Studio
+        </span>
+        <span onClick={user ? onOpenAvatarStudio : onOpenAuth} className="text-indigo-300 cursor-pointer hover:text-indigo-100 flex items-center gap-1">
+            <Camera size={14} /> Avatar Studio
+        </span>
       </div>
     </header>
   );
