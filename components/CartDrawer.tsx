@@ -70,10 +70,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
         {/* Header */}
         <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-[#131921] text-white">
             <div className="flex items-center gap-2">
-                <ShoppingBag size={20} className="text-[#febd69]"/>
-                <h2 className="font-bold text-lg">Giỏ hàng ({cartItems.length})</h2>
+                <ShoppingBag size={20} className="text-[#febd69] drop-shadow-md"/>
+                <h2 className="font-bold text-lg text-white drop-shadow-sm">Giỏ hàng ({cartItems.length})</h2>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-gray-700 rounded-full transition-colors">
+            <button onClick={onClose} className="p-2 hover:bg-gray-700 rounded-full transition-colors text-white">
                 <X size={20} />
             </button>
         </div>
@@ -81,38 +81,38 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
         {/* Cart Items */}
         <div className="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar bg-gray-50">
             {cartItems.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-gray-400">
-                    <ShoppingBag size={64} className="mb-4 opacity-20"/>
-                    <p className="font-medium">Giỏ hàng của bạn đang trống</p>
-                    <button onClick={onClose} className="mt-4 text-[#febd69] font-bold hover:underline">
+                <div className="h-full flex flex-col items-center justify-center text-gray-500 bg-gray-50">
+                    <ShoppingBag size={64} className="mb-4 opacity-30 text-gray-400"/>
+                    <p className="font-medium text-gray-700 text-lg">Giỏ hàng của bạn đang trống</p>
+                    <button onClick={onClose} className="mt-4 text-[#febd69] font-bold hover:underline hover:text-[#f3a847] transition-colors">
                         Tiếp tục mua sắm
                     </button>
                 </div>
             ) : (
                 cartItems.map(item => (
-                    <div key={item.id} className="bg-white p-3 rounded-xl border border-gray-200 flex gap-3 shadow-sm">
+                    <div key={item.id} className="bg-white p-3 rounded-xl border border-gray-200 flex gap-3 shadow-sm hover:shadow-md transition-shadow">
                         <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden shrink-0">
                             <img src={item.image} className="w-full h-full object-cover" alt={item.title} />
                         </div>
                         <div className="flex-1 flex flex-col justify-between">
                             <div>
-                                <h4 className="font-bold text-sm text-gray-800 line-clamp-1">{item.title}</h4>
-                                <p className="text-xs text-gray-500">{item.category}</p>
+                                <h4 className="font-bold text-sm text-gray-900 line-clamp-1">{item.title}</h4>
+                                <p className="text-xs text-gray-600 font-medium">{item.category}</p>
                             </div>
                             <div className="flex justify-between items-end">
-                                <span className="font-bold text-[#b12704]">${item.price.toLocaleString()}</span>
+                                <span className="font-bold text-[#b12704] text-lg">${item.price.toLocaleString()}</span>
                                 <div className="flex items-center bg-gray-100 rounded-lg p-1 gap-2">
                                     <button 
                                         onClick={() => onUpdateQuantity(item.id, -1)}
                                         disabled={item.quantity <= 1}
-                                        className="p-1 hover:bg-white rounded shadow-sm disabled:opacity-30"
+                                        className="p-1 hover:bg-white rounded shadow-sm disabled:opacity-30 text-gray-700"
                                     >
                                         <Minus size={12} />
                                     </button>
-                                    <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
+                                    <span className="text-xs font-bold w-4 text-center text-gray-900">{item.quantity}</span>
                                     <button 
                                         onClick={() => onUpdateQuantity(item.id, 1)}
-                                        className="p-1 hover:bg-white rounded shadow-sm"
+                                        className="p-1 hover:bg-white rounded shadow-sm text-gray-700"
                                     >
                                         <Plus size={12} />
                                     </button>
@@ -121,7 +121,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                         </div>
                         <button 
                             onClick={() => onRemoveItem(item.id)}
-                            className="text-gray-300 hover:text-red-500 self-start p-1"
+                            className="text-gray-400 hover:text-red-500 self-start p-1 transition-colors"
                         >
                             <Trash2 size={16} />
                         </button>
@@ -137,34 +137,34 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                 {/* Promo Code */}
                 <div className="flex gap-2 mb-6">
                     <div className="relative flex-1">
-                        <Ticket size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
+                        <Ticket size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"/>
                         <input 
                             value={promoCode}
                             onChange={(e) => setPromoCode(e.target.value)}
                             placeholder="Mã giảm giá (VD: AMAZE20)"
-                            className="w-full pl-9 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:border-[#febd69] outline-none uppercase"
+                            className="w-full pl-9 pr-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:border-[#febd69] focus:ring-2 focus:ring-[#febd69]/20 outline-none text-gray-900 placeholder-gray-500"
                         />
                     </div>
                     <button 
                         onClick={handleApplyPromo}
-                        className="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-lg hover:bg-black"
+                        className="px-4 py-2 bg-gray-900 text-white text-xs font-bold rounded-lg hover:bg-black transition-colors shadow-sm"
                     >
                         Áp dụng
                     </button>
                 </div>
 
-                <div className="space-y-2 text-sm text-gray-600 mb-6">
+                <div className="space-y-2 text-sm text-gray-700 mb-6">
                     <div className="flex justify-between">
-                        <span>Tạm tính</span>
-                        <span className="font-medium">${subtotal.toLocaleString()}</span>
+                        <span className="font-medium">Tạm tính</span>
+                        <span className="font-semibold text-gray-900">${subtotal.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between">
-                        <span>Thuế (8%)</span>
-                        <span>${tax.toFixed(2)}</span>
+                        <span className="font-medium">Thuế (8%)</span>
+                        <span className="font-semibold text-gray-900">${tax.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
-                        <span>Phí vận chuyển</span>
-                        <span>{shipping === 0 ? <span className="text-green-600 font-bold">Miễn phí</span> : `$${shipping}`}</span>
+                        <span className="font-medium">Phí vận chuyển</span>
+                        <span>{shipping === 0 ? <span className="text-green-600 font-bold">Miễn phí</span> : <span className="font-semibold text-gray-900">${shipping}</span>}</span>
                     </div>
                     {discount > 0 && (
                         <div className="flex justify-between text-green-600 font-bold">
@@ -172,7 +172,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                             <span>-${discount.toFixed(2)}</span>
                         </div>
                     )}
-                    <div className="flex justify-between text-lg font-black text-[#131921] pt-4 border-t border-gray-100">
+                    <div className="flex justify-between text-lg font-bold text-[#131921] pt-4 border-t border-gray-200">
                         <span>Tổng cộng</span>
                         <span>${total.toLocaleString()}</span>
                     </div>
@@ -180,9 +180,9 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
 
                 <button 
                     onClick={handleStartCheckout}
-                    className="w-full bg-[#febd69] hover:bg-[#f3a847] text-black font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+                    className="w-full bg-[#febd69] hover:bg-[#f3a847] text-black font-bold py-4 rounded-xl shadow-lg flex items-center justify-center gap-2 transition-transform active:scale-[0.98] hover:shadow-xl"
                 >
-                    <CreditCard size={20} /> Thanh toán ngay (${total.toLocaleString()})
+                    <CreditCard size={20} /> <span className="drop-shadow-sm">Thanh toán ngay (${total.toLocaleString()})</span>
                 </button>
             </div>
         )}
