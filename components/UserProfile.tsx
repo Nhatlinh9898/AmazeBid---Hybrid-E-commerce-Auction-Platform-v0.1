@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { User, CreditCard, ShieldCheck, MapPin, Eye, EyeOff, Edit2, Plus, LogOut, Lock, X, Share2, Copy, Check, Facebook, Instagram, Chrome, Users, Link, Save, Trash2, AlertTriangle, Phone, FileText, ShoppingBag, Gavel, Calendar, Video } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { PaymentMethod, SocialAccount, Product, ContentPost, ItemType } from '../types';
+import '../src/styles/toggle.css';
 
 interface UserProfileProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
   const [showSensitive, setShowSensitive] = useState<Record<string, boolean>>({});
   const [copied, setCopied] = useState(false);
   const [friendCodeInput, setFriendCodeInput] = useState('');
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
 
   // --- CRUD States ---
   // 1. Profile Edit State
@@ -122,6 +124,12 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
       }
+  };
+
+  const handleToggle2FA = () => {
+      setIs2FAEnabled(!is2FAEnabled);
+      // Here you would typically make an API call to enable/disable 2FA
+      console.log('2FA toggled:', !is2FAEnabled);
   };
 
   const handleDeleteAccount = () => {
@@ -602,9 +610,16 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                                 <p className="text-xs text-gray-500">Bảo vệ tài khoản bằng mã OTP</p>
                             </div>
                             <div className="relative inline-block w-12 mr-2 align-middle">
-                                <input type="checkbox" name="toggle" id="toggle" className="sr-only" />
+                                <input 
+                                    type="checkbox" 
+                                    name="toggle" 
+                                    id="toggle" 
+                                    className="sr-only" 
+                                    checked={is2FAEnabled}
+                                    onChange={handleToggle2FA}
+                                />
                                 <label htmlFor="toggle" className="relative block w-12 h-6 bg-gray-300 rounded-full cursor-pointer transition-colors duration-200 ease-in-out hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
-                                    <span className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out transform translate-x-0 group-hover:translate-x-6"></span>
+                                    <span className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out ${is2FAEnabled ? 'translate-x-6' : 'translate-x-0'}`}></span>
                                 </label>
                             </div>
                         </div>
