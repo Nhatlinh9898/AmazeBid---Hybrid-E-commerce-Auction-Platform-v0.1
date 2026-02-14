@@ -1,11 +1,11 @@
 /* Toggle Switch Styles */
 .toggle-checkbox:checked + .toggle-label {
-  background-color: #3b82f6;
+  background-color: #10b981;
 }
 
 .toggle-checkbox:checked + .toggle-label span {
   transform: translateX(24px);
-  background-color: #3b82f6;
+  background-color: #10b981;
 }
 
 .toggle-label:hover {
@@ -19,6 +19,6 @@
 
 /* Accessibility */
 .toggle-checkbox:focus-visible + .toggle-label {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #10b981;
   outline-offset: 2px;
 }
