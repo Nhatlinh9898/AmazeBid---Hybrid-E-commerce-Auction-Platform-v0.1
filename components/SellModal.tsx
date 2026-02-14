@@ -230,10 +230,112 @@ const SellModal: React.FC<SellModalProps> = ({ onClose, onAddProduct }) => {
 
         {activeTab === 'AFFILIATE' ? (
              <div className="flex-1 overflow-y-auto custom-scrollbar p-6 bg-gray-50">
+                {/* Manual Affiliate Link Form */}
+                <div className="mb-6 bg-gradient-to-br from-green-50 to-emerald-50 p-5 rounded-xl border-2 border-green-300 shadow-lg">
+                    <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <div className="bg-green-600 p-2 rounded-lg">
+                            <Link2 size={18} className="text-white"/>
+                        </div>
+                        Thêm Affiliate Link thủ công
+                    </h3>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-xs font-bold text-gray-800 mb-2">Tên sản phẩm *</label>
+                            <input 
+                                type="text"
+                                className="w-full border-2 border-green-300 bg-white p-3 rounded-lg focus:border-green-600 focus:ring-2 focus:ring-green-200 outline-none text-sm font-medium text-gray-900 shadow-sm"
+                                placeholder="VD: iPhone 15 Pro Max 256GB"
+                                value={formData.title}
+                                onChange={e => setFormData({...formData, title: e.target.value})}
+                            />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-800 mb-2">Giá sản phẩm *</label>
+                                <div className="relative">
+                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 font-bold">$</div>
+                                    <input 
+                                        type="number"
+                                        className="w-full border-2 border-green-300 bg-white p-3 pl-8 rounded-lg focus:border-green-600 focus:ring-2 focus:ring-green-200 outline-none font-bold text-gray-900 shadow-sm"
+                                        placeholder="0.00"
+                                        value={formData.price}
+                                        onChange={e => setFormData({...formData, price: e.target.value})}
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label className="block text-xs font-bold text-gray-800 mb-2">Hoa hồng (%)</label>
+                                <div className="relative">
+                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 font-bold">%</div>
+                                    <input 
+                                        type="number"
+                                        min="0" max="100"
+                                        className="w-full border-2 border-green-300 bg-white p-3 pl-8 rounded-lg focus:border-green-600 focus:ring-2 focus:ring-green-200 outline-none font-bold text-gray-900 shadow-sm"
+                                        placeholder="5"
+                                        value={formData.commissionRate}
+                                        onChange={e => setFormData({...formData, commissionRate: parseFloat(e.target.value) || 0})}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-xs font-bold text-gray-800 mb-2">Nền tảng bán hàng *</label>
+                            <select 
+                                className="w-full border-2 border-green-300 bg-white p-3 rounded-lg focus:border-green-600 focus:ring-2 focus:ring-green-200 outline-none text-sm font-medium text-gray-900 shadow-sm"
+                                value={formData.platformName}
+                                onChange={e => setFormData({...formData, platformName: e.target.value})}
+                            >
+                                <option value="">Chọn nền tảng</option>
+                                <option value="Amazon">Amazon</option>
+                                <option value="Shopee">Shopee</option>
+                                <option value="Lazada">Lazada</option>
+                                <option value="Tiki">Tiki</option>
+                                <option value="eBay">eBay</option>
+                                <option value="Other">Khác</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-xs font-bold text-gray-800 mb-2">Affiliate Link *</label>
+                            <input 
+                                type="url"
+                                className="w-full border-2 border-green-300 bg-white p-3 rounded-lg focus:border-green-600 focus:ring-2 focus:ring-green-200 outline-none text-sm font-medium text-gray-900 shadow-sm"
+                                placeholder="https://amazon.com/dp/..."
+                                value={manualAffiliateLink}
+                                onChange={e => setManualAffiliateLink(e.target.value)}
+                            />
+                            <p className="text-xs text-gray-600 mt-1 font-medium">Nhập link affiliate của bạn từ nền tảng đã chọn</p>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-xs font-bold text-gray-800 mb-2">Mô tả</label>
+                            <textarea 
+                                rows={3}
+                                className="w-full border-2 border-green-300 bg-white p-3 rounded-lg focus:border-green-600 focus:ring-2 focus:ring-green-200 outline-none text-sm resize-none text-gray-900 shadow-sm"
+                                placeholder="Mô tả ngắn về sản phẩm..."
+                                value={formData.description}
+                                onChange={e => setFormData({...formData, description: e.target.value})}
+                            />
+                        </div>
+                        
+                        <button 
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={!formData.title || !formData.price || !manualAffiliateLink || !formData.platformName}
+                            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-all disabled:cursor-not-allowed shadow-lg transform hover:scale-[1.02]"
+                        >
+                            <PlusCircle size={18} /> Thêm Affiliate Link
+                        </button>
+                    </div>
+                </div>
+                
                 {/* Existing Affiliate Logic */}
-                <div className="mb-6">
+                <div>
                     <h3 className="font-bold text-gray-800 mb-2 flex items-center gap-2">
-                        <Link2 size={18} className="text-blue-600"/>
+                        <Globe size={18} className="text-blue-600"/>
                         Kho hàng tiếp thị liên kết (Shared Inventory)
                     </h3>
                     <div className="space-y-3">
