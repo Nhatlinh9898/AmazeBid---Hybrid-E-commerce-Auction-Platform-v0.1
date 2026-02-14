@@ -221,7 +221,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
 
         {/* Main Content */}
         <div className="flex-1 overflow-y-auto p-8 relative custom-scrollbar">
-            <button onClick={onClose} className="absolute top-4 right-4 z-10 hover:bg-gray-100 p-2 rounded-full"><X size={20}/></button>
+            <button onClick={onClose} className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white border-2 border-gray-300 p-2 rounded-full shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl">
+                <X size={20} className="text-gray-600 hover:text-gray-900" />
+            </button>
 
             {/* TAB: INFO (READ & UPDATE) */}
             {activeTab === 'INFO' && (
