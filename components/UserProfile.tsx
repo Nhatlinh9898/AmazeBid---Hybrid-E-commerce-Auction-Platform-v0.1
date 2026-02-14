@@ -234,7 +234,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                             <div className="absolute bottom-0 right-0 flex gap-2">
                                 <button 
                                     onClick={handleCancelEdit}
-                                    className="text-sm font-bold text-gray-700 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-500/50 transition-all"
+                                    className="text-sm font-bold text-gray-700 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-500/50 transition-all absolute top-0 right-0"
                                 >
                                     Hủy
                                 </button>
