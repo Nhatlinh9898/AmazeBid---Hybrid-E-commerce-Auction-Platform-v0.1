@@ -228,7 +228,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
             {/* TAB: INFO (READ & UPDATE) */}
             {activeTab === 'INFO' && (
                 <div className="space-y-6 animate-in slide-in-from-right-4 relative">
-                    <div className="flex justify-between items-center mb-6 relative">
+                    <div className="mb-6 relative">
                         <h2 className="text-2xl font-bold">Thông tin cá nhân</h2>
                         {isEditingProfile && (
                             <div className="absolute bottom-0 right-0 flex gap-2">
@@ -243,15 +243,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                                     className="text-sm font-bold text-white bg-green-700 px-4 py-2 rounded-lg hover:bg-green-800 focus:ring-2 focus:ring-green-500/50 flex items-center gap-2 shadow-md transition-all relative z-20"
                                 >
                                     <Save size={16} /> Lưu lại
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="absolute bottom-0 right-0">
-                                <button 
-                                    onClick={() => setIsEditingProfile(true)}
-                                    className="text-sm font-bold text-white bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-800 focus:ring-2 focus:ring-blue-500/50 flex items-center gap-2 shadow-md transition-all relative z-20"
-                                >
-                                    <Edit2 size={16} /> Chỉnh sửa
                                 </button>
                             </div>
                         )}
