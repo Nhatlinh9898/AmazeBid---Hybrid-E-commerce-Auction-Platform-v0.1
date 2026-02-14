@@ -147,17 +147,17 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
       <div className="relative bg-white w-full max-w-4xl h-[80vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row animate-in zoom-in-95">
         
         {/* Sidebar */}
-        <div className="w-full md:w-64 bg-gray-50 border-r border-gray-200 p-6 flex flex-col">
+        <div className="w-full md:w-64 bg-gray-100 border-r border-gray-200 p-6 flex flex-col">
             <div className="text-center mb-6">
                 <div className="w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-[#febd69] mb-3 group relative">
                     <img src={user.avatar} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity">
-                        <Edit2 className="text-white" size={20}/>
+                        <Edit2 className="text-white drop-shadow-lg" size={20}/>
                     </div>
                 </div>
-                <h3 className="font-bold text-lg">{user.fullName}</h3>
-                <p className="text-xs text-gray-500">{user.email}</p>
-                <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded text-[10px] font-bold">
+                <h3 className="font-bold text-lg text-gray-900">{user.fullName}</h3>
+                <p className="text-xs text-gray-600 font-medium">{user.email}</p>
+                <div className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 rounded text-[10px] font-bold">
                     <ShieldCheck size={10} /> Verified
                 </div>
             </div>
@@ -165,25 +165,41 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
             <nav className="space-y-2 flex-1">
                 <button 
                     onClick={() => setActiveTab('INFO')}
-                    className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-3 ${activeTab === 'INFO' ? 'bg-[#131921] text-white' : 'hover:bg-gray-200 text-gray-600'}`}
+                    className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-3 transition-colors ${
+                        activeTab === 'INFO' 
+                            ? 'bg-[#131921] text-white shadow-lg' 
+                            : 'hover:bg-gray-200 text-gray-700 hover:text-gray-900'
+                    }`}
                 >
                     <User size={16} /> Thông tin cá nhân
                 </button>
                 <button 
                     onClick={() => setActiveTab('POSTS')}
-                    className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-3 ${activeTab === 'POSTS' ? 'bg-[#131921] text-white' : 'hover:bg-gray-200 text-gray-600'}`}
+                    className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-3 transition-colors ${
+                        activeTab === 'POSTS' 
+                            ? 'bg-[#131921] text-white shadow-lg' 
+                            : 'hover:bg-gray-200 text-gray-700 hover:text-gray-900'
+                    }`}
                 >
                     <FileText size={16} /> Bài đăng & Sản phẩm
                 </button>
                 <button 
                     onClick={() => setActiveTab('PAYMENT')}
-                    className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-3 ${activeTab === 'PAYMENT' ? 'bg-[#131921] text-white' : 'hover:bg-gray-200 text-gray-600'}`}
+                    className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-3 transition-colors ${
+                        activeTab === 'PAYMENT' 
+                            ? 'bg-[#131921] text-white shadow-lg' 
+                            : 'hover:bg-gray-200 text-gray-700 hover:text-gray-900'
+                    }`}
                 >
                     <CreditCard size={16} /> Tài khoản thanh toán
                 </button>
                 <button 
                     onClick={() => setActiveTab('SOCIAL')}
-                    className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-3 ${activeTab === 'SOCIAL' ? 'bg-[#131921] text-white' : 'hover:bg-gray-200 text-gray-600'}`}
+                    className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-3 transition-colors ${
+                        activeTab === 'SOCIAL' 
+                            ? 'bg-[#131921] text-white shadow-lg' 
+                            : 'hover:bg-gray-200 text-gray-700 hover:text-gray-900'
+                    }`}
                 >
                     <Share2 size={16} /> Mạng xã hội & Bạn bè
                 </button>
@@ -197,7 +213,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
 
             <button 
                 onClick={() => { logout(); onClose(); }}
-                className="mt-auto flex items-center gap-2 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-bold transition-colors"
+                className="mt-auto flex items-center gap-2 text-red-700 hover:bg-red-50 hover:text-red-800 px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-md"
             >
                 <LogOut size={16} /> Đăng xuất
             </button>
@@ -215,7 +231,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                         {!isEditingProfile ? (
                              <button 
                                 onClick={() => setIsEditingProfile(true)}
-                                className="text-sm font-bold text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 shadow-sm"
+                                className="text-sm font-bold text-white bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-800 focus:ring-2 focus:ring-blue-500/50 flex items-center gap-2 shadow-md transition-all"
                              >
                                 <Edit2 size={16} /> Chỉnh sửa
                              </button>
@@ -223,13 +239,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                             <div className="flex gap-2">
                                 <button 
                                     onClick={handleCancelEdit}
-                                    className="text-sm font-bold text-gray-600 bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200"
+                                    className="text-sm font-bold text-gray-700 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-500/50 transition-all"
                                 >
                                     Hủy
                                 </button>
                                 <button 
                                     onClick={handleSaveProfile}
-                                    className="text-sm font-bold text-white bg-green-600 px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"
+                                    className="text-sm font-bold text-white bg-green-700 px-4 py-2 rounded-lg hover:bg-green-800 focus:ring-2 focus:ring-green-500/50 flex items-center gap-2 shadow-md transition-all"
                                 >
                                     <Save size={16} /> Lưu lại
                                 </button>
