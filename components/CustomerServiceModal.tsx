@@ -72,12 +72,12 @@ const CustomerServiceModal: React.FC<CustomerServiceModalProps> = ({ isOpen, onC
               <p className="font-bold text-blue-900">Cơ chế AmazeBid SafePay™</p>
               <p className="text-sm text-blue-800 mt-1">Mọi giao dịch đều qua trung gian. Người bán KHÔNG nhận được tiền ngay lập tức. Tiền chỉ được giải ngân sau khi người mua xác nhận "Đã nhận hàng & Hài lòng".</p>
             </div>
-            <ul className={`list-disc list-inside space-y-2 mt-4 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
-                <li>Hỗ trợ thẻ Visa/Mastercard/JCB nội địa và quốc tế.</li>
-                <li>Hỗ trợ chuyển khoản ngân hàng (xác thực tự động).</li>
-                <li>Hỗ trợ Ví điện tử (Momo, ZaloPay) và Crypto (USDT).</li>
-                <li><strong>Người mua:</strong> Không mất phí giao dịch.</li>
-                <li><strong>Người bán:</strong> Phí sàn 5% trên mỗi đơn hàng thành công.</li>
+            <ul className={`list-disc list-inside space-y-2 mt-4 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+                <li className="font-medium">Hỗ trợ thẻ Visa/Mastercard/JCB nội địa và quốc tế.</li>
+                <li className="font-medium">Hỗ trợ chuyển khoản ngân hàng (xác thực tự động).</li>
+                <li className="font-medium">Hỗ trợ Ví điện tử (Momo, ZaloPay) và Crypto (USDT).</li>
+                <li className="font-bold"><strong>Người mua:</strong> Không mất phí giao dịch.</li>
+                <li className="font-bold"><strong>Người bán:</strong> Phí sàn 5% trên mỗi đơn hàng thành công.</li>
             </ul>
           </div>
         );
@@ -86,20 +86,20 @@ const CustomerServiceModal: React.FC<CustomerServiceModalProps> = ({ isOpen, onC
         return (
           <div className="space-y-6 animate-in slide-in-from-right-4">
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><Package className="text-[#febd69]"/> Quy cách đóng gói</h2>
-            <p className={`text-gray-600 italic mb-4 ${isDarkMode ? 'text-gray-300' : ''}`}>Người bán chịu trách nhiệm hoàn toàn về sự nguyên vẹn của hàng hóa khi đến tay người mua.</p>
+            <p className={`text-gray-700 italic mb-4 font-medium ${isDarkMode ? 'text-gray-300' : ''}`}>Người bán chịu trách nhiệm hoàn toàn về sự nguyên vẹn của hàng hóa khi đến tay người mua.</p>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className={`border-2 p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-400 shadow-sm'}`}>
                     <h4 className={`font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Hàng dễ vỡ</h4>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Bắt buộc quấn 3-4 lớp xốp hơi (bubble wrap). Dùng thùng carton cứng, chèn kín các khe hở bằng xốp hoặc giấy vụn. Dán tem "Hàng dễ vỡ".</p>
+                    <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Bắt buộc quấn 3-4 lớp xốp hơi (bubble wrap). Dùng thùng carton cứng, chèn kín các khe hở bằng xốp hoặc giấy vụn. Dán tem "Hàng dễ vỡ".</p>
                 </div>
                 <div className={`border-2 p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-400 shadow-sm'}`}>
                     <h4 className={`font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Đồ điện tử</h4>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Bọc nilon chống thấm nước trước khi đóng hộp. Tháo pin nếu có thể (đối với thiết bị dùng pin rời).</p>
+                    <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Bọc nilon chống thấm nước trước khi đóng hộp. Tháo pin nếu có thể (đối với thiết bị dùng pin rời).</p>
                 </div>
                 <div className={`border-2 p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-400 shadow-sm'}`}>
                     <h4 className={`font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quần áo/Vải vóc</h4>
-                    <p className={`text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Gấp gọn, bọc trong túi nilon kín miệng để tránh ẩm mốc hoặc nước trong quá trình vận chuyển.</p>
+                    <p className={`text-sm font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>Gấp gọn, bọc trong túi nilon kín miệng để tránh ẩm mốc hoặc nước trong quá trình vận chuyển.</p>
                 </div>
             </div>
             <div className={`mt-4 p-3 rounded text-sm font-bold border-2 ${isDarkMode ? 'bg-yellow-900 text-yellow-100 border-yellow-600' : 'bg-yellow-100 text-yellow-900 border-yellow-400'}`}>
@@ -114,22 +114,22 @@ const CustomerServiceModal: React.FC<CustomerServiceModalProps> = ({ isOpen, onC
             <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><Truck className="text-[#febd69]"/> Quy tắc Gửi & Nhận hàng</h2>
             
             <div className="space-y-4">
-                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border border-gray-600' : 'bg-white'}`}>
+                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border border-gray-600' : 'bg-white border-2 border-gray-400 shadow-sm'}`}>
                     <h3 className={`text-lg font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quy trình Gửi hàng (Người bán)</h3>
-                    <ul className={`list-decimal list-inside space-y-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <li>Xác nhận đơn hàng trong vòng 24h.</li>
-                        <li>Đóng gói theo quy chuẩn.</li>
-                        <li>Giao cho đơn vị vận chuyển được AmazeBid chỉ định trong vòng 48h.</li>
-                        <li>Cập nhật trạng thái "Đã gửi" lên hệ thống.</li>
+                    <ul className={`list-decimal list-inside space-y-1 ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
+                        <li className="font-medium">Xác nhận đơn hàng trong vòng 24h.</li>
+                        <li className="font-medium">Đóng gói theo quy chuẩn.</li>
+                        <li className="font-medium">Giao cho đơn vị vận chuyển được AmazeBid chỉ định trong vòng 48h.</li>
+                        <li className="font-medium">Cập nhật trạng thái "Đã gửi" lên hệ thống.</li>
                     </ul>
                 </div>
 
-                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border border-gray-600' : 'bg-white'}`}>
+                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border border-gray-600' : 'bg-white border-2 border-gray-400 shadow-sm'}`}>
                     <h3 className={`text-lg font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quy trình Nhận hàng (Người mua)</h3>
-                    <ul className={`list-decimal list-inside space-y-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <li><strong>Đồng kiểm:</strong> Được phép kiểm tra ngoại quan (không thử hàng) khi nhận.</li>
-                        <li><strong>Quay video:</strong> BẮT BUỘC quay video mở hộp (uncut) để làm bằng chứng khiếu nại.</li>
-                        <li><strong>Xác nhận:</strong> Nhấn "Đã nhận hàng" trong vòng 3 ngày kể từ khi nhận. Sau 3 ngày, hệ thống tự động xác nhận.</li>
+                    <ul className={`list-decimal list-inside space-y-1 ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
+                        <li className="font-medium"><strong>Đồng kiểm:</strong> Được phép kiểm tra ngoại quan (không thử hàng) khi nhận.</li>
+                        <li className="font-medium"><strong>Quay video:</strong> BẮT BUỘC quay video mở hộp (uncut) để làm bằng chứng khiếu nại.</li>
+                        <li className="font-medium"><strong>Xác nhận:</strong> Nhấn "Đã nhận hàng" trong vòng 3 ngày kể từ khi nhận. Sau 3 ngày, hệ thống tự động xác nhận.</li>
                     </ul>
                 </div>
             </div>
