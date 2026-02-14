@@ -207,7 +207,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                         {!isEditingProfile ? (
                              <button 
                                 onClick={() => setIsEditingProfile(true)}
-                                className="text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-lg hover:bg-blue-100 flex items-center gap-2"
+                                className="text-sm font-bold text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 shadow-sm"
                              >
                                 <Edit2 size={16} /> Chỉnh sửa
                              </button>
@@ -231,51 +231,51 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Họ và tên</label>
+                            <label className="block text-xs font-bold text-gray-700 uppercase mb-2">Họ và tên</label>
                             {isEditingProfile ? (
                                 <input 
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:border-[#febd69] outline-none"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:border-[#febd69] focus:ring-2 focus:ring-[#febd69]/20 outline-none text-gray-900 placeholder-gray-500"
                                     value={profileForm.fullName}
                                     onChange={e => setProfileForm({...profileForm, fullName: e.target.value})}
                                 />
                             ) : (
-                                <div className="p-3 bg-gray-50 rounded-lg font-medium border border-gray-200">{user.fullName}</div>
+                                <div className="p-3 bg-white rounded-lg font-medium border border-gray-200 text-gray-900">{user.fullName}</div>
                             )}
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Email (Không thể thay đổi)</label>
-                            <div className="p-3 bg-gray-100 rounded-lg font-medium border border-gray-200 text-gray-500 cursor-not-allowed">
+                            <label className="block text-xs font-bold text-gray-700 uppercase mb-2">Email (Không thể thay đổi)</label>
+                            <div className="p-3 bg-white rounded-lg font-medium border border-gray-200 text-gray-900 cursor-not-allowed">
                                 {user.email}
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Số điện thoại</label>
+                            <label className="block text-xs font-bold text-gray-700 uppercase mb-2">Số điện thoại</label>
                             {isEditingProfile ? (
                                 <div className="relative">
                                     <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
                                     <input 
-                                        className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:border-[#febd69] outline-none"
+                                        className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:border-[#febd69] focus:ring-2 focus:ring-[#febd69]/20 outline-none text-gray-900 placeholder-gray-500"
                                         value={profileForm.phone}
                                         placeholder="Thêm số điện thoại"
                                         onChange={e => setProfileForm({...profileForm, phone: e.target.value})}
                                     />
                                 </div>
                             ) : (
-                                <div className="p-3 bg-gray-50 rounded-lg font-medium border border-gray-200">
-                                    {user.phone || <span className="text-gray-400 italic">Chưa cập nhật</span>}
+                                <div className="p-3 bg-white rounded-lg font-medium border border-gray-200 text-gray-900">
+                                    {user.phone || <span className="text-gray-500 italic">Chưa cập nhật</span>}
                                 </div>
                             )}
                         </div>
 
                         <div className="md:col-span-2">
-                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Địa chỉ giao hàng</label>
+                             <label className="block text-xs font-bold text-gray-700 uppercase mb-2">Địa chỉ giao hàng</label>
                              {isEditingProfile ? (
                                  <div className="relative">
                                      <MapPin size={18} className="absolute left-3 top-3 text-gray-400"/>
                                      <textarea 
-                                        className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:border-[#febd69] outline-none resize-none"
+                                        className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:border-[#febd69] focus:ring-2 focus:ring-[#febd69]/20 outline-none resize-none text-gray-900 placeholder-gray-500"
                                         rows={3}
                                         value={profileForm.address}
                                         placeholder="Nhập địa chỉ đầy đủ..."
@@ -283,9 +283,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                                     />
                                  </div>
                              ) : (
-                                 <div className="p-3 bg-gray-50 rounded-lg font-medium border border-gray-200 flex items-start gap-2">
-                                     <MapPin size={18} className="text-gray-400 mt-0.5 shrink-0"/>
-                                     {user.address || <span className="text-gray-400 italic">Chưa cập nhật địa chỉ</span>}
+                                 <div className="p-3 bg-white rounded-lg font-medium border border-gray-200 text-gray-900 flex items-start gap-2">
+                                     <MapPin size={18} className="text-gray-500 mt-0.5 shrink-0"/>
+                                     {user.address || <span className="text-gray-500 italic">Chưa cập nhật địa chỉ</span>}
                                  </div>
                              )}
                         </div>
@@ -431,9 +431,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                                 <h3 className="font-bold text-gray-900">Thêm thẻ mới</h3>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-xs font-bold text-gray-500 mb-1">Loại thẻ</label>
+                                        <label className="block text-xs font-bold text-gray-700 mb-2">Loại thẻ</label>
                                         <select 
-                                            className="w-full p-2 border border-gray-300 rounded bg-white"
+                                            className="w-full p-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:border-[#febd69] focus:ring-2 focus:ring-[#febd69]/20 outline-none"
                                             value={cardForm.provider}
                                             onChange={e => setCardForm({...cardForm, provider: e.target.value})}
                                         >
@@ -443,9 +443,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-gray-500 mb-1">Tên chủ thẻ</label>
+                                        <label className="block text-xs font-bold text-gray-700 mb-2">Tên chủ thẻ</label>
                                         <input 
-                                            className="w-full p-2 border border-gray-300 rounded uppercase" 
+                                            className="w-full p-2 border border-gray-300 rounded-lg uppercase text-gray-900 placeholder-gray-500 focus:border-[#febd69] focus:ring-2 focus:ring-[#febd69]/20 outline-none" 
                                             placeholder="NGUYEN VAN A"
                                             required
                                             value={cardForm.holder}
@@ -453,9 +453,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                                         />
                                     </div>
                                     <div className="col-span-2">
-                                        <label className="block text-xs font-bold text-gray-500 mb-1">Số thẻ</label>
+                                        <label className="block text-xs font-bold text-gray-700 mb-2">Số thẻ</label>
                                         <input 
-                                            className="w-full p-2 border border-gray-300 rounded font-mono" 
+                                            className="w-full p-2 border border-gray-300 rounded-lg font-mono text-gray-900 placeholder-gray-500 focus:border-[#febd69] focus:ring-2 focus:ring-[#febd69]/20 outline-none" 
                                             placeholder="0000 0000 0000 0000"
                                             required
                                             minLength={12}
@@ -571,7 +571,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                                     value={friendCodeInput}
                                     onChange={(e) => setFriendCodeInput(e.target.value.toUpperCase())}
                                     placeholder="Nhập mã (VD: AMAZE-X-999)"
-                                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm uppercase focus:border-[#febd69] outline-none"
+                                    className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm uppercase focus:border-[#febd69] focus:ring-2 focus:ring-[#febd69]/20 outline-none text-gray-900 placeholder-gray-500"
                                 />
                                 <button className="bg-gray-200 text-gray-700 font-bold px-4 rounded-lg text-sm hover:bg-gray-300 flex items-center gap-1">
                                     <Link size={14} /> Liên kết
