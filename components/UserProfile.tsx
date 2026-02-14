@@ -231,7 +231,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold">Thông tin cá nhân</h2>
                         {isEditingProfile ? (
-                            <div className="flex gap-2">
+                            <div className="flex justify-end mt-4 mb-4">
                                 <button 
                                     onClick={handleCancelEdit}
                                     className="text-sm font-bold text-gray-700 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-500/50 transition-all"
