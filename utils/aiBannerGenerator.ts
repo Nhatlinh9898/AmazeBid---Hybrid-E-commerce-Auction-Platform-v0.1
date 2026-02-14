@@ -1,4 +1,5 @@
 import { SeasonalBanner } from './seasonalBanners';
+import { generateBannerImage } from '../services/geminiService';
 
 export interface AIBannerConfig {
   theme: 'tet' | 'autumn' | 'spring' | 'summer' | 'winter' | 'valentine' | 'christmas' | 'black-friday';
@@ -129,7 +130,7 @@ export class AIBannerGenerator {
     return `${basePrompt} ${elementsPrompt} ${colorsPrompt} ${compositionPrompt} ${lightingPrompt} ${compositionGuide}`;
   }
 
-  static generateMultipleBanners(): Partial<SeasonalBanner>[] {
+  static async generateMultipleBanners(): Promise<Partial<SeasonalBanner>[]> {
     const banners: Partial<SeasonalBanner>[] = [];
     
     // Generate for current season
@@ -147,31 +148,38 @@ export class AIBannerGenerator {
     // Generate variations for current theme
     const styles: AIBannerConfig['style'][] = ['traditional', 'modern', 'minimalist', 'vibrant'];
     
-    styles.forEach((style, index) => {
+    for (const style of styles) {
+      const index = styles.indexOf(style);
+      const config: AIBannerConfig = {
+        theme: currentTheme,
+        style: style,
+        elements: this.THEME_CONFIGS[currentTheme].elements.slice(0, 3),
+        colors: this.THEME_CONFIGS[currentTheme].colors.slice(0, 2)
+      };
+      
       banners.push({
         id: `${currentTheme}_${style}_${index}`,
         name: `${currentTheme} - ${style} style`,
-        imageUrl: this.generateImageURL({
-          theme: currentTheme,
-          style: style,
-          elements: this.THEME_CONFIGS[currentTheme].elements.slice(0, 3),
-          colors: this.THEME_CONFIGS[currentTheme].colors.slice(0, 2)
-        }),
+        imageUrl: await this.generateImageURL(config),
         title: this.generateTitle(currentTheme, style),
         subtitle: this.generateSubtitle(currentTheme, style)
       });
-    });
+    }
 
     return banners;
   }
 
-  private static generateImageURL(config: AIBannerConfig): string {
-    const prompt = this.generatePrompt(config);
-    const encodedPrompt = encodeURIComponent(prompt);
-    
-    // Using a placeholder AI image generation service with specific dimensions
-    // In production, this would connect to DALL-E, Midjourney, or Stable Diffusion
-    return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1920&height=600&seed=${Math.random()}`;
+  private static async generateImageURL(config: AIBannerConfig): Promise<string> {
+    try {
+      // Use Gemini service as primary method
+      return await generateBannerImage(config);
+    } catch (error) {
+      console.error('Gemini image generation failed, using fallback:', error);
+      // Fallback to placeholder service with specific dimensions
+      const prompt = this.generatePrompt(config);
+      const encodedPrompt = encodeURIComponent(prompt);
+      return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1920&height=600&seed=${Math.random()}`;
+    }
   }
 
   private static generateTitle(theme: AIBannerConfig['theme'], style: AIBannerConfig['style']): string {
@@ -285,35 +293,13 @@ export class AIBannerGenerator {
   }
 
   static async generateBannerWithAI(config: AIBannerConfig): Promise<string> {
-    // This would integrate with AI image generation API
-    const prompt = this.generatePrompt(config);
-    
     try {
-      // Example with OpenAI DALL-E (requires API key)
-      /*
-      const response = await fetch('https://api.openai.com/v1/images/generations', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          prompt: prompt,
-          n: 1,
-          size: "1920x600", // Standard banner size
-          quality: "hd",
-          model: "dall-e-3"
-        })
-      });
-      
-      const data = await response.json();
-      return data.data[0].url;
-      */
-      
-      // Fallback to placeholder service with correct dimensions
-      return this.generateImageURL(config);
+      // Use Gemini service for image generation
+      const imageUrl = await generateBannerImage(config);
+      return imageUrl;
     } catch (error) {
       console.error('AI Banner generation failed:', error);
+      // Fallback to placeholder service
       return this.generateImageURL(config);
     }
   }

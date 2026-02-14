@@ -1,6 +1,7 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 import { Product, KOLProfile } from "../types";
+import { AIBannerConfig } from "../utils/aiBannerGenerator";
 
 export const generateUnfulfilledKOL = async (industry: string, productContext?: string): Promise<KOLProfile | null> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -278,5 +279,70 @@ export const generateRecruitmentMessage = async (productName: string, price: num
     return response.text.trim();
   } catch (e) {
     return `Mua chung ${productName} giá cực sốc $${price} cùng mình nhé!`;
+  }
+};
+
+export const generateBannerImage = async (config: AIBannerConfig): Promise<string> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
+  const themeDescriptions = {
+    tet: 'Tết Nguyên Đán với hoa mai, đèn lồng, màu đỏ vàng',
+    autumn: 'Mùa thu với lá vàng lá đỏ, cây phong, màu ấm',
+    spring: 'Mùa xuân với hoa anh đào, cây xanh, màu tươi mới',
+    summer: 'Mùa hè với biển cát, nắng vàng, màu xanh dương',
+    winter: 'Mùa đông với tuyết trắng, cảnh ấm cúng',
+    valentine: 'Valentine với hoa hồng, trái tim, màu đỏ hồng',
+    christmas: 'Giáng sinh với cây thông, quà tặng, màu xanh đỏ',
+    'black-friday': 'Black Friday với giảm giá, mua sắm, màu đen vàng'
+  };
+
+  const styleDescriptions = {
+    traditional: 'truyền thống, cổ điển, trang trọng',
+    modern: 'hiện đại, tối giản, sang trọng',
+    minimalist: 'tối giản, tinh tế, sạch sẽ',
+    vibrant: 'sống động, rực rỡ, nổi bật'
+  };
+
+  const themeDesc = themeDescriptions[config.theme] || config.theme;
+  const styleDesc = styleDescriptions[config.style] || config.style;
+  const elements = config.elements?.slice(0, 3).join(', ') || '';
+  
+  const prompt = `Tạo banner thương mại điện tử chuyên nghiệp cho ${themeDesc} với phong cách ${styleDesc}. 
+  ${elements ? `Bao gồm các yếu tố: ${elements}.` : ''}
+  Yêu cầu:
+  - Kích thước widescreen 16:9 phù hợp cho website header
+  - Chất lượng cao, sắc nét
+  - Có không gian trống để đặt text
+  - Màu sắc hài hòa, chuyên nghiệp
+  - Phong cách ${styleDesc}
+  - Chủ đề ${themeDesc}
+  - Không chứa text, chỉ có hình ảnh`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash-exp',
+      contents: prompt,
+    });
+
+    // Try to extract image data from response
+    const candidates = response.candidates;
+    if (candidates && candidates.length > 0) {
+      const parts = candidates[0].content?.parts;
+      if (parts && parts.length > 0) {
+        const imageData = parts[0].inlineData?.data;
+        if (imageData) {
+          // Convert base64 to data URL
+          return `data:image/png;base64,${imageData}`;
+        }
+      }
+    }
+    
+    throw new Error('No image data in response');
+  } catch (error) {
+    console.error("Gemini banner generation failed:", error);
+    // Fallback to placeholder service
+    const fallbackPrompt = `E-commerce banner for ${themeDesc}, ${styleDesc} style, ${elements}`;
+    const encodedPrompt = encodeURIComponent(fallbackPrompt);
+    return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=1920&height=600&seed=${Math.random()}`;
   }
 };

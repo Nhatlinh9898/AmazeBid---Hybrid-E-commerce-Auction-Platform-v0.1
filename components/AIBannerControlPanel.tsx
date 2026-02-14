@@ -97,9 +97,13 @@ const AIBannerControlPanel: React.FC<AIBannerControlPanelProps> = ({ onBannerGen
     }
   };
 
-  const handleGenerateMultiple = () => {
-    const banners = AIBannerGenerator.generateMultipleBanners();
-    console.log('Generated AI banners:', banners);
+  const handleGenerateMultiple = async () => {
+    try {
+      const banners = await AIBannerGenerator.generateMultipleBanners();
+      console.log('Generated AI banners:', banners);
+    } catch (error) {
+      console.error('Failed to generate multiple banners:', error);
+    }
   };
 
   const addCustomElement = () => {
