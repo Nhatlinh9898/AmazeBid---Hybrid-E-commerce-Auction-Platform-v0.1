@@ -221,7 +221,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
 
         {/* Main Content */}
         <div className="flex-1 overflow-y-auto p-8 relative custom-scrollbar">
-            <button onClick={onClose} className="absolute top-4 right-4 hover:bg-gray-100 p-2 rounded-full"><X size={20}/></button>
+            <button onClick={onClose} className="absolute top-4 right-4 z-10 hover:bg-gray-100 p-2 rounded-full"><X size={20}/></button>
 
             {/* TAB: INFO (READ & UPDATE) */}
             {activeTab === 'INFO' && (
@@ -231,7 +231,7 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                         {!isEditingProfile ? (
                              <button 
                                 onClick={() => setIsEditingProfile(true)}
-                                className="text-sm font-bold text-white bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-800 focus:ring-2 focus:ring-blue-500/50 flex items-center gap-2 shadow-md transition-all"
+                                className="text-sm font-bold text-white bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-800 focus:ring-2 focus:ring-blue-500/50 flex items-center gap-2 shadow-md transition-all relative z-20"
                              >
                                 <Edit2 size={16} /> Chỉnh sửa
                              </button>
