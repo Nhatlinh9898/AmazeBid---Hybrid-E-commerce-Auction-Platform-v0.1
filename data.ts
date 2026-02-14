@@ -58,6 +58,226 @@ export const AFFILIATE_NETWORK_ITEMS = [
     platformName: "Shopee",
     commissionRate: 5,
     affiliateLink: "https://shopee.vn/philips-xxl"
+  },
+  {
+    title: "AirPods Pro 2nd Gen",
+    description: "Chống ồn chủ động adaptive, âm thanh không gian, pin lên đến 6 giờ.",
+    price: 249.00,
+    image: "https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&q=80&w=400",
+    category: "Electronics",
+    platformName: "Amazon",
+    commissionRate: 6,
+    affiliateLink: "https://amazon.com/dp/B09JQMJHWG"
+  },
+  {
+    title: "MacBook Air M2 13 inch",
+    description: "Chip M2 siêu mạnh, mỏng nhẹ 1.24kg, màn hình Liquid Retina 13.6 inch.",
+    price: 999.00,
+    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&q=80&w=400",
+    category: "Electronics",
+    platformName: "Lazada",
+    commissionRate: 4,
+    affiliateLink: "https://lazada.vn/macbook-air-m2"
+  },
+  {
+    title: "Sony WH-1000XM5 Headphones",
+    description: "Chống ồn industry leading, 30 giờ pin, chất âm Hi-Res.",
+    price: 379.00,
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400",
+    category: "Electronics",
+    platformName: "Tiki",
+    commissionRate: 7,
+    affiliateLink: "https://tiki.vn/sony-wh1000xm5"
+  },
+  {
+    title: "Dyson V15 Detect Vacuum",
+    description: "Hệ thống laser phát hiện bụi, công suất 230AW, pin 60 phút.",
+    price: 699.00,
+    image: "https://images.unsplash.com/photo-1578912699407-2a8b2b5c3b7c?auto=format&fit=crop&q=80&w=400",
+    category: "Home & Office",
+    platformName: "Amazon",
+    commissionRate: 5,
+    affiliateLink: "https://amazon.com/dp/B09JGQFMW3"
+  },
+  {
+    title: "Nike Air Max 270",
+    description: "Đế Air Max 270 unit, upper mesh thoáng khí, màu sắc trendy.",
+    price: 150.00,
+    image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=400",
+    category: "Fashion",
+    platformName: "Shopee",
+    commissionRate: 10,
+    affiliateLink: "https://shopee.vn/nike-airmax270"
+  },
+  {
+    title: "iPad Pro 12.9 inch M2",
+    description: "Chip M2, màn hình Liquid Retina XDR, hỗ trợ Apple Pencil 2nd gen.",
+    price: 1099.00,
+    image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&q=80&w=400",
+    category: "Electronics",
+    platformName: "Amazon",
+    commissionRate: 3,
+    affiliateLink: "https://amazon.com/dp/B09J3KWLJ2"
+  },
+  {
+    title: "Samsung Galaxy Watch 6",
+    description: "Màn hình Super AMOLED, theo dõi sức khỏe toàn diện, pin 40 giờ.",
+    price: 299.00,
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=400",
+    category: "Electronics",
+    platformName: "Lazada",
+    commissionRate: 8,
+    affiliateLink: "https://lazada.vn/galaxy-watch6"
+  },
+  {
+    title: "Lululemon Yoga Mat",
+    description: "Thảm yoga cao cấp 5mm, chống trượt, thân thiện môi trường.",
+    price: 78.00,
+    image: "https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&q=80&w=400",
+    category: "Fashion",
+    platformName: "Tiki",
+    commissionRate: 12,
+    affiliateLink: "https://tiki.vn/lululemon-yoga-mat"
+  },
+  {
+    title: "LEGO Creator Expert Bookshop",
+    description: "Mô hình 2,504 chi tiết, kiến trúc châu Âu cổ điển.",
+    price: 179.99,
+    image: "https://images.unsplash.com/photo-1589923268231-6a684e1c7b4c?auto=format&fit=crop&q=80&w=400",
+    category: "Collectibles",
+    platformName: "Amazon",
+    commissionRate: 6,
+    affiliateLink: "https://amazon.com/dp/B07W5NZL4G"
+  },
+  {
+    title: "Instant Pot Duo 7-in-1",
+    description: "Nồi đa năng 7 chức năng, dung tích 6QT, 14 chương trình thông minh.",
+    price: 89.00,
+    image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&q=80&w=400",
+    category: "Home & Office",
+    platformName: "Shopee",
+    commissionRate: 9,
+    affiliateLink: "https://shopee.vn/instant-pot-duo"
+  },
+  {
+    title: "Adidas Ultraboost 22",
+    description: "Đế Boost responsive, upper Primeknit, công nghệ Continental.",
+    price: 190.00,
+    image: "https://images.unsplash.com/photo-1551107696-a4b0bf5a8c1c?auto=format&fit=crop&q=80&w=400",
+    category: "Fashion",
+    platformName: "Lazada",
+    commissionRate: 11,
+    affiliateLink: "https://lazada.vn/ultraboost22"
+  },
+  {
+    title: "Canon EOS R6 Mark II",
+    description: "Full-frame 24MP, Dual Pixel AF II, quay video 4K 60fps.",
+    price: 2499.00,
+    image: "https://images.unsplash.com/photo-1516035069371-29a1b242cc32?auto=format&fit=crop&q=80&w=400",
+    category: "Electronics",
+    platformName: "Amazon",
+    commissionRate: 2,
+    affiliateLink: "https://amazon.com/dp/B0BNRZTXG8"
+  },
+  {
+    title: "Vitamix 5200 Blender",
+    description: "Máy xay sinh tố chuyên nghiệp, công suất 2HP, cối 64oz.",
+    price: 449.00,
+    image: "https://images.unsplash.com/photo-1577662614448-4f8e0c2b1c1f?auto=format&fit=crop&q=80&w=400",
+    category: "Home & Office",
+    platformName: "Tiki",
+    commissionRate: 7,
+    affiliateLink: "https://tiki.vn/vitamix-5200"
+  },
+  {
+    title: "iPhone 15 Pro Max",
+    description: "Chip A17 Pro, Titan grade 5, camera 48MP, Action button.",
+    price: 1199.00,
+    image: "https://images.unsplash.com/photo-1592286115803-a1c3b552ee43?auto=format&fit=crop&q=80&w=400",
+    category: "Electronics",
+    platformName: "Amazon",
+    commissionRate: 3,
+    affiliateLink: "https://amazon.com/dp/B0CHX2XQ2F"
+  },
+  {
+    title: "Samsung 85\" QLED 4K TV",
+    description: "Smart TV QLED, Quantum HDR, Dolby Atmos, Gaming Hub.",
+    price: 1499.00,
+    image: "https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&q=80&w=400",
+    category: "Electronics",
+    platformName: "Lazada",
+    commissionRate: 4,
+    affiliateLink: "https://lazada.vn/samsung-qled85"
+  },
+  {
+    title: "Tesla Model Y Floor Mats",
+    description: "Thảm lót sàn cao cấp, chống thấm, khử mùi, chính hãng.",
+    price: 129.00,
+    image: "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&q=80&w=400",
+    category: "Automotive",
+    platformName: "Amazon",
+    commissionRate: 8,
+    affiliateLink: "https://amazon.com/dp/B08XYZ1234"
+  },
+  {
+    title: "Peloton Bike+",
+    description: "Xe đạp tập thông minh, màn hình 23.8\", live classes.",
+    price: 2495.00,
+    image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80&w=400",
+    category: "Sports",
+    platformName: "Amazon",
+    commissionRate: 5,
+    affiliateLink: "https://amazon.com/dp/B08PXYZ567"
+  },
+  {
+    title: "Dyson Supersonic Hair Dryer",
+    description: "Máy sấy tóc nhanh, không nhiệt, magnetic attachments.",
+    price: 399.00,
+    image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=400",
+    category: "Beauty",
+    platformName: "Shopee",
+    commissionRate: 10,
+    affiliateLink: "https://shopee.vn/dyson-supersonic"
+  },
+  {
+    title: "Nintendo Switch OLED",
+    description: "Màn hình 7 inch OLED, 64GB storage, dock mode.",
+    price: 349.99,
+    image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&q=80&w=400",
+    category: "Electronics",
+    platformName: "Tiki",
+    commissionRate: 6,
+    affiliateLink: "https://tiki.vn/nintendo-switch-oled"
+  },
+  {
+    title: "Vans Old Skool Sneakers",
+    description: "Classic skate shoes, canvas upper, waffle sole.",
+    price: 65.00,
+    image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?auto=format&fit=crop&q=80&w=400",
+    category: "Fashion",
+    platformName: "Shopee",
+    commissionRate: 12,
+    affiliateLink: "https://shopee.vn/vans-oldskool"
+  },
+  {
+    title: "KitchenAid Stand Mixer",
+    description: "Máy đánh trứng 5.5QT, 10 speeds, 3 attachments.",
+    price: 379.99,
+    image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&q=80&w=400",
+    category: "Home & Office",
+    platformName: "Amazon",
+    commissionRate: 7,
+    affiliateLink: "https://amazon.com/dp/B07W5NZL4H"
+  },
+  {
+    title: "GoPro Hero 12 Black",
+    description: "Camera 5.3K 60fps, HyperSmooth 6.0, waterproof.",
+    price: 399.99,
+    image: "https://images.unsplash.com/photo-1596462502278-27d52b24f849?auto=format&fit=crop&q=80&w=400",
+    category: "Electronics",
+    platformName: "Lazada",
+    commissionRate: 8,
+    affiliateLink: "https://lazada.vn/gopro-hero12"
   }
 ];
 
