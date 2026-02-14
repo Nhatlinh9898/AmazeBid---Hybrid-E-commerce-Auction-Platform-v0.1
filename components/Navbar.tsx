@@ -26,7 +26,8 @@ interface NavbarProps {
   onOpenKOLStudio: () => void;
   onOpenRewards: () => void; 
   onOpenVisualSearch: () => void;
-  onOpenAgencyHub: () => void; // New prop
+  onOpenAgencyHub: () => void;
+  onOpenAIBannerPanel?: () => void; // New prop
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
   
@@ -39,6 +40,7 @@ const Navbar: React.FC<NavbarProps> = ({
   onOpenLiveStudio, onViewLiveStreams, onOpenAuth, onOpenProfile, onOpenCustomerService, 
   onOpenContentStudio, onOpenSuperDeals, onOpenSellerDashboard, onOpenAdminDashboard, 
   onOpenAvatarStudio, onOpenKOLStudio, onOpenRewards, onOpenVisualSearch, onOpenAgencyHub,
+  onOpenAIBannerPanel, // New prop
   isDarkMode, onToggleDarkMode,
   currentView, onChangeView
 }) => {
@@ -307,6 +309,11 @@ const Navbar: React.FC<NavbarProps> = ({
         <span onClick={user ? onOpenAvatarStudio : onOpenAuth} className="text-indigo-300 cursor-pointer hover:text-indigo-100 flex items-center gap-1">
             <Camera size={14} /> Avatar Studio
         </span>
+        {onOpenAIBannerPanel && (
+          <span onClick={onOpenAIBannerPanel} className="text-purple-300 cursor-pointer hover:text-purple-100 flex items-center gap-1">
+              <Sparkles size={14} /> AI Banner
+          </span>
+        )}
       </div>
     </header>
   );

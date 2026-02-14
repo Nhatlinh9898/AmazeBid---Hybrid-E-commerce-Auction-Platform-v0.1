@@ -27,8 +27,11 @@ import CartDrawer from './components/CartDrawer';
 import FilterPanel from './components/FilterPanel';
 import ChatWidget from './components/ChatWidget';
 import AgencyHub from './components/AgencyHub'; // Import AgencyHub
+import AIBannerControlPanel from './components/AIBannerControlPanel'; // Import AI Banner Generator
 
 import { AuthProvider, useAuth } from './context/AuthContext'; 
+import { getCurrentSeasonalBanner } from './utils/seasonalBanners'; 
+import AIBannerGenerator from './utils/aiBannerGenerator'; // Import AI Banner Generator 
 
 import { MOCK_PRODUCTS, MOCK_STREAMS } from './data';
 import { Product, CartItem, ItemType, OrderStatus, LiveStream, Bid, ContentPost, ShippingInfo } from './types';
@@ -39,6 +42,7 @@ const InnerApp: React.FC = () => {
   
   // --- STATE ---
   const [currentView, setCurrentView] = useState<'MARKET' | 'SOCIAL'>('MARKET');
+  const [currentBanner, setCurrentBanner] = useState(getCurrentSeasonalBanner());
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Load dark mode preference from localStorage
     const saved = localStorage.getItem('amaze_dark_mode');
@@ -83,6 +87,7 @@ const InnerApp: React.FC = () => {
   const [selectedDetailProduct, setSelectedDetailProduct] = useState<Product | null>(null);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
   const [isAgencyHubOpen, setIsAgencyHubOpen] = useState(false); // Agency State
+  const [showAIBannerPanel, setShowAIBannerPanel] = useState(false); // AI Banner Panel State
 
   // Compare List State
   const [compareList, setCompareList] = useState<Product[]>([]);
@@ -103,6 +108,69 @@ const InnerApp: React.FC = () => {
               setRecentlyViewed(JSON.parse(saved));
           } catch(e) {}
       }
+  }, []);
+
+  // --- Update banner based on current date ---
+  useEffect(() => {
+      const updateBanner = () => {
+          setCurrentBanner(getCurrentSeasonalBanner());
+      };
+
+      // Update immediately
+      updateBanner();
+
+      // Update every day at midnight
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      
+      const msUntilMidnight = tomorrow.getTime() - now.getTime();
+      
+      const timer = setTimeout(() => {
+          updateBanner();
+          // Set up daily interval
+          setInterval(updateBanner, 24 * 60 * 60 * 1000);
+      }, msUntilMidnight);
+
+      return () => clearTimeout(timer);
+  }, []);
+
+  // --- Auto AI Banner Generation on Season Change ---
+  useEffect(() => {
+      const checkAndAutoGenerate = async () => {
+          try {
+              const aiBanner = await AIBannerGenerator.checkAndGenerateBanner();
+              if (aiBanner) {
+                  // Apply AI generated banner
+                  const customBanner = {
+                      id: `ai_auto_${Date.now()}`,
+                      name: 'AI Auto Generated',
+                      imageUrl: aiBanner.imageUrl,
+                      startDate: '01-01',
+                      endDate: '12-31',
+                      title: aiBanner.title,
+                      subtitle: aiBanner.subtitle,
+                      buttonText: 'Khám phá ngay'
+                  };
+                  
+                  setCurrentBanner(customBanner as any);
+                  showNotification('Đã tự động tạo banner AI cho mùa mới!');
+                  // Lưu theme đã tạo để tránh tạo lại
+                  AIBannerGenerator.saveGeneratedTheme(currentBanner);
+              }
+          } catch (error) {
+              console.error('Auto banner generation failed:', error);
+          }
+      };
+
+      // Check immediately on mount
+      checkAndAutoGenerate();
+
+      // Check every hour for season changes
+      const interval = setInterval(checkAndAutoGenerate, 60 * 60 * 1000); // Every hour
+
+      return () => clearInterval(interval);
   }, []);
 
   // --- Dark Mode Toggle ---
@@ -305,6 +373,26 @@ const InnerApp: React.FC = () => {
       setCurrentView('SOCIAL');
   };
 
+  // --- AI Banner Handler ---
+  const handleAIBannerGenerated = (banner: { imageUrl: string; title: string; subtitle: string }) => {
+      // Create a custom banner from AI generation
+      const customBanner = {
+          id: `ai_${Date.now()}`,
+          name: 'AI Generated',
+          imageUrl: banner.imageUrl,
+          startDate: '01-01',
+          endDate: '12-31',
+          title: banner.title,
+          subtitle: banner.subtitle,
+          buttonText: 'Khám phá ngay'
+      };
+      
+      // Update current banner to use AI generated one
+      setCurrentBanner(customBanner as any);
+      showNotification('Đã tạo banner AI thành công!');
+      setShowAIBannerPanel(false);
+  };
+
   const handleCreateStream = (streamData: Partial<LiveStream>) => {
     if (!user) return;
     const newStream = { ...streamData, hostName: user.fullName, hostAvatar: user.avatar } as LiveStream;
@@ -344,6 +432,7 @@ const InnerApp: React.FC = () => {
         onOpenRewards={() => setIsRewardsHubOpen(true)}
         onOpenVisualSearch={() => setIsVisualSearchOpen(true)}
         onOpenAgencyHub={() => user ? setIsAgencyHubOpen(true) : setIsAuthModalOpen(true)}
+        onOpenAIBannerPanel={() => setShowAIBannerPanel(true)}
         isDarkMode={isDarkMode}
         onToggleDarkMode={toggleDarkMode}
         currentView={currentView}
@@ -389,11 +478,38 @@ const InnerApp: React.FC = () => {
 
             {!showLiveList && !showWishlistOnly && (
                 <>
-                    <div className="relative h-[250px] md:h-[350px] mb-8 overflow-hidden rounded-xl shadow-lg group">
-                        <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&q=80&w=1500" alt="Banner" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
-                        <div className="absolute inset-0 bg-black/40 flex flex-col justify-center p-8 md:p-12 text-white">
-                            <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">MUA SẮM THÔNG MINH<br/>ĐẤU GIÁ ĐỈNH CAO</h1>
-                            <button onClick={() => user ? setIsSellModalOpen(true) : setIsAuthModalOpen(true)} className="bg-[#febd69] text-black font-bold px-6 py-3 rounded-lg hover:bg-[#f3a847] w-fit shadow-lg transition-transform hover:-translate-y-1">Đăng bán ngay</button>
+                    <div className="relative h-[300px] md:h-[400px] mb-8 overflow-hidden rounded-xl shadow-lg group">
+                        {/* Background Image */}
+                        <div 
+                            className="absolute inset-0 opacity-20"
+                            style={{
+                                backgroundImage: `url('https://i.ibb.co/QfC54z0/tet-banner-background.jpg')`,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'top',
+                                backgroundRepeat: 'no-repeat',
+                                backgroundBlendMode: 'multiply'
+                            }}
+                        />
+                        <img 
+                            src={currentBanner.imageUrl} 
+                            alt={`${currentBanner.name} Banner`} 
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            style={{
+                                objectFit: 'cover',
+                                objectPosition: 'center'
+                            }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-black/60 flex flex-col justify-center p-8 md:p-12 text-white">
+                            <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight text-center">
+                                <div>{currentBanner.title || 'MUA SẮM THÔNG MINH'}</div>
+                                <div className="mt-2">{currentBanner.subtitle || 'ĐẤU GIÁ ĐỊNH CAO'}</div>
+                            </h1>
+                            <button 
+                                onClick={() => user ? setIsSellModalOpen(true) : setIsAuthModalOpen(true)} 
+                                className="bg-[#febd69] text-black font-bold px-6 py-3 rounded-lg hover:bg-[#f3a847] w-fit shadow-lg transition-transform hover:-translate-y-1"
+                            >
+                                {currentBanner.buttonText || 'Đăng bán ngay'}
+                            </button>
                         </div>
                     </div>
 
@@ -567,6 +683,29 @@ const InnerApp: React.FC = () => {
       {/* Global Widgets */}
       <ChatWidget />
       <GeminiAssistant products={products} />
+      
+      {/* AI Banner Panel */}
+      {showAIBannerPanel && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-4xl max-h-[90vh] overflow-y-auto w-full">
+            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <Sparkles className="text-purple-600" size={24} />
+                AI Banner Generator
+              </h2>
+              <button
+                onClick={() => setShowAIBannerPanel(false)}
+                className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <AIBannerControlPanel onBannerGenerated={handleAIBannerGenerated} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
