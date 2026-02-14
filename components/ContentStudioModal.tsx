@@ -176,11 +176,11 @@ const ContentStudioModal: React.FC<ContentStudioModalProps> = ({ isOpen, onClose
                         value={productName}
                         onChange={e => setProductName(e.target.value)}
                         placeholder="VD: iPhone 15 Pro Max..."
-                        className="flex-1 p-3 border-2 border-gray-200 rounded-xl focus:border-[#febd69] outline-none font-medium"
+                        className="flex-1 p-3 border-2 border-gray-300 rounded-xl focus:border-[#febd69] focus:ring-2 focus:ring-[#febd69]/20 outline-none font-medium bg-white text-gray-900 placeholder-gray-500"
                     />
                     <button 
                         onClick={() => setIsProductListOpen(!isProductListOpen)}
-                        className="px-4 bg-gray-100 hover:bg-gray-200 rounded-xl font-bold text-sm text-gray-700 flex items-center gap-2 whitespace-nowrap"
+                        className="px-4 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold text-sm text-gray-800 flex items-center gap-2 whitespace-nowrap border border-gray-300 transition-all"
                     >
                         <ShoppingBag size={18}/> Chọn từ kho
                     </button>
@@ -226,7 +226,7 @@ const ContentStudioModal: React.FC<ContentStudioModalProps> = ({ isOpen, onClose
                     value={keywords}
                     onChange={e => setKeywords(e.target.value)}
                     placeholder="VD: giá rẻ, chính hãng, review chi tiết..."
-                    className="w-full p-3 border border-gray-200 rounded-xl focus:border-[#febd69] outline-none mb-3"
+                    className="w-full p-3 border-2 border-gray-300 rounded-xl focus:border-[#febd69] focus:ring-2 focus:ring-[#febd69]/20 outline-none mb-3 bg-white text-gray-900 placeholder-gray-500"
                 />
 
                 {/* Keyword Chips */}
@@ -240,8 +240,8 @@ const ContentStudioModal: React.FC<ContentStudioModalProps> = ({ isOpen, onClose
                                     onClick={() => toggleKeyword(kw)}
                                     className={`px-3 py-1 rounded-full text-xs font-bold transition-all border ${
                                         isSelected 
-                                        ? 'bg-blue-100 text-blue-700 border-blue-200' 
-                                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                                        ? 'bg-blue-600 text-white border-blue-700 shadow-md' 
+                                        : 'bg-white text-gray-700 border-gray-400 hover:border-gray-600 hover:bg-gray-50'
                                     }`}
                                 >
                                     {kw} {isSelected && <CheckCircle2 size={10} className="inline ml-1"/>}
@@ -257,7 +257,7 @@ const ContentStudioModal: React.FC<ContentStudioModalProps> = ({ isOpen, onClose
                 <select 
                     value={tone}
                     onChange={e => setTone(e.target.value)}
-                    className="w-full p-3 border border-gray-200 rounded-xl bg-white outline-none"
+                    className="w-full p-3 border-2 border-gray-300 rounded-xl bg-white outline-none focus:border-[#febd69] focus:ring-2 focus:ring-[#febd69]/20 text-gray-900 font-medium"
                 >
                     <option>Chuyên nghiệp & Tin cậy</option>
                     <option>Hài hước & Thân thiện</option>
@@ -270,7 +270,7 @@ const ContentStudioModal: React.FC<ContentStudioModalProps> = ({ isOpen, onClose
           <button 
             onClick={handleGenerateText}
             disabled={!productName || isLoading}
-            className="w-full bg-[#131921] text-white py-4 rounded-xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-auto"
+            className="w-full bg-[#1a1f2e] text-white py-4 rounded-xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 disabled:opacity-50 mt-auto border border-gray-700 shadow-lg"
           >
               {isLoading ? <Wand2 className="animate-spin"/> : <PenTool size={20}/>}
               {isLoading ? 'AI Đang Viết...' : 'Tạo Bài Viết Ngay'}
@@ -282,7 +282,7 @@ const ContentStudioModal: React.FC<ContentStudioModalProps> = ({ isOpen, onClose
       <div className="flex flex-col h-full animate-in slide-in-from-right">
           <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-lg">Nội dung SEO (Bản nháp)</h3>
-              <button onClick={() => setStep(3)} className="bg-[#febd69] px-4 py-2 rounded-lg font-bold text-sm">Tiếp theo: Hình ảnh</button>
+              <button onClick={() => setStep(3)} className="bg-[#febd69] text-black px-4 py-2 rounded-lg font-bold text-sm hover:bg-[#f3a847] transition-all shadow-md border border-yellow-600">Tiếp theo: Hình ảnh</button>
           </div>
           <textarea 
             value={generatedContent}
@@ -336,7 +336,7 @@ const ContentStudioModal: React.FC<ContentStudioModalProps> = ({ isOpen, onClose
                   <button 
                     onClick={handleGenerateImage}
                     disabled={isLoading}
-                    className="bg-blue-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-blue-700 disabled:opacity-50"
+                    className="bg-blue-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-blue-700 disabled:opacity-50 shadow-md border border-blue-700 transition-all"
                   >
                       {isLoading ? '...' : 'Tạo Ảnh'}
                   </button>
@@ -379,7 +379,7 @@ const ContentStudioModal: React.FC<ContentStudioModalProps> = ({ isOpen, onClose
                   <button 
                      onClick={handleGenerateVideo}
                      disabled={isLoading}
-                     className="bg-red-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-red-700 disabled:opacity-50"
+                     className="bg-red-600 text-white px-4 rounded-lg font-bold text-sm hover:bg-red-700 disabled:opacity-50 shadow-md border border-red-700 transition-all"
                   >
                       {isLoading ? 'Đang render...' : 'Tạo Video'}
                   </button>
@@ -398,7 +398,7 @@ const ContentStudioModal: React.FC<ContentStudioModalProps> = ({ isOpen, onClose
           </div>
 
           <div className="pt-4 flex justify-end">
-              <button onClick={() => setStep(4)} className="bg-[#131921] text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2">
+              <button onClick={() => setStep(4)} className="bg-[#1a1f2e] text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-black shadow-lg border border-gray-700 transition-all">
                   Xem bản hoàn chỉnh <ChevronRight size={18}/>
               </button>
           </div>
@@ -490,7 +490,7 @@ const ContentStudioModal: React.FC<ContentStudioModalProps> = ({ isOpen, onClose
       <div className="relative bg-white w-full max-w-6xl h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row animate-in zoom-in-95">
         
         {/* Sidebar Nav */}
-        <div className="w-full md:w-64 bg-[#131921] text-white p-6 flex flex-col shrink-0">
+        <div className="w-full md:w-64 bg-[#1a1f2e] text-white p-6 flex flex-col shrink-0 border-r border-gray-700">
             <h2 className="text-2xl font-bold italic mb-8 flex items-center gap-2">
                 <Wand2 className="text-[#febd69]"/> Content<span className="text-[#febd69]">Studio</span>
             </h2>
@@ -513,9 +513,17 @@ const ContentStudioModal: React.FC<ContentStudioModalProps> = ({ isOpen, onClose
                 ].map((s, idx) => (
                     <div 
                         key={s.id}
-                        className={`flex items-center gap-3 p-3 rounded-lg transition-all ${step === s.id ? 'bg-white/10 text-white font-bold' : 'text-gray-400'}`}
+                        className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
+                            step === s.id 
+                                ? 'bg-white/20 text-white font-bold border border-white/30' 
+                                : 'text-gray-300 hover:text-white hover:bg-white/10'
+                        }`}
                     >
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs border ${step === s.id ? 'border-white' : 'border-gray-500'}`}>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs border-2 ${
+                            step === s.id 
+                                ? 'border-white bg-white text-[#1a1f2e]' 
+                                : 'border-gray-500 text-gray-400'
+                        }`}>
                             {step > s.id ? <CheckCircle2 size={14}/> : s.id}
                         </div>
                         <span className="text-sm">{s.label}</span>
@@ -523,8 +531,8 @@ const ContentStudioModal: React.FC<ContentStudioModalProps> = ({ isOpen, onClose
                 ))}
             </div>
 
-            <div className="mt-auto bg-gray-800 p-4 rounded-xl text-xs text-gray-400">
-                <p className="font-bold text-white mb-1">AI Power</p>
+            <div className="mt-auto bg-gray-900/50 p-4 rounded-xl text-xs text-gray-300 border border-gray-700">
+                <p className="font-bold text-white mb-2">AI Power</p>
                 <div className="flex flex-col gap-1">
                     <span className="flex items-center gap-1"><CheckCircle2 size={10} className="text-green-500"/> Gemini 3 Pro (Text)</span>
                     <span className="flex items-center gap-1"><CheckCircle2 size={10} className="text-green-500"/> Imagen 3 (Image)</span>
