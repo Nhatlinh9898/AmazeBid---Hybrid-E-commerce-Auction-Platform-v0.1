@@ -592,16 +592,20 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                                 <p className="font-bold">Đổi mật khẩu</p>
                                 <p className="text-xs text-gray-500">Lần cuối thay đổi: 3 tháng trước</p>
                             </div>
-                            <button className="text-blue-600 font-bold text-sm hover:underline">Cập nhật</button>
+                            <button className="bg-blue-600 text-white font-bold px-4 py-2 rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500/50 transition-all text-sm shadow-sm">
+                                Cập nhật
+                            </button>
                         </div>
                         <div className="flex justify-between items-center p-4 border rounded-xl">
                             <div>
                                 <p className="font-bold">Xác thực 2 bước (2FA)</p>
                                 <p className="text-xs text-gray-500">Bảo vệ tài khoản bằng mã OTP</p>
                             </div>
-                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                                <input type="checkbox" name="toggle" id="toggle" className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300"/>
-                                <label htmlFor="toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                            <div className="relative inline-block w-12 mr-2 align-middle">
+                                <input type="checkbox" name="toggle" id="toggle" className="sr-only" />
+                                <label htmlFor="toggle" className="relative block w-12 h-6 bg-gray-300 rounded-full cursor-pointer transition-colors duration-200 ease-in-out hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                                    <span className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform duration-200 ease-in-out transform translate-x-0 group-hover:translate-x-6"></span>
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -617,8 +621,9 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                             </p>
                             <button 
                                 onClick={handleDeleteAccount}
-                                className="bg-white border border-red-200 text-red-600 font-bold px-4 py-2 rounded-lg hover:bg-red-600 hover:text-white transition-colors text-sm"
+                                className="bg-red-600 text-white font-bold px-6 py-3 rounded-lg hover:bg-red-700 focus:ring-2 focus:ring-red-500/50 transition-all text-sm shadow-md"
                             >
+                                <AlertTriangle className="inline-block mr-2" size={16} />
                                 Xóa tài khoản này
                             </button>
                         </div>

@@ -1,0 +1,24 @@
+/* Toggle Switch Styles */
+.toggle-checkbox:checked + .toggle-label {
+  background-color: #3b82f6;
+}
+
+.toggle-checkbox:checked + .toggle-label span {
+  transform: translateX(24px);
+  background-color: #3b82f6;
+}
+
+.toggle-label:hover {
+  background-color: #d1d5db;
+}
+
+.toggle-checkbox:focus + .toggle-label {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+/* Accessibility */
+.toggle-checkbox:focus-visible + .toggle-label {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
