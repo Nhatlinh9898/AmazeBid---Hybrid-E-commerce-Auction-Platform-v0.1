@@ -318,6 +318,18 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                              )}
                         </div>
                     </div>
+                    
+                    {/* Edit Button - At end of form section */}
+                    {!isEditingProfile && (
+                        <div className="flex justify-end mt-6 mb-4">
+                            <button 
+                                onClick={() => setIsEditingProfile(true)}
+                                className="text-sm font-bold text-white bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-800 focus:ring-2 focus:ring-blue-500/50 flex items-center gap-2 shadow-md transition-all relative z-20"
+                             >
+                                <Edit2 size={16} /> Chỉnh sửa
+                             </button>
+                        </div>
+                    )}
                 </div>
             )}
 
