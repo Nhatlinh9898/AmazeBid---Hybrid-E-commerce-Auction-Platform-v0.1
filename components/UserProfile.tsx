@@ -230,28 +230,13 @@ const UserProfile: React.FC<UserProfileProps> = ({ isOpen, onClose, myProducts =
                 <div className="space-y-6 animate-in slide-in-from-right-4">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-2xl font-bold">Thông tin cá nhân</h2>
-                        {!isEditingProfile ? (
-                             <button 
+                        {!isEditingProfile && (
+                            <button 
                                 onClick={() => setIsEditingProfile(true)}
-                                className="text-sm font-bold text-white bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-800 focus:ring-2 focus:ring-blue-500/50 flex items-center gap-2 shadow-md transition-all relative z-20 mr-14"
+                                className="text-sm font-bold text-white bg-blue-700 px-4 py-2 rounded-lg hover:bg-blue-800 focus:ring-2 focus:ring-blue-500/50 flex items-center gap-2 shadow-md transition-all relative z-20"
                              >
                                 <Edit2 size={16} /> Chỉnh sửa
                              </button>
-                        ) : (
-                            <div className="flex gap-2">
-                                <button 
-                                    onClick={handleCancelEdit}
-                                    className="text-sm font-bold text-gray-700 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-100 focus:ring-2 focus:ring-gray-500/50 transition-all"
-                                >
-                                    Hủy
-                                </button>
-                                <button 
-                                    onClick={handleSaveProfile}
-                                    className="text-sm font-bold text-white bg-green-700 px-4 py-2 rounded-lg hover:bg-green-800 focus:ring-2 focus:ring-green-500/50 flex items-center gap-2 shadow-md transition-all"
-                                >
-                                    <Save size={16} /> Lưu lại
-                                </button>
-                            </div>
                         )}
                     </div>
                     
