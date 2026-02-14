@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { X, Briefcase, Search, Download, TrendingUp, Users, Package, DollarSign, ArrowRight, Filter, ShoppingBag } from 'lucide-react';
 import { Product, ItemType, OrderStatus } from '../types';
+import AgencyReportModal from './AgencyReportModal';
 
 interface AgencyHubProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ interface AgencyHubProps {
 const AgencyHub: React.FC<AgencyHubProps> = ({ isOpen, onClose, products, onImportProduct, currentUserId }) => {
   const [activeTab, setActiveTab] = useState<'MARKETPLACE' | 'MY_AGENCY'>('MARKETPLACE');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   // Lọc các sản phẩm cho phép bán lại và không phải của chính mình
   const wholesaleProducts = products.filter(p => 
@@ -193,7 +195,7 @@ const AgencyHub: React.FC<AgencyHubProps> = ({ isOpen, onClose, products, onImpo
                             ))}
                         </div>
                         <button 
-                            onClick={() => alert('Chức năng báo cáo chi tiết đang được phát triển...')}
+                            onClick={() => setIsReportModalOpen(true)}
                             className="w-full mt-4 py-3 text-sm font-bold text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-xl transition-all duration-200 flex items-center justify-center gap-1 border-2 border-gray-300 hover:border-gray-400 hover:shadow-md transform hover:scale-[1.02]"
                         >
                             Xem tất cả báo cáo <ArrowRight size={14} className="transition-transform group-hover:translate-x-1"/>
@@ -204,6 +206,12 @@ const AgencyHub: React.FC<AgencyHubProps> = ({ isOpen, onClose, products, onImpo
 
         </div>
       </div>
+      
+      {/* Agency Report Modal */}
+      <AgencyReportModal 
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+      />
     </div>
   );
 };
